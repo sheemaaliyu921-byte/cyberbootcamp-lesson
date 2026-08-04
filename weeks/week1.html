@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cybersecurity Bootcamp — Phase 1, Week 1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@700;900&display=swap');
+
+  :root {
+    --bg:        #090d13;
+    --surface:   #0f1923;
+    --card:      #131e2b;
+    --border:    #1e3048;
+    --accent:    #00ffe7;
+    --accent2:   #ff4c6e;
+    --accent3:   #f5a623;
+    --text:      #c8d8e8;
+    --muted:     #5a7a94;
+    --green:     #39ff8f;
+    --purple:    #9d6fff;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Inter', sans-serif;
+    --display:   'Orbitron', sans-serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── SCANLINE OVERLAY ── */
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,231,0.015) 2px, rgba(0,255,231,0.015) 4px);
+    pointer-events:none; z-index:9999;
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    background: linear-gradient(180deg, #0a1520 0%, var(--bg) 100%);
+    position: sticky; top:0; z-index:100;
+  }
+  .header-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    font-family: var(--display);
+    font-size: 0.85rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-shadow: 0 0 12px rgba(0,255,231,0.5);
+  }
+  .phase-badge {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent3);
+    border: 1px solid var(--accent3);
+    padding: 4px 12px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    max-width: 1100px; margin: 0 auto;
+    padding: 4rem 2rem 3rem;
+    position: relative;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+  }
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 1.2rem;
+  }
+  .hero h1 span { color: var(--accent); text-shadow: 0 0 20px rgba(0,255,231,0.4); }
+  .hero-desc {
+    max-width: 620px;
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+  .hero-stats {
+    display: flex; gap: 2rem; flex-wrap: wrap;
+  }
+  .stat {
+    display: flex; flex-direction: column;
+  }
+  .stat-num {
+    font-family: var(--display);
+    font-size: 1.5rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .stat-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── NAV TABS ── */
+  .day-nav {
+    max-width: 1100px; margin: 0 auto;
+    padding: 0 2rem;
+    display: flex; gap: 0.4rem; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+  }
+  .day-tab {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    padding: 10px 18px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .day-tab:hover { color: var(--text); }
+  .day-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    text-shadow: 0 0 8px rgba(0,255,231,0.4);
+  }
+
+  /* ── MAIN CONTENT ── */
+  .content-wrap {
+    max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem;
+  }
+
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  /* ── SECTION HEADING ── */
+  .day-header {
+    display: flex; align-items: flex-start; gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .day-number {
+    font-family: var(--display);
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--border);
+    line-height: 1;
+    min-width: 80px;
+  }
+  .day-title-block h2 {
+    font-family: var(--display);
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 0.4rem;
+  }
+  .day-title-block p {
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+  .day-tag {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-right: 6px;
+    letter-spacing: 0.08em;
+  }
+  .tag-theory { background: rgba(157,111,255,0.15); color: var(--purple); border: 1px solid rgba(157,111,255,0.3); }
+  .tag-lab    { background: rgba(57,255,143,0.12); color: var(--green); border: 1px solid rgba(57,255,143,0.3); }
+  .tag-tool   { background: rgba(0,255,231,0.1); color: var(--accent); border: 1px solid rgba(0,255,231,0.25); }
+
+  /* ── CONTENT CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.6rem;
+    margin-bottom: 1.4rem;
+  }
+  .card-title {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .card-title::before {
+    content:'';
+    display:inline-block; width:6px; height:6px;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+  }
+  .card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e0eaf5;
+    margin-bottom: 0.6rem;
+  }
+  .card p { color: var(--text); font-size: 0.9rem; margin-bottom: 0.6rem; }
+  .card p:last-child { margin-bottom: 0; }
+
+  /* ── CONCEPT GRID ── */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+  }
+  .concept-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 1.2rem 1.4rem;
+    transition: border-color 0.2s;
+  }
+  .concept-card.red   { border-left-color: var(--accent2); }
+  .concept-card.amber { border-left-color: var(--accent3); }
+  .concept-card.green { border-left-color: var(--green); }
+  .concept-card.purple{ border-left-color: var(--purple); }
+  .concept-card h4 {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+  .concept-card p {
+    font-size: 0.83rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #06101a;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 1.2rem 1.4rem;
+    margin: 1rem 0;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--accent);
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.8;
+  }
+  .code-block .comment { color: var(--muted); }
+  .code-block .cmd     { color: var(--green); }
+  .code-block .flag    { color: var(--accent3); }
+  .code-block .output  { color: #7dd3fc; }
+
+  /* ── TABLE ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 1rem 0;
+  }
+  .data-table th {
+    background: var(--surface);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .data-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  .data-table tr:hover td { background: rgba(0,255,231,0.03); }
+
+  /* ── CALLOUT ── */
+  .callout {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding: 1rem 1.2rem;
+    border-radius: 3px;
+    margin: 1rem 0;
+    font-size: 0.87rem;
+  }
+  .callout-info  { background: rgba(0,255,231,0.06); border: 1px solid rgba(0,255,231,0.2); }
+  .callout-warn  { background: rgba(245,166,35,0.07); border: 1px solid rgba(245,166,35,0.25); }
+  .callout-danger{ background: rgba(255,76,110,0.07); border: 1px solid rgba(255,76,110,0.25); }
+  .callout-icon  { font-size: 1.1rem; line-height: 1.5; flex-shrink: 0; }
+  .callout p     { color: var(--text); margin:0; }
+  .callout strong{ color: #fff; }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; margin: 0.8rem 0; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 0.7rem;
+    padding: 0.4rem 0;
+    font-size: 0.88rem;
+    color: var(--text);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: '▸';
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── QUIZ ── */
+  .quiz-question {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.4rem;
+    margin-bottom: 1rem;
+  }
+  .quiz-q {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #e0eaf5;
+    margin-bottom: 1rem;
+  }
+  .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .quiz-opt {
+    display: flex; align-items: center; gap: 0.7rem;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .quiz-opt:hover { border-color: var(--accent); color: #fff; background: rgba(0,255,231,0.04); }
+  .quiz-opt.correct { border-color: var(--green); background: rgba(57,255,143,0.08); color: var(--green); }
+  .quiz-opt.wrong   { border-color: var(--accent2); background: rgba(255,76,110,0.08); color: var(--accent2); }
+  .quiz-opt .opt-key {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    min-width: 20px;
+  }
+  .quiz-feedback {
+    margin-top: 0.8rem;
+    font-size: 0.82rem;
+    padding: 0.6rem 1rem;
+    border-radius: 3px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: rgba(57,255,143,0.1); color: var(--green); border: 1px solid rgba(57,255,143,0.3); }
+  .quiz-feedback.wrong   { background: rgba(255,76,110,0.1); color: var(--accent2); border: 1px solid rgba(255,76,110,0.3); }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap { margin-bottom: 1.5rem; }
+  .progress-label { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+  .progress-track { height: 3px; background: var(--border); border-radius: 2px; }
+  .progress-fill  { height: 100%; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: 2px; transition: width 0.5s ease; }
+
+  /* ── TERMINAL DEMO ── */
+  .terminal {
+    background: #04090f;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+  .terminal-bar {
+    background: #0a1520;
+    padding: 8px 14px;
+    display: flex; align-items: center; gap: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .t-dot { width:10px; height:10px; border-radius:50%; }
+  .t-red    { background: #ff5f56; }
+  .t-yellow { background: #ffbd2e; }
+  .t-green  { background: #27c93f; }
+  .terminal-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-left: 0.5rem;
+    letter-spacing: 0.1em;
+  }
+  .terminal-body {
+    padding: 1.2rem 1.4rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 2;
+    color: #7dd3fc;
+  }
+  .t-prompt { color: var(--green); }
+  .t-cmd    { color: #e0eaf5; }
+  .t-out    { color: var(--muted); }
+  .t-accent { color: var(--accent); }
+  .t-warn   { color: var(--accent3); }
+
+  /* ── MISC ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width:680px){ .two-col { grid-template-columns: 1fr; } }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin: 2rem 0 0.8rem;
+  }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  .highlight { color: var(--accent); font-weight: 600; }
+  .highlight-red { color: var(--accent2); font-weight: 600; }
+  .highlight-amber { color: var(--accent3); font-weight: 600; }
+  .highlight-green { color: var(--green); font-weight: 600; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    max-width: 1100px;
+    margin: 2rem auto 0;
+  }
+</style>
+<link rel="stylesheet" href="../css/shared.css"/>
+</head>
+<body>
+<nav class="breadcrumb" style="background:var(--surface,#090c12);border-bottom-color:var(--border,#141b26);color:var(--muted,#253040);">
+  <a href="../index.html" style="color:var(--accent,#3b82f6);">LESSON HUB</a>
+  <span>/</span>
+  <span style="color:var(--text,#b0c0d8);">Phase 1</span>
+  <span>/</span>
+  <span style="color:#fff;">Week 1</span>
+</nav>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">CYBERBOOTCAMP</div>
+    <div class="phase-badge">PHASE 1 · WEEK 1 · FOUNDATIONS</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">// BEGINNER → PRO ROADMAP</div>
+  <h1>Phase 1, Week 1 —<br><span>Core Concepts & Environment</span></h1>
+  <p class="hero-desc">Seven focused days covering the cybersecurity landscape, Linux mastery, Windows fundamentals, virtualization, Python scripting, and your first CTF challenges.</p>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-num">7</span><span class="stat-label">Days</span></div>
+    <div class="stat"><span class="stat-num">35+</span><span class="stat-label">Concepts</span></div>
+    <div class="stat"><span class="stat-num">12+</span><span class="stat-label">Lab Exercises</span></div>
+    <div class="stat"><span class="stat-num">1</span><span class="stat-label">CTF Challenge</span></div>
+  </div>
+</div>
+
+<!-- DAY TABS -->
+<div class="day-nav">
+  <button class="day-tab active" onclick="showDay(0)">Day 1</button>
+  <button class="day-tab" onclick="showDay(1)">Day 2</button>
+  <button class="day-tab" onclick="showDay(2)">Day 3</button>
+  <button class="day-tab" onclick="showDay(3)">Day 4</button>
+  <button class="day-tab" onclick="showDay(4)">Day 5</button>
+  <button class="day-tab" onclick="showDay(5)">Day 6</button>
+  <button class="day-tab" onclick="showDay(6)">Day 7</button>
+</div>
+
+<div class="content-wrap">
+
+<!-- ═══════════════════════════════════ DAY 1 ═══════════════════════════════════ -->
+<div class="day-panel active" id="day-0">
+
+  <div class="day-header">
+    <div class="day-number">01</div>
+    <div class="day-title-block">
+      <h2>The Cybersecurity Landscape</h2>
+      <p>
+        <span class="day-tag tag-theory">THEORY</span>
+        CIA Triad · Threat Actors · Attack Surfaces · CVE/CWE
+      </p>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">WEEK PROGRESS — DAY 1 OF 7</div>
+    <div class="progress-track"><div class="progress-fill" style="width:14%"></div></div>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">🎯</div>
+    <p><strong>Goal:</strong> Understand the full mental model of cybersecurity — what you are protecting, from whom, and how attackers think. This is the foundation every single technique you learn later will build upon.</p>
+  </div>
+
+  <div class="section-label">// 1.1 — THE CIA TRIAD</div>
+  <div class="card">
+    <div class="card-title">What is the CIA Triad?</div>
+    <p>Every security decision in existence maps back to three principles. These aren't guidelines — they are the <span class="highlight">atomic definition of security</span>. If you can't explain an attack in terms of CIA, you don't yet understand it.</p>
+  </div>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <h4>🔒 Confidentiality</h4>
+      <p>Only authorized entities can access data. Violations: data breaches, credential theft, eavesdropping, insecure storage. Example attack: a hacker intercepts unencrypted login credentials on public Wi-Fi (Man-in-the-Middle).</p>
+    </div>
+    <div class="concept-card red">
+      <h4>✅ Integrity</h4>
+      <p>Data is only modified by authorized entities in authorized ways. Violations: SQL injection altering a database, malware corrupting files, DNS poisoning. Example: an attacker changes a bank transfer amount mid-transit.</p>
+    </div>
+    <div class="concept-card amber">
+      <h4>⚡ Availability</h4>
+      <p>Systems are accessible to authorized users when needed. Violations: DDoS attacks, ransomware, hardware failure, misconfigured firewalls. Example: a DDoS flood takes down an e-commerce site during Black Friday.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-icon">💡</div>
+    <p><strong>Mental model:</strong> Ask of any attack — <em>"What did it break?"</em> Ransomware breaks Availability AND Confidentiality. A misconfigured S3 bucket breaks Confidentiality only. This maps directly to how you report and prioritize vulnerabilities later.</p>
+  </div>
+
+  <div class="section-label">// 1.2 — THREAT ACTORS</div>
+  <div class="card">
+    <div class="card-title">Who are the adversaries?</div>
+    <p>Understanding <span class="highlight">who attacks</span> tells you <span class="highlight">how they attack</span>. Motivation drives technique. A script kiddie uses existing tools blindly; a nation-state APT builds custom malware and operates for months undetected.</p>
+  </div>
+
+  <table class="data-table">
+    <tr>
+      <th>ACTOR TYPE</th><th>MOTIVATION</th><th>SKILL LEVEL</th><th>TYPICAL ATTACK</th>
+    </tr>
+    <tr><td>Script Kiddie</td><td>Fun, ego, disruption</td><td>Low</td><td>Off-the-shelf exploit tools, DDoS stresser</td></tr>
+    <tr><td>Hacktivist</td><td>Political/ideological</td><td>Medium</td><td>Website defacement, data leaks, DDoS</td></tr>
+    <tr><td>Cybercriminal</td><td>Financial gain</td><td>Medium–High</td><td>Ransomware, phishing, fraud, credential theft</td></tr>
+    <tr><td>Insider Threat</td><td>Revenge, money, accident</td><td>Varies</td><td>Data exfiltration, sabotage, accidental exposure</td></tr>
+    <tr><td>Nation-State APT</td><td>Espionage, warfare</td><td>Elite</td><td>Zero-days, supply chain attacks, long-term persistence</td></tr>
+    <tr><td>Pen Tester (YOU)</td><td>Defense by offense</td><td>High</td><td>Authorized simulation of all above</td></tr>
+  </table>
+
+  <div class="section-label">// 1.3 — ATTACK SURFACES</div>
+  <div class="card">
+    <div class="card-title">What can be attacked?</div>
+    <p>The <span class="highlight">attack surface</span> is every point of entry that an attacker could exploit. Reducing attack surface is the most fundamental defensive strategy. You cannot protect what you don't know exists.</p>
+  </div>
+
+  <div class="concept-grid">
+    <div class="concept-card green">
+      <h4>🌐 Network Surface</h4>
+      <p>Open ports, exposed services, unencrypted protocols, firewall gaps. Every listening service is a potential door. Run <code>nmap</code> — you may find 50 open ports on a server that should have 3.</p>
+    </div>
+    <div class="concept-card purple">
+      <h4>💻 Software Surface</h4>
+      <p>Web apps, APIs, desktop applications, OS services. Every line of code is a potential vulnerability. Buffer overflows live here. SQL injection lives here.</p>
+    </div>
+    <div class="concept-card amber">
+      <h4>👤 Human Surface</h4>
+      <p>The most reliably exploitable surface. Social engineering, phishing, vishing, tailgating. "The human is the weakest link" isn't a cliché — it's statistically proven. 85%+ of breaches involve a human element.</p>
+    </div>
+    <div class="concept-card red">
+      <h4>🏢 Physical Surface</h4>
+      <p>Unlocked server rooms, USB drops, dumpster diving, shoulder surfing. Air gaps are broken by physical access. Never underestimate this.</p>
+    </div>
+  </div>
+
+  <div class="section-label">// 1.4 — CVE, CWE & THE VULNERABILITY ECOSYSTEM</div>
+  <div class="card">
+    <div class="card-title">The Language of Vulnerabilities</div>
+    <p>You need to speak the industry's language. These identifiers are how the entire security industry communicates about flaws.</p>
+  </div>
+
+  <table class="data-table">
+    <tr><th>TERM</th><th>WHAT IT IS</th><th>EXAMPLE</th></tr>
+    <tr>
+      <td><span class="highlight">CVE</span></td>
+      <td>Common Vulnerabilities and Exposures — a unique ID for a specific, publicly known vulnerability in specific software</td>
+      <td>CVE-2021-44228 = Log4Shell (critical RCE in Apache Log4j)</td>
+    </tr>
+    <tr>
+      <td><span class="highlight">CWE</span></td>
+      <td>Common Weakness Enumeration — a category of flaw types in code or design, not a specific bug</td>
+      <td>CWE-79 = Cross-Site Scripting (XSS) as a class of flaw</td>
+    </tr>
+    <tr>
+      <td><span class="highlight">CVSS</span></td>
+      <td>Common Vulnerability Scoring System — a 0–10 score rating vulnerability severity</td>
+      <td>CVSS 9.8 = Critical. CVSS 3.1 = Low.</td>
+    </tr>
+    <tr>
+      <td><span class="highlight">Zero-Day</span></td>
+      <td>A vulnerability unknown to the vendor — no patch exists. Extremely valuable; sold for millions.</td>
+      <td>Stuxnet used 4 zero-days simultaneously (unprecedented)</td>
+    </tr>
+    <tr>
+      <td><span class="highlight">Exploit</span></td>
+      <td>Code or technique that takes advantage of a vulnerability</td>
+      <td>A Python script that triggers a buffer overflow to get shell access</td>
+    </tr>
+    <tr>
+      <td><span class="highlight">PoC</span></td>
+      <td>Proof of Concept — a demonstration that a vulnerability is real and exploitable</td>
+      <td>A PoC for Log4Shell was released within 24 hours of disclosure</td>
+    </tr>
+  </table>
+
+  <div class="section-label">// 1.5 — HACKER ETHICS & LEGAL FRAMEWORK</div>
+  <div class="callout callout-danger">
+    <div class="callout-icon">⚠️</div>
+    <p><strong>Critical:</strong> Unauthorized access to any system — even to "test" it — is illegal in virtually every jurisdiction. In the US: Computer Fraud and Abuse Act (CFAA). In UK: Computer Misuse Act. Always have <strong>written authorization</strong> before testing any system. "I was just testing" is not a legal defense. Ever.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Hacker Spectrum</div>
+    <div class="two-col">
+      <div>
+        <p><span class="highlight-green">White Hat</span> — Ethical hackers. Work with authorization. Report findings responsibly. Build defenses. This is where you're headed.</p>
+        <p style="margin-top:0.8rem"><span class="highlight-amber">Grey Hat</span> — Find vulnerabilities without authorization but don't exploit maliciously. Still illegal despite good intent.</p>
+      </div>
+      <div>
+        <p><span class="highlight-red">Black Hat</span> — Malicious actors. Exploit for personal gain, damage, or espionage. Criminal prosecution follows.</p>
+        <p style="margin-top:0.8rem"><span class="highlight">Bug Bounty</span> — Authorized programs where companies pay you to find their vulnerabilities. Legal white-hat hacking for money.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">// DAY 1 — KNOWLEDGE CHECK</div>
+  <div class="quiz-question">
+    <div class="quiz-q">1. A hospital's ransomware attack encrypts all patient records, making them inaccessible. Which CIA properties are violated?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answer(this,'wrong','Confidentiality only means others can READ the data. Ransomware locks you out — that\'s Availability. The encrypted data also loses Integrity in terms of usability.')"><span class="opt-key">A</span> Confidentiality only</div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','Integrity alone is incorrect. The data is also unavailable — that\'s the primary impact of ransomware.')"><span class="opt-key">B</span> Integrity only</div>
+      <div class="quiz-opt" onclick="answer(this,'correct','Correct! Availability (can\'t access records) and Integrity (encrypted = unusable/tampered) are both violated. Confidentiality may also be violated if data is exfiltrated first — common in modern double-extortion ransomware.')"><span class="opt-key">C</span> Availability and Integrity</div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','All three being violated simultaneously is possible but the primary violation here is Availability. The question specifies encryption that makes data inaccessible.')"><span class="opt-key">D</span> All three equally</div>
+    </div>
+    <div class="quiz-feedback" id="qf-0-0"></div>
+  </div>
+
+  <div class="quiz-question">
+    <div class="quiz-q">2. You discover a critical vulnerability in a popular banking app. The right ethical action is:</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answer(this,'wrong','Posting publicly without notifying the vendor (zero-day disclosure) gives attackers a head start before a patch exists. This is considered irresponsible disclosure.')"><span class="opt-key">A</span> Post it publicly on Twitter immediately to warn users</div>
+      <div class="quiz-opt" onclick="answer(this,'correct','Correct! This is Responsible Disclosure (also called Coordinated Disclosure). Notify the vendor privately, give them reasonable time (typically 90 days) to patch, then disclose publicly. Many companies have bug bounty programs for exactly this.')"><span class="opt-key">B</span> Notify the bank privately and give them time to patch before any public disclosure</div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','Exploiting it — even once to "prove" it — is illegal without written authorization and could result in prosecution regardless of intent.')"><span class="opt-key">C</span> Exploit it once to prove it\'s real, then report it</div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','Ignoring it leaves users at risk. If you find it, a malicious actor can find it too. Responsible disclosure is the ethical path.')"><span class="opt-key">D</span> Ignore it since you didn\'t cause it</div>
+    </div>
+    <div class="quiz-feedback" id="qf-0-1"></div>
+  </div>
+
+  <div class="section-label">// DAY 1 — LAB EXERCISE</div>
+  <div class="card">
+    <div class="card-title">Practical Task</div>
+    <h3>Research 3 Real-World Breaches</h3>
+    <p>For each breach, identify: <span class="highlight">which CIA properties were violated</span>, what threat actor type was responsible, what the attack vector was, and what the financial/reputational impact was.</p>
+    <ul class="checklist">
+      <li>Research the 2017 Equifax breach (147M records exposed)</li>
+      <li>Research the 2021 Colonial Pipeline ransomware attack</li>
+      <li>Research the 2020 SolarWinds supply chain attack</li>
+      <li>For each: write 3–5 sentences mapping to CIA Triad + threat actor type</li>
+      <li>Bookmark: <strong>nvd.nist.gov</strong> (National Vulnerability Database) — your home for CVE research</li>
+    </ul>
+  </div>
+
+</div><!-- end day-0 -->
+
+
+<!-- ═══════════════════════════════════ DAY 2 ═══════════════════════════════════ -->
+<div class="day-panel" id="day-1">
+
+  <div class="day-header">
+    <div class="day-number">02</div>
+    <div class="day-title-block">
+      <h2>Linux Fundamentals</h2>
+      <p>
+        <span class="day-tag tag-theory">THEORY</span>
+        <span class="day-tag tag-lab">LAB</span>
+        Filesystem · Permissions · Processes · SSH · Users
+      </p>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">WEEK PROGRESS — DAY 2 OF 7</div>
+    <div class="progress-track"><div class="progress-fill" style="width:28%"></div></div>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">🐧</div>
+    <p><strong>Why Linux matters in cybersecurity:</strong> Kali Linux, Parrot OS, servers you'll attack, and most tools you'll use all run on Linux. You must be fluent — not just functional — in the command line. 90% of offensive security work happens in a terminal.</p>
+  </div>
+
+  <div class="section-label">// 2.1 — THE FILESYSTEM</div>
+  <div class="card">
+    <div class="card-title">Linux Directory Structure</div>
+    <p>Linux has a single hierarchical tree rooted at <span class="highlight">/</span>. No drive letters (C:, D:). Everything — files, devices, network sockets — is a file in this tree.</p>
+  </div>
+
+  <table class="data-table">
+    <tr><th>DIRECTORY</th><th>WHAT LIVES HERE</th><th>SECURITY RELEVANCE</th></tr>
+    <tr><td><span class="highlight">/etc</span></td><td>System configuration files</td><td>passwd, shadow (password hashes), SSH config, cron jobs — goldmine for attackers</td></tr>
+    <tr><td><span class="highlight">/home</span></td><td>User home directories</td><td>SSH keys, bash history, browser data, personal files</td></tr>
+    <tr><td><span class="highlight">/root</span></td><td>Root user's home</td><td>Target for privilege escalation — getting here = full system compromise</td></tr>
+    <tr><td><span class="highlight">/var/log</span></td><td>System and application logs</td><td>Evidence of attacks; blue teamers live here; attackers try to clear it</td></tr>
+    <tr><td><span class="highlight">/tmp</span></td><td>Temporary files, world-writable</td><td>Common place to drop exploit scripts; persists across logins unless cleared</td></tr>
+    <tr><td><span class="highlight">/bin, /sbin</span></td><td>Essential binaries</td><td>SUID binaries here are a privesc target (explained Week 5)</td></tr>
+    <tr><td><span class="highlight">/proc</span></td><td>Virtual FS for running processes</td><td>Real-time process info, memory maps, used in forensics</td></tr>
+  </table>
+
+  <div class="section-label">// 2.2 — FILE PERMISSIONS (CRITICAL)</div>
+  <div class="card">
+    <div class="card-title">Understanding rwx Permissions</div>
+    <p>Misconfigured permissions are one of the top causes of privilege escalation. You must read permission strings instantly.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div><div class="t-dot t-yellow"></div><div class="t-dot t-green"></div>
+      <div class="terminal-label">kali@machine:~$</div>
+    </div>
+    <div class="terminal-body"><span class="t-prompt">$</span> <span class="t-cmd">ls -la /etc/passwd</span>
+<span class="t-out">-rw-r--r-- 1 root root 2847 Jan 15 09:22 /etc/passwd</span>
+
+<span class="t-accent">Breaking down: -rw-r--r--</span>
+<span class="t-out">
+ -        rw-      r--      r--
+ │         │        │        │
+ │         │        │        └── Others:  read only
+ │         │        └────────── Group:   read only
+ │         └─────────────────── Owner:   read + write
+ └───────────────────────────── Type: - = file, d = dir, l = symlink
+</span>
+
+<span class="t-prompt">$</span> <span class="t-cmd">ls -la /etc/shadow</span>
+<span class="t-out">-rw-r----- 1 root shadow 1547 Jan 15 09:22 /etc/shadow</span>
+<span class="t-warn"># shadow = password hashes. Only root + shadow group can read. This is why you need privesc to crack passwords.</span>
+
+<span class="t-prompt">$</span> <span class="t-cmd">chmod 755 script.sh</span>   <span class="t-out"># 7=rwx(owner) 5=r-x(group) 5=r-x(others)</span>
+<span class="t-prompt">$</span> <span class="t-cmd">chmod +x script.sh</span>    <span class="t-out"># adds execute for all</span>
+<span class="t-prompt">$</span> <span class="t-cmd">chown root:root file</span>  <span class="t-out"># change owner to root</span></div>
+  </div>
+
+  <div class="section-label">// 2.3 — ESSENTIAL COMMANDS</div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div><div class="t-dot t-yellow"></div><div class="t-dot t-green"></div>
+      <div class="terminal-label">FILE NAVIGATION & MANIPULATION</div>
+    </div>
+    <div class="terminal-body"><span class="t-prompt">$</span> <span class="t-cmd">pwd</span>                           <span class="t-out"># Print Working Directory</span>
+<span class="t-prompt">$</span> <span class="t-cmd">ls -la</span>                        <span class="t-out"># List all files with permissions + hidden files</span>
+<span class="t-prompt">$</span> <span class="t-cmd">cd /etc</span>                       <span class="t-out"># Change directory</span>
+<span class="t-prompt">$</span> <span class="t-cmd">cat /etc/passwd</span>               <span class="t-out"># Display file contents</span>
+<span class="t-prompt">$</span> <span class="t-cmd">less /var/log/auth.log</span>        <span class="t-out"># Paginate through large files</span>
+<span class="t-prompt">$</span> <span class="t-cmd">find / -name "*.conf" 2>/dev/null</span>  <span class="t-out"># Find all .conf files (suppress errors)</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grep -r "password" /etc/</span>     <span class="t-out"># Search recursively for "password" string</span>
+<span class="t-prompt">$</span> <span class="t-cmd">cp file.txt /tmp/backup.txt</span>   <span class="t-out"># Copy file</span>
+<span class="t-prompt">$</span> <span class="t-cmd">mv old.txt new.txt</span>            <span class="t-out"># Move / rename file</span>
+<span class="t-prompt">$</span> <span class="t-cmd">rm -rf /tmp/testdir</span>          <span class="t-out"># Remove dir recursively (CAREFUL: irreversible)</span></div>
+  </div>
+
+  <div class="section-label">// 2.4 — USERS, GROUPS & SUDO</div>
+  <div class="card">
+    <div class="card-title">User Management — Security Critical</div>
+    <p>Every privilege escalation attack targets this: becoming a higher-privileged user. Understanding how users and sudo work is the precursor to breaking them.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div><div class="t-dot t-yellow"></div><div class="t-dot t-green"></div>
+      <div class="terminal-label">USER & PROCESS COMMANDS</div>
+    </div>
+    <div class="terminal-body"><span class="t-prompt">$</span> <span class="t-cmd">whoami</span>                         <span class="t-out"># Current user</span>
+<span class="t-prompt">$</span> <span class="t-cmd">id</span>                             <span class="t-out"># uid=1000(user) gid=1000(user) groups=...</span>
+<span class="t-prompt">$</span> <span class="t-cmd">cat /etc/passwd</span>               <span class="t-out"># All system users (username:x:uid:gid:info:home:shell)</span>
+<span class="t-prompt">$</span> <span class="t-cmd">cat /etc/shadow</span>               <span class="t-out"># Password hashes — needs root to read</span>
+<span class="t-prompt">$</span> <span class="t-cmd">sudo -l</span>                        <span class="t-out"># What can THIS user run as root? (key privesc check)</span>
+<span class="t-prompt">$</span> <span class="t-cmd">su - root</span>                      <span class="t-out"># Switch to root (needs root password)</span>
+<span class="t-prompt">$</span> <span class="t-cmd">ps aux</span>                         <span class="t-out"># All running processes — look for interesting services</span>
+<span class="t-prompt">$</span> <span class="t-cmd">ps aux | grep apache</span>          <span class="t-out"># Filter processes</span>
+<span class="t-prompt">$</span> <span class="t-cmd">kill -9 1234</span>                   <span class="t-out"># Force-kill process with PID 1234</span>
+<span class="t-prompt">$</span> <span class="t-cmd">netstat -tulpn</span>                 <span class="t-out"># What's listening on which ports?</span></div>
+  </div>
+
+  <div class="section-label">// 2.5 — SSH (SECURE SHELL)</div>
+  <div class="card">
+    <div class="card-title">SSH — Your Primary Remote Access Tool</div>
+    <p>SSH is how you access remote machines, both legitimately and as part of post-exploitation. You'll use SSH keys constantly in CTFs and real engagements.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div><div class="t-dot t-yellow"></div><div class="t-dot t-green"></div>
+      <div class="terminal-label">SSH COMMANDS</div>
+    </div>
+    <div class="terminal-body"><span class="t-prompt">$</span> <span class="t-cmd">ssh user@192.168.1.10</span>         <span class="t-out"># Connect to remote host</span>
+<span class="t-prompt">$</span> <span class="t-cmd">ssh -p 2222 user@target.com</span>   <span class="t-out"># Non-standard port</span>
+<span class="t-prompt">$</span> <span class="t-cmd">ssh-keygen -t ed25519</span>          <span class="t-out"># Generate SSH key pair (stronger than RSA)</span>
+<span class="t-prompt">$</span> <span class="t-cmd">ssh-copy-id user@remote</span>       <span class="t-out"># Copy public key to remote (passwordless auth)</span>
+<span class="t-prompt">$</span> <span class="t-cmd">cat ~/.ssh/id_ed25519</span>         <span class="t-warn"># PRIVATE KEY — never share this!</span>
+<span class="t-prompt">$</span> <span class="t-cmd">cat ~/.ssh/id_ed25519.pub</span>     <span class="t-out"># PUBLIC KEY — safe to share/upload</span>
+
+<span class="t-accent"># In CTFs: you'll often find SSH private keys in files like /home/user/.ssh/id_rsa</span>
+<span class="t-accent"># Finding one = instant SSH access as that user</span>
+<span class="t-prompt">$</span> <span class="t-cmd">chmod 600 found_key.pem</span>       <span class="t-out"># Keys must be 600 or SSH refuses them</span>
+<span class="t-prompt">$</span> <span class="t-cmd">ssh -i found_key.pem user@target</span></div>
+  </div>
+
+  <div class="section-label">// DAY 2 — KNOWLEDGE CHECK</div>
+  <div class="quiz-question">
+    <div class="quiz-q">A file shows permissions <strong>-rwsr-xr-x root root</strong>. The 's' in the owner execute position is called a SUID bit. What does this mean for a regular user who runs this file?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answer(this,'wrong','The file runs in the context of the owner (root), not the invoking user. This is a fundamental Linux security concept with major privilege escalation implications.')"><span class="opt-key">A</span> The file runs with the permissions of the user who invokes it</div>
+      <div class="quiz-opt" onclick="answer(this,'correct','Correct! SUID (Set User ID) means the file executes with the effective permissions of its OWNER (root), not the person running it. This is why misconfigured SUID binaries are a classic privilege escalation vector — a regular user can run a program as root.')"><span class="opt-key">B</span> The file runs with root permissions regardless of who runs it</div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','Only root can execute the file is incorrect — r-x means group and others also have execute permission. The s just changes whose identity the execution uses.')"><span class="opt-key">C</span> Only root can execute this file</div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','The s does modify execution significantly — it\'s not merely cosmetic. You\'ll exploit SUID binaries in Week 5.')"><span class="opt-key">D</span> The 's' has no practical effect on execution</div>
+    </div>
+    <div class="quiz-feedback" id="qf-1-0"></div>
+  </div>
+
+  <div class="section-label">// DAY 2 — LAB EXERCISE</div>
+  <div class="card">
+    <div class="card-title">Lab: Linux Filesystem Exploration (on your Kali VM)</div>
+    <ul class="checklist">
+      <li>Open terminal. Run <code>cat /etc/passwd</code> — identify the format: username:x:UID:GID:comment:home:shell</li>
+      <li>Find all SUID binaries on the system: <code>find / -perm -4000 2>/dev/null</code> — note what you find</li>
+      <li>Check what sudo permissions your user has: <code>sudo -l</code></li>
+      <li>Examine running processes: <code>ps aux | sort -k3 -rn | head -20</code> (top 20 by CPU)</li>
+      <li>Check open network ports: <code>ss -tulpn</code> (modern replacement for netstat)</li>
+      <li>Generate an SSH key pair. Find where it's stored. Read both files.</li>
+      <li>Create a file, set permissions to 600, verify with ls -la</li>
+    </ul>
+  </div>
+
+</div><!-- end day-1 -->
+
+
+<!-- ═══════════════════════════════════ DAY 3 ═══════════════════════════════════ -->
+<div class="day-panel" id="day-2">
+
+  <div class="day-header">
+    <div class="day-number">03</div>
+    <div class="day-title-block">
+      <h2>Linux Deep Dive</h2>
+      <p>
+        <span class="day-tag tag-tool">TOOL</span>
+        <span class="day-tag tag-lab">LAB</span>
+        grep · awk · sed · Pipes · Cron · Scripting
+      </p>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">WEEK PROGRESS — DAY 3 OF 7</div>
+    <div class="progress-track"><div class="progress-fill" style="width:42%"></div></div>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">⚙️</div>
+    <p><strong>Today's goal:</strong> Master the power tools that make Linux lethal. grep, awk, and sed are not "nice to know" — they are how you process massive log files, extract credentials from dumps, and automate repetitive security tasks. A pentester who can't pipe commands is severely limited.</p>
+  </div>
+
+  <div class="section-label">// 3.1 — grep: THE UNIVERSAL SEARCHER</div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div><div class="t-dot t-yellow"></div><div class="t-dot t-green"></div>
+      <div class="terminal-label">grep MASTERY</div>
+    </div>
+    <div class="terminal-body"><span class="t-accent"># Basic: search for pattern in file</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grep "failed" /var/log/auth.log</span>
+
+<span class="t-accent"># Case-insensitive search</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grep -i "password" config.txt</span>
+
+<span class="t-accent"># Recursive search in all files in directory</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grep -r "api_key" /var/www/</span>
+
+<span class="t-accent"># Show line numbers</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grep -n "root" /etc/passwd</span>
+
+<span class="t-accent"># Invert match (lines NOT containing pattern)</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grep -v "#" /etc/ssh/sshd_config</span>    <span class="t-out"># Strip comment lines</span>
+
+<span class="t-accent"># Count occurrences</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grep -c "Failed password" /var/log/auth.log</span>
+
+<span class="t-accent"># Extended regex — find IPs in a file</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grep -E "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}" access.log</span>
+
+<span class="t-accent"># REAL PENTEST USE: Find hardcoded credentials in web app source</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grep -rn "password\|passwd\|secret\|api_key\|token" /var/www/ --include="*.php"</span></div>
+  </div>
+
+  <div class="section-label">// 3.2 — PIPES & CHAINING COMMANDS</div>
+  <div class="card">
+    <div class="card-title">The Pipe | — Linux's Superpower</div>
+    <p>Pipe <span class="highlight">|</span> sends the output of one command as input to the next. This lets you build powerful one-line processing pipelines. The best security analysts think in pipelines.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div><div class="t-dot t-yellow"></div><div class="t-dot t-green"></div>
+      <div class="terminal-label">PIPES IN ACTION</div>
+    </div>
+    <div class="terminal-body"><span class="t-accent"># Count failed SSH logins by IP address (real log analysis)</span>
+<span class="t-prompt">$</span> <span class="t-cmd">grep "Failed password" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -rn | head -20</span>
+<span class="t-out">     847 192.168.1.105     ← brute-force attack from this IP
+     312 10.0.0.23
+      45 172.16.0.5</span>
+
+<span class="t-accent"># Extract usernames from /etc/passwd</span>
+<span class="t-prompt">$</span> <span class="t-cmd">cat /etc/passwd | cut -d: -f1</span>
+<span class="t-out">root
+daemon
+www-data
+user1 ...</span>
+
+<span class="t-accent"># Find the 10 largest files in /var</span>
+<span class="t-prompt">$</span> <span class="t-cmd">find /var -type f -exec du -sh {} \; 2>/dev/null | sort -rh | head -10</span>
+
+<span class="t-accent"># Live monitoring: show new SSH failed logins in real-time</span>
+<span class="t-prompt">$</span> <span class="t-cmd">tail -f /var/log/auth.log | grep "Failed password"</span></div>
+  </div>
+
+  <div class="section-label">// 3.3 — CRON JOBS (KEY PRIVESC VECTOR)</div>
+  <div class="card">
+    <div class="card-title">Cron — Scheduled Tasks in Linux</div>
+    <p>Cron runs commands automatically on a schedule. <span class="highlight-red">Misconfigured cron jobs running as root are one of the most common Linux privilege escalation techniques.</span> If a cron job runs a script that's world-writable, you can modify that script to run your own commands as root.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div><div class="t-dot t-yellow"></div><div class="t-dot t-green"></div>
+      <div class="terminal-label">CRON</div>
+    </div>
+    <div class="terminal-body"><span class="t-accent"># Cron syntax: minute hour day month weekday command</span>
+<span class="t-out">*  *  *  *  *  /path/to/command
+│  │  │  │  │
+│  │  │  │  └── Day of week (0=Sunday)
+│  │  │  └───── Month (1-12)
+│  │  └──────── Day of month (1-31)
+│  └─────────── Hour (0-23)
+└────────────── Minute (0-59)</span>
+
+<span class="t-accent"># View current user's cron jobs</span>
+<span class="t-prompt">$</span> <span class="t-cmd">crontab -l</span>
+
+<span class="t-accent"># View system-wide cron jobs (check these for privesc)</span>
+<span class="t-prompt">$</span> <span class="t-cmd">cat /etc/crontab</span>
+<span class="t-prompt">$</span> <span class="t-cmd">ls -la /etc/cron.d/ /etc/cron.daily/</span>
+
+<span class="t-warn"># Classic privesc scenario:
+# /etc/crontab shows: * * * * * root /opt/backup.sh
+# ls -la /opt/backup.sh shows: -rwxrwxrwx (world writable!)
+# You add: echo 'chmod +s /bin/bash' >> /opt/backup.sh
+# Wait 1 minute... then: /bin/bash -p   →   YOU ARE ROOT</span></div>
+  </div>
+
+  <div class="section-label">// 3.4 — BASH SCRIPTING BASICS</div>
+
+  <div class="code-block"><span class="comment">#!/bin/bash
+# Recon script — automates initial enumeration of a target</span>
+
+TARGET=<span class="flag">$1</span>   <span class="comment"># First argument: IP address</span>
+
+<span class="cmd">echo</span> "[*] Starting recon on <span class="flag">$TARGET</span>"
+
+<span class="comment"># Check if target is alive</span>
+<span class="cmd">ping</span> -c 1 <span class="flag">$TARGET</span> > /dev/null 2>&1
+if [ <span class="flag">$?</span> -eq 0 ]; then
+    <span class="cmd">echo</span> "[+] Host is UP"
+else
+    <span class="cmd">echo</span> "[-] Host appears DOWN"
+    exit 1
+fi
+
+<span class="comment"># Quick port scan</span>
+<span class="cmd">echo</span> "[*] Scanning common ports..."
+<span class="cmd">nmap</span> -sV --top-ports 1000 <span class="flag">$TARGET</span> -o /tmp/scan_<span class="flag">$TARGET</span>.txt
+
+<span class="cmd">echo</span> "[+] Done. Results in /tmp/scan_<span class="flag">$TARGET</span>.txt"</code></div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div><div class="t-dot t-yellow"></div><div class="t-dot t-green"></div>
+      <div class="terminal-label">RUN YOUR SCRIPT</div>
+    </div>
+    <div class="terminal-body"><span class="t-prompt">$</span> <span class="t-cmd">chmod +x recon.sh</span>
+<span class="t-prompt">$</span> <span class="t-cmd">./recon.sh 192.168.1.100</span>
+<span class="t-out">[*] Starting recon on 192.168.1.100
+[+] Host is UP
+[*] Scanning common ports...
+[+] Done. Results in /tmp/scan_192.168.1.100.txt</span></div>
+  </div>
+
+  <div class="section-label">// DAY 3 — LAB</div>
+  <div class="card">
+    <div class="card-title">Lab: Log Analysis + Bash Script</div>
+    <ul class="checklist">
+      <li>Download a sample auth.log from the internet. Use grep to find all failed SSH attempts.</li>
+      <li>Build a pipeline to extract attacker IPs and count how many attempts each made (see example above).</li>
+      <li>Write a bash script that accepts an IP as argument, pings it, and prints "UP" or "DOWN".</li>
+      <li>Check your own cron jobs with crontab -l and inspect /etc/cron.d/ on your Kali VM.</li>
+      <li>Use <code>find / -writable -type f 2>/dev/null | grep -v proc</code> — what writable files exist?</li>
+    </ul>
+  </div>
+</div><!-- end day-2 -->
+
+
+<!-- ═══════════════════════════════════ DAY 4 ═══════════════════════════════════ -->
+<div class="day-panel" id="day-3">
+
+  <div class="day-header">
+    <div class="day-number">04</div>
+    <div class="day-title-block">
+      <h2>Windows Fundamentals</h2>
+      <p>
+        <span class="day-tag tag-theory">THEORY</span>
+        <span class="day-tag tag-lab">LAB</span>
+        Registry · Active Directory · PowerShell · Services
+      </p>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">WEEK PROGRESS — DAY 4 OF 7</div>
+    <div class="progress-track"><div class="progress-fill" style="width:57%"></div></div>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">🪟</div>
+    <p><strong>Why Windows?</strong> Over 70% of enterprise environments run Windows. Most high-value targets (domain controllers, file servers, workstations) are Windows. Active Directory is the authentication backbone of almost every large organization — and it's riddled with attackable design decisions.</p>
+  </div>
+
+  <div class="section-label">// 4.1 — WINDOWS REGISTRY</div>
+  <div class="card">
+    <div class="card-title">The Registry — Windows's Configuration Database</div>
+    <p>The Windows Registry is a hierarchical database storing OS and application settings. Attackers love it for <span class="highlight">persistence</span> (making malware survive reboots) and <span class="highlight">credential storage</span>.</p>
+  </div>
+
+  <table class="data-table">
+    <tr><th>HIVE</th><th>CONTAINS</th><th>SECURITY RELEVANCE</th></tr>
+    <tr><td><span class="highlight">HKLM\SOFTWARE</span></td><td>Installed applications settings (all users)</td><td>Find installed software, versions → look for vulnerable versions</td></tr>
+    <tr><td><span class="highlight">HKLM\SYSTEM</span></td><td>Hardware config, services, network settings</td><td>SAM database location, service configs, sometimes credentials</td></tr>
+    <tr><td><span class="highlight">HKCU\SOFTWARE</span></td><td>Per-user application settings</td><td>Putty saved sessions (often contain SSH credentials!)</td></tr>
+    <tr><td><span class="highlight">HKLM\SAM</span></td><td>Local user accounts and password hashes</td><td>Extract with mimikatz or reg save — crack with hashcat</td></tr>
+    <tr><td><span class="highlight">HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run</span></td><td>Programs that run on startup</td><td>Classic persistence location for malware — check this in forensics</td></tr>
+  </table>
+
+  <div class="section-label">// 4.2 — ACTIVE DIRECTORY (AD) OVERVIEW</div>
+  <div class="card">
+    <div class="card-title">Active Directory — The Crown Jewel Target</div>
+    <p>Active Directory is Microsoft's centralized authentication and authorization system used in virtually every enterprise network. Compromising AD = compromising the entire organization. The <span class="highlight-red">Domain Controller (DC)</span> is the most valuable target in any network.</p>
+  </div>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <h4>🏰 Domain</h4>
+      <p>A logical grouping of computers sharing a common authentication database. All managed by a Domain Controller. E.g., <code>CORP.LOCAL</code></p>
+    </div>
+    <div class="concept-card red">
+      <h4>👑 Domain Controller (DC)</h4>
+      <p>The server running AD. Handles all authentication (Kerberos/NTLM), stores all user/computer accounts, enforces Group Policy. Owning this = owning everything.</p>
+    </div>
+    <div class="concept-card amber">
+      <h4>🎫 Kerberos</h4>
+      <p>AD's primary authentication protocol. Uses tickets (TGT, TGS). Attacks like Kerberoasting, Pass-the-Ticket, and Golden Ticket attacks all target this. You'll learn these in Week 5.</p>
+    </div>
+    <div class="concept-card green">
+      <h4>📋 Group Policy (GPO)</h4>
+      <p>Centralized configuration rules pushed to all domain machines. Can set password policies, install software, configure firewalls. Misconfigured GPOs = attack vector.</p>
+    </div>
+  </div>
+
+  <div class="section-label">// 4.3 — POWERSHELL FOR SECURITY</div>
+  <div class="card">
+    <div class="card-title">PowerShell — The Swiss Army Knife</div>
+    <p>PowerShell is to Windows what bash is to Linux — but more powerful for security work. Modern malware and red teams use PowerShell extensively because it's built-in, trusted, and can do almost anything.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div><div class="t-dot t-yellow"></div><div class="t-dot t-green"></div>
+      <div class="terminal-label">PowerShell — Windows Security Commands</div>
+    </div>
+    <div class="terminal-body"><span class="t-accent"># System information</span>
+<span class="t-cmd">Get-ComputerInfo</span>
+<span class="t-cmd">systeminfo</span>
+
+<span class="t-accent"># Running processes (like ps aux on Linux)</span>
+<span class="t-cmd">Get-Process</span>
+<span class="t-cmd">Get-Process | Sort-Object CPU -Descending | Select -First 10</span>
+
+<span class="t-accent"># Network connections (like netstat)</span>
+<span class="t-cmd">Get-NetTCPConnection | Where-Object State -eq "Listen"</span>
+
+<span class="t-accent"># Find users and their privileges</span>
+<span class="t-cmd">Get-LocalUser</span>
+<span class="t-cmd">Get-LocalGroupMember -Group "Administrators"</span>
+
+<span class="t-accent"># Services — look for vulnerable/unusual services</span>
+<span class="t-cmd">Get-Service | Where-Object Status -eq "Running"</span>
+
+<span class="t-accent"># Scheduled Tasks (Windows equivalent of cron)</span>
+<span class="t-cmd">Get-ScheduledTask | Where-Object State -eq "Ready"</span>
+
+<span class="t-accent"># Firewall rules</span>
+<span class="t-cmd">Get-NetFirewallRule | Where-Object Enabled -eq True</span>
+
+<span class="t-warn"># Download and run in memory (fileless malware technique)
+# Never run untrusted content — shown for EDUCATIONAL awareness only
+# IEX (Invoke-Expression) + download = common attack pattern
+# Defenders watch for this in PowerShell logs</span></div>
+  </div>
+
+  <div class="section-label">// 4.4 — WINDOWS IMPORTANT LOCATIONS</div>
+
+  <table class="data-table">
+    <tr><th>LOCATION</th><th>WHAT'S THERE</th><th>WHY IT MATTERS</th></tr>
+    <tr><td><code>C:\Windows\System32\config\SAM</code></td><td>Local password hashes</td><td>Extract and crack to get local admin passwords</td></tr>
+    <tr><td><code>C:\Windows\System32\drivers\etc\hosts</code></td><td>Local DNS overrides</td><td>Attackers modify to redirect domains</td></tr>
+    <tr><td><code>C:\Users\[user]\AppData\Roaming</code></td><td>User app data, browser data</td><td>Browser credentials, saved passwords</td></tr>
+    <tr><td><code>C:\Windows\Prefetch</code></td><td>Program execution cache</td><td>Forensics: proves what programs ran and when</td></tr>
+    <tr><td><code>C:\Windows\System32\winevt\Logs</code></td><td>Event logs</td><td>Security.evtx, System.evtx — evidence of attacks</td></tr>
+    <tr><td><code>%TEMP%</code></td><td>Temporary files</td><td>Malware often drops here; check in IR</td></tr>
+  </table>
+
+  <div class="section-label">// DAY 4 — LAB</div>
+  <div class="card">
+    <div class="card-title">Lab: Windows Exploration (Windows VM)</div>
+    <ul class="checklist">
+      <li>Open regedit.exe. Navigate to HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run — what's there?</li>
+      <li>Open PowerShell as admin. Run Get-LocalGroupMember -Group "Administrators"</li>
+      <li>Run Get-NetTCPConnection | Where-Object State -eq "Listen" — what ports are open?</li>
+      <li>Open Event Viewer → Windows Logs → Security. Find event ID 4624 (successful logon) and 4625 (failed logon)</li>
+      <li>Run Get-ScheduledTask — identify any suspicious scheduled tasks</li>
+    </ul>
+  </div>
+
+</div><!-- end day-3 -->
+
+
+<!-- ═══════════════════════════════════ DAY 5 ═══════════════════════════════════ -->
+<div class="day-panel" id="day-4">
+
+  <div class="day-header">
+    <div class="day-number">05</div>
+    <div class="day-title-block">
+      <h2>Virtualization Lab Setup</h2>
+      <p>
+        <span class="day-tag tag-lab">LAB</span>
+        <span class="day-tag tag-tool">TOOL</span>
+        VirtualBox · Kali Linux · Metasploitable · Isolated Network
+      </p>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">WEEK PROGRESS — DAY 5 OF 7</div>
+    <div class="progress-track"><div class="progress-fill" style="width:71%"></div></div>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-icon">⚠️</div>
+    <p><strong>Critical:</strong> Your lab must be <strong>isolated from the internet</strong>. Machines like Metasploitable are intentionally vulnerable — they will be compromised within minutes if exposed publicly. Use Host-Only or Internal Network mode in VirtualBox.</p>
+  </div>
+
+  <div class="section-label">// 5.1 — YOUR LAB ARCHITECTURE</div>
+  <div class="card">
+    <div class="card-title">Target Lab Architecture</div>
+    <p>You need at minimum three virtual machines communicating on an isolated network:</p>
+    <div class="concept-grid">
+      <div class="concept-card green">
+        <h4>🗡️ Kali Linux (Attacker)</h4>
+        <p>Your primary attack machine. Pre-loaded with 600+ security tools. Download from kali.org/get-kali. Use the pre-built VM image.</p>
+      </div>
+      <div class="concept-card red">
+        <h4>🎯 Metasploitable 2 (Linux Target)</h4>
+        <p>An intentionally vulnerable Linux server. Contains dozens of exploitable services. Download from SourceForge. Never expose to internet.</p>
+      </div>
+      <div class="concept-card amber">
+        <h4>🪟 Windows 10/11 (Windows Target)</h4>
+        <p>Get a free evaluation copy from Microsoft. Needed for Windows-specific attacks, Active Directory labs later.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">// 5.2 — VIRTUALBOX NETWORK MODES</div>
+  <table class="data-table">
+    <tr><th>MODE</th><th>VM → Internet</th><th>VM → VM</th><th>USE WHEN</th></tr>
+    <tr><td><span class="highlight">NAT</span></td><td>Yes (via host)</td><td>No</td><td>Default. VMs can access internet but not each other</td></tr>
+    <tr><td><span class="highlight-green">Host-Only</span></td><td>No</td><td>Yes</td><td>Isolated lab between VMs and host only. SAFE.</td></tr>
+    <tr><td><span class="highlight-amber">Internal Network</span></td><td>No</td><td>Yes</td><td>VMs talk to each other only — host excluded. SAFEST.</td></tr>
+    <tr><td><span class="highlight">Bridged</span></td><td>Yes (own IP)</td><td>Yes</td><td>VM acts like a real device on your LAN. DANGEROUS with vuln VMs</td></tr>
+  </table>
+
+  <div class="section-label">// 5.3 — STEP-BY-STEP SETUP</div>
+  <div class="card">
+    <div class="card-title">Lab Setup Procedure</div>
+    <ul class="checklist">
+      <li><strong>Step 1:</strong> Download VirtualBox from virtualbox.org and install. Also install the Extension Pack.</li>
+      <li><strong>Step 2:</strong> Download Kali Linux pre-built VM from kali.org/get-kali → Virtual Machines. Import the OVA file into VirtualBox.</li>
+      <li><strong>Step 3:</strong> Download Metasploitable 2. Unzip, create a new VM in VirtualBox pointing to the .vmdk file. Set type: Linux / Ubuntu.</li>
+      <li><strong>Step 4:</strong> In VirtualBox → File → Host Network Manager → Create a Host-Only network (e.g., 192.168.56.0/24).</li>
+      <li><strong>Step 5:</strong> For BOTH Kali and Metasploitable: Settings → Network → Adapter 1 → Host-Only Adapter (select your Host-Only network).</li>
+      <li><strong>Step 6:</strong> Boot Kali. Default credentials: kali / kali. Run <code>ip addr</code> — you should see a 192.168.56.x address.</li>
+      <li><strong>Step 7:</strong> Boot Metasploitable. Default credentials: msfadmin / msfadmin. Run <code>ifconfig</code> to find its IP.</li>
+      <li><strong>Step 8:</strong> From Kali, ping Metasploitable: <code>ping 192.168.56.101</code>. If you get replies — your lab works!</li>
+    </ul>
+  </div>
+
+  <div class="section-label">// 5.4 — FIRST LOOK AT YOUR TARGET</div>
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div><div class="t-dot t-yellow"></div><div class="t-dot t-green"></div>
+      <div class="terminal-label">KALI ATTACKING METASPLOITABLE — FIRST SCAN</div>
+    </div>
+    <div class="terminal-body"><span class="t-prompt">kali$</span> <span class="t-cmd">nmap -sV 192.168.56.101</span>
+<span class="t-out">Starting Nmap 7.94 at 2024-01-15 10:00
+Nmap scan report for 192.168.56.101
+Host is up (0.00045s latency).
+
+PORT     STATE SERVICE     VERSION
+21/tcp   open  ftp         vsftpd 2.3.4      ← known backdoor (CVE-2011-2523)
+22/tcp   open  ssh         OpenSSH 4.7p1
+23/tcp   open  telnet      Linux telnetd
+25/tcp   open  smtp        Postfix smtpd
+80/tcp   open  http        Apache httpd 2.2.8
+139/tcp  open  netbios-ssn Samba smbd 3.X
+445/tcp  open  microsoft-ds Samba smbd 3.X   ← EternalBlue-style attacks
+3306/tcp open  mysql       MySQL 5.0.51a      ← no root password!
+5432/tcp open  postgresql  PostgreSQL 8.3.0
+6667/tcp open  irc         UnrealIRCd         ← known backdoor
+8180/tcp open  http        Apache Tomcat 5.5</span>
+
+<span class="t-warn"># This single scan reveals MASSIVE attack surface
+# Every one of these services has known critical vulnerabilities
+# You'll exploit them starting Week 3</span></div>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">🎉</div>
+    <p><strong>If you see output like above:</strong> Your lab is working perfectly. You've just done your first security reconnaissance. Save this IP and output — you'll return to this machine many times in the coming weeks.</p>
+  </div>
+
+</div><!-- end day-4 -->
+
+
+<!-- ═══════════════════════════════════ DAY 6 ═══════════════════════════════════ -->
+<div class="day-panel" id="day-5">
+
+  <div class="day-header">
+    <div class="day-number">06</div>
+    <div class="day-title-block">
+      <h2>Python for Security</h2>
+      <p>
+        <span class="day-tag tag-theory">THEORY</span>
+        <span class="day-tag tag-lab">LAB</span>
+        Sockets · File I/O · Build a Port Scanner
+      </p>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">WEEK PROGRESS — DAY 6 OF 7</div>
+    <div class="progress-track"><div class="progress-fill" style="width:85%"></div></div>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">🐍</div>
+    <p><strong>Why Python:</strong> Python is the de facto language of security tools. Metasploit modules, exploit scripts, automation, custom C2 tools — all Python. You don't need to be a developer. You need to read, modify, and write scripts that interact with networks and files.</p>
+  </div>
+
+  <div class="section-label">// 6.1 — PYTHON CRASH COURSE FOR SECURITY</div>
+
+  <div class="code-block"><span class="comment"># ── Variables & Data Types ──────────────────────────────</span>
+target_ip = <span class="flag">"192.168.56.101"</span>
+port = <span class="flag">80</span>
+ports = <span class="flag">[21, 22, 80, 443, 8080]</span>
+service_map = {<span class="flag">21: "FTP", 22: "SSH", 80: "HTTP", 443: "HTTPS"</span>}
+
+<span class="comment"># ── Conditionals ─────────────────────────────────────────</span>
+if port in service_map:
+    <span class="cmd">print</span>(f<span class="flag">"Port {port} → {service_map[port]}"</span>)
+else:
+    <span class="cmd">print</span>(f<span class="flag">"Port {port} → Unknown service"</span>)
+
+<span class="comment"># ── Loops ────────────────────────────────────────────────</span>
+for p in ports:
+    <span class="cmd">print</span>(f<span class="flag">"Checking port {p}..."</span>)
+
+<span class="comment"># ── Functions ────────────────────────────────────────────</span>
+def banner(target):
+    <span class="cmd">print</span>(f<span class="flag">"="*40</span>)
+    <span class="cmd">print</span>(f<span class="flag">"  TARGET: {target}"</span>)
+    <span class="cmd">print</span>(f<span class="flag">"="*40</span>)
+
+banner(target_ip)
+
+<span class="comment"># ── File Operations (reading configs, logs, wordlists) ──</span>
+with <span class="cmd">open</span>(<span class="flag">"/usr/share/wordlists/rockyou.txt"</span>, <span class="flag">"r"</span>, encoding=<span class="flag">"latin-1"</span>) as f:
+    passwords = f.readlines()
+    <span class="cmd">print</span>(f<span class="flag">"Loaded {len(passwords)} passwords"</span>)</div>
+
+  <div class="section-label">// 6.2 — SOCKETS: NETWORK PROGRAMMING</div>
+  <div class="card">
+    <div class="card-title">Sockets — How Programs Communicate Over Networks</div>
+    <p>A socket is a software endpoint for sending/receiving data. Every network tool — scanners, exploits, C2 frameworks — uses sockets under the hood. Understanding this is the difference between using tools blindly and understanding what they do.</p>
+  </div>
+
+  <div class="code-block"><span class="comment"># How a TCP connection works in Python</span>
+import socket
+
+<span class="comment"># Create a TCP socket</span>
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.settimeout(<span class="flag">1</span>)  <span class="comment"># Don't wait more than 1 second</span>
+
+<span class="comment"># Try to connect — if we can, port is open</span>
+result = s.connect_ex((<span class="flag">"192.168.56.101"</span>, <span class="flag">80</span>))
+<span class="comment"># connect_ex returns 0 on success, error code on failure</span>
+
+if result == <span class="flag">0</span>:
+    <span class="cmd">print</span>(<span class="flag">"Port 80: OPEN"</span>)
+    
+    <span class="comment"># Try to grab the banner (what service says hello)</span>
+    s.send(<span class="flag">b"HEAD / HTTP/1.0\r\n\r\n"</span>)
+    banner = s.recv(<span class="flag">1024</span>).decode(<span class="flag">"utf-8"</span>, errors=<span class="flag">"ignore"</span>)
+    <span class="cmd">print</span>(f<span class="flag">"Banner: {banner[:100]}"</span>)
+else:
+    <span class="cmd">print</span>(<span class="flag">"Port 80: CLOSED"</span>)
+
+s.close()</div>
+
+  <div class="section-label">// 6.3 — BUILD YOUR FIRST SECURITY TOOL: PORT SCANNER</div>
+
+  <div class="code-block"><span class="comment">#!/usr/bin/env python3
+"""
+Simple Port Scanner — Your First Security Tool
+Usage: python3 scanner.py 192.168.56.101
+"""</span>
+
+import socket
+import sys
+from datetime import datetime
+
+def scan_port(host, port, timeout=<span class="flag">0.5</span>):
+    <span class="flag">"""Returns True if port is open, False if closed"""</span>
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(timeout)
+        result = s.connect_ex((host, port))
+        s.close()
+        return result == <span class="flag">0</span>
+    except socket.error:
+        return False
+
+def get_banner(host, port):
+    <span class="flag">"""Try to grab service banner"""</span>
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(<span class="flag">1</span>)
+        s.connect((host, port))
+        s.send(<span class="flag">b"HEAD / HTTP/1.0\r\n\r\n"</span>)
+        banner = s.recv(<span class="flag">100</span>).decode(<span class="flag">"utf-8"</span>, errors=<span class="flag">"ignore"</span>).strip()
+        s.close()
+        return banner.split(<span class="flag">"\n"</span>)[<span class="flag">0</span>]
+    except:
+        return <span class="flag">"(no banner)"</span>
+
+def main():
+    if len(sys.argv) != <span class="flag">2</span>:
+        <span class="cmd">print</span>(<span class="flag">"Usage: python3 scanner.py &lt;target_ip&gt;"</span>)
+        sys.exit(<span class="flag">1</span>)
+    
+    target = sys.argv[<span class="flag">1</span>]
+    common_ports = [<span class="flag">21,22,23,25,53,80,110,139,143,443,445,
+                    3306,3389,5432,5900,6379,6667,8080,8443</span>]
+    
+    <span class="cmd">print</span>(f<span class="flag">"\n{'='*50}"</span>)
+    <span class="cmd">print</span>(f<span class="flag">"  PORT SCANNER — Target: {target}"</span>)
+    <span class="cmd">print</span>(f<span class="flag">"  Scan started: {datetime.now().strftime('%H:%M:%S')}"</span>)
+    <span class="cmd">print</span>(f<span class="flag">"{'='*50}\n"</span>)
+    
+    open_ports = []
+    
+    for port in common_ports:
+        if scan_port(target, port):
+            banner = get_banner(target, port)
+            open_ports.append(port)
+            <span class="cmd">print</span>(f<span class="flag">"  [OPEN]  Port {port:5d}  →  {banner}"</span>)
+    
+    <span class="cmd">print</span>(f<span class="flag">"\n[+] {len(open_ports)} open ports found"</span>)
+
+if __name__ == <span class="flag">"__main__"</span>:
+    main()</div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div><div class="t-dot t-yellow"></div><div class="t-dot t-green"></div>
+      <div class="terminal-label">RUNNING YOUR SCANNER</div>
+    </div>
+    <div class="terminal-body"><span class="t-prompt">kali$</span> <span class="t-cmd">python3 scanner.py 192.168.56.101</span>
+
+<span class="t-out">==================================================
+  PORT SCANNER — Target: 192.168.56.101
+  Scan started: 14:32:11
+==================================================
+
+  [OPEN]  Port    21  →  220 (vsFTPd 2.3.4)
+  [OPEN]  Port    22  →  SSH-2.0-OpenSSH_4.7p1
+  [OPEN]  Port    23  →  (no banner)
+  [OPEN]  Port    80  →  HTTP/1.1 200 OK
+  [OPEN]  Port   139  →  (no banner)
+  [OPEN]  Port   445  →  (no banner)
+  [OPEN]  Port  3306  →  (no banner)
+  [OPEN]  Port  5432  →  (no banner)
+
+[+] 8 open ports found</span>
+
+<span class="t-accent"># You just built a working security tool from scratch. 
+# Nmap does this + 1000x more. Now you understand HOW it works.</span></div>
+  </div>
+
+</div><!-- end day-5 -->
+
+
+<!-- ═══════════════════════════════════ DAY 7 ═══════════════════════════════════ -->
+<div class="day-panel" id="day-6">
+
+  <div class="day-header">
+    <div class="day-number">07</div>
+    <div class="day-title-block">
+      <h2>Review + First CTF Challenge</h2>
+      <p>
+        <span class="day-tag tag-lab">LAB</span>
+        PicoCTF · TryHackMe · Week 1 Consolidation
+      </p>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">WEEK PROGRESS — DAY 7 OF 7 — WEEK COMPLETE</div>
+    <div class="progress-track"><div class="progress-fill" style="width:100%"></div></div>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">🏁</div>
+    <p><strong>CTF = Capture The Flag.</strong> Security competitions where you solve challenges to find hidden "flags" (text strings like <code>flag{y0u_f0und_1t}</code>). This is how you build real skills — reading about security is theory; CTFs make it real.</p>
+  </div>
+
+  <div class="section-label">// 7.1 — WEEK 1 KNOWLEDGE REVIEW</div>
+
+  <table class="data-table">
+    <tr><th>TOPIC</th><th>KEY TAKEAWAY</th><th>STATUS</th></tr>
+    <tr><td>CIA Triad</td><td>Every attack breaks Confidentiality, Integrity, and/or Availability</td><td><span class="highlight-green">Day 1 ✓</span></td></tr>
+    <tr><td>Threat Actors</td><td>Motivation drives technique — know who you're defending against</td><td><span class="highlight-green">Day 1 ✓</span></td></tr>
+    <tr><td>Linux Permissions</td><td>rwx notation, SUID bits, chmod, chown — misconfigs = privesc</td><td><span class="highlight-green">Day 2 ✓</span></td></tr>
+    <tr><td>Linux Commands</td><td>grep, awk, pipes, find, process management, SSH</td><td><span class="highlight-green">Day 3 ✓</span></td></tr>
+    <tr><td>Windows / AD</td><td>Registry, Kerberos, PowerShell, Event Logs — enterprise fundamentals</td><td><span class="highlight-green">Day 4 ✓</span></td></tr>
+    <tr><td>Lab Setup</td><td>Isolated VirtualBox environment: Kali + Metasploitable + Windows</td><td><span class="highlight-green">Day 5 ✓</span></td></tr>
+    <tr><td>Python Scripting</td><td>Sockets, file I/O, loops — built a working port scanner</td><td><span class="highlight-green">Day 6 ✓</span></td></tr>
+  </table>
+
+  <div class="section-label">// 7.2 — FINAL QUIZ: WEEK 1</div>
+
+  <div class="quiz-question">
+    <div class="quiz-q">1. You find a file: <strong>-rwsr-xr-x root root /usr/bin/find</strong>. What can a low-privilege user potentially do with this?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answer(this,'wrong','Simply reading files as root is an understatement of the SUID impact here.')"><span class="opt-key">A</span> Read files owned by root</div>
+      <div class="quiz-opt" onclick="answer(this,'correct','Correct! The find binary has SUID set (s in owner execute). Since find can execute commands with -exec, a regular user could run: find . -exec /bin/bash -p \\; — spawning a bash shell running as root. This is a textbook GTFOBins SUID exploitation. GTFOBins.github.io documents exactly these techniques.')"><span class="opt-key">B</span> Execute commands as root using find's -exec flag</div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','Deleting system files might be a side effect, but the core impact is privilege escalation to root — full system compromise.')"><span class="opt-key">C</span> Delete system files</div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','SUID absolutely matters — this is one of the most common Linux privilege escalation techniques and is checked on every engagement.')"><span class="opt-key">D</span> Nothing special — SUID on find is harmless</div>
+    </div>
+    <div class="quiz-feedback" id="qf-6-0"></div>
+  </div>
+
+  <div class="quiz-question">
+    <div class="quiz-q">2. A pipeline shows: <strong>grep "Failed password" auth.log | awk '{print $11}' | sort | uniq -c | sort -rn</strong>. What is the purpose of <code>uniq -c</code>?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="answer(this,'wrong','uniq alone removes duplicates. The -c flag adds counting. Without understanding this, you cannot build log analysis pipelines.')"><span class="opt-key">A</span> Remove duplicate lines</div>
+      <div class="quiz-opt" onclick="answer(this,'correct','Correct! uniq -c prefixes each unique line with a count of how many times it appeared. Combined with sort before it (required — uniq only deduplicates adjacent lines) and sort -rn after (reverse numeric sort), this pipeline counts how many failed login attempts came from each IP address, sorted highest first.')"><span class="opt-key">B</span> Count occurrences of each unique line and prefix each with its count</div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','Sorting is done by the sort command. uniq -c counts — these are separate commands with distinct roles.')"><span class="opt-key">C</span> Sort lines alphabetically</div>
+      <div class="quiz-opt" onclick="answer(this,'wrong','uniq processes all matching lines, not just the first. It collapses consecutive identical lines into one, with -c showing how many were collapsed.')"><span class="opt-key">D</span> Show only the first occurrence of each line</div>
+    </div>
+    <div class="quiz-feedback" id="qf-6-1"></div>
+  </div>
+
+  <div class="section-label">// 7.3 — YOUR FIRST CTF MISSIONS</div>
+  <div class="card">
+    <div class="card-title">Mission 1: PicoCTF (picoctf.org)</div>
+    <ul class="checklist">
+      <li>Create a free account at picoctf.org</li>
+      <li>Complete: <strong>Obedient Cat</strong> (General Skills) — learn to find flags in files</li>
+      <li>Complete: <strong>Python Wrangling</strong> — run a Python script to decode a flag</li>
+      <li>Complete: <strong>Wave a Flag</strong> — use --help flags and command arguments</li>
+      <li>Complete: <strong>Nice netcat</strong> — use netcat (nc) to connect to a server</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Mission 2: TryHackMe (tryhackme.com)</div>
+    <ul class="checklist">
+      <li>Create a free account at tryhackme.com</li>
+      <li>Complete the room: <strong>"Pre-Security"</strong> path (free) — perfect Week 1 review</li>
+      <li>Complete the room: <strong>"Linux Fundamentals Part 1"</strong></li>
+      <li>Complete the room: <strong>"Introductory Networking"</strong> (preview for Week 2)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Mission 3: Metasploitable Exploration</div>
+    <ul class="checklist">
+      <li>From your Kali VM, run your Python port scanner against Metasploitable.</li>
+      <li>Navigate to <strong>http://192.168.56.101</strong> in a browser — explore the Metasploitable web interface (DVWA, Mutillidae — these are vulnerable web apps for practice)</li>
+      <li>From Kali: <code>ftp 192.168.56.101</code> — log in with anonymous / anonymous. What files can you see?</li>
+      <li>Document everything in a notes file. This is your first reconnaissance report.</li>
+    </ul>
+  </div>
+
+  <div class="section-label">// 7.4 — WEEK 1 CHECKLIST</div>
+  <div class="card">
+    <div class="card-title">Before You Move to Week 2 — Verify You Can:</div>
+    <ul class="checklist">
+      <li>Explain the CIA Triad and map any attack to it</li>
+      <li>Navigate the Linux filesystem, read permissions, find SUID files</li>
+      <li>Write a grep pipeline to analyze a log file and count attacker IPs</li>
+      <li>Use PowerShell to enumerate users, services, and network connections</li>
+      <li>Have a working VirtualBox lab: Kali ↔ Metasploitable on an isolated network</li>
+      <li>Run your Python port scanner and understand every line of code</li>
+      <li>Complete at least 3 PicoCTF or TryHackMe challenges</li>
+      <li>Have a notes system set up (Obsidian, Notion, or even a text file)</li>
+    </ul>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">🚀</div>
+    <p><strong>Coming in Week 2:</strong> Networking & Protocols — OSI model, TCP/IP in depth, Wireshark packet analysis, DNS/HTTP/ARP internals, and understanding the attack surface at the network layer. Everything you'll do in offensive and defensive security requires this.</p>
+  </div>
+
+</div><!-- end day-6 -->
+
+</div><!-- .content-wrap -->
+
+<footer>
+  PHASE 1 · WEEK 1 COMPLETE · 7 DAYS · CYBERSECURITY BOOTCAMP
+</footer>
+
+<script>
+function showDay(index) {
+  document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('day-' + index).classList.add('active');
+  document.querySelectorAll('.day-tab')[index].classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function answer(el, type, explanation) {
+  // Find parent question
+  const question = el.closest('.quiz-question');
+  if (question.dataset.answered) return;
+  question.dataset.answered = '1';
+
+  // Disable all options
+  question.querySelectorAll('.quiz-opt').forEach(opt => {
+    opt.style.pointerEvents = 'none';
+    opt.style.opacity = '0.5';
+  });
+  el.style.opacity = '1';
+  el.classList.add(type);
+
+  // Show feedback
+  const feedbacks = question.querySelectorAll('.quiz-feedback');
+  if (feedbacks.length > 0) {
+    const fb = feedbacks[0];
+    fb.classList.add('show', type);
+    fb.textContent = explanation;
+  }
+}
+</script>
+
+
+<div class="week-nav" style="border-top-color:var(--border,#141b26);max-width:1160px;margin:2rem auto 0;padding:2rem;display:flex;justify-content:space-between;align-items:center;">
+  <span class="disabled" style="opacity:0.25;font-family:monospace;font-size:0.72rem;">← Previous Week</span>
+  <a href="../index.html" style="color:var(--teal,#2dd4bf);border-color:rgba(45,212,191,0.3);">⌂ Lesson Hub</a>
+  <a href="week2.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">Next Week →</a>
+</div>
+
+<a href="#" id="back-to-top" title="Back to top">↑</a>
+
+<script src="../js/shared.js"></script>
+</body>
+</html>

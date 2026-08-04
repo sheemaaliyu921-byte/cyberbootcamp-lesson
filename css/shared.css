@@ -1,0 +1,213 @@
+/* ============================================================
+   CyberBootcamp — Shared Lesson Styles
+   Used across all week pages via <link rel="stylesheet">
+   ============================================================ */
+
+/* ── Google Fonts (loaded per-page, referenced here for docs) ── */
+/* Each page imports its own font stack */
+
+/* ── CSS Reset & Base ──────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  min-height: 100vh;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar styling ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+/* ── Selection ─────────────────────────────────────────────── */
+::selection { background: rgba(99,179,237,0.3); }
+
+/* ── Shared Table styles ───────────────────────────────────── */
+.shared-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin: 1rem 0;
+}
+.shared-table th {
+  text-align: left;
+  padding: 9px 13px;
+  font-size: 0.6rem;
+  letter-spacing: 0.13em;
+  font-family: monospace;
+}
+.shared-table td {
+  padding: 9px 13px;
+  vertical-align: top;
+}
+
+/* ── Shared Quiz styles ────────────────────────────────────── */
+.quiz-block { border-radius: 4px; padding: 1.4rem; margin-bottom: 1rem; }
+.quiz-question { font-size: 0.88rem; font-weight: 600; margin-bottom: 1rem; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.44rem; }
+.quiz-option {
+  display: flex; align-items: flex-start; gap: 0.65rem;
+  padding: 0.6rem 1rem; border-radius: 2px; cursor: pointer;
+  font-size: 0.81rem; transition: all 0.14s; user-select: none;
+  border-width: 1px; border-style: solid;
+}
+.quiz-option-key {
+  font-family: monospace; font-size: 0.67rem;
+  min-width: 16px; flex-shrink: 0; padding-top: 1px;
+}
+.quiz-feedback {
+  margin-top: 0.8rem; font-size: 0.79rem;
+  padding: 0.6rem 1rem; border-radius: 2px;
+  display: none; border-width: 1px; border-style: solid;
+}
+.quiz-feedback.show { display: block; }
+
+/* ── Shared Terminal block ─────────────────────────────────── */
+.terminal {
+  border-radius: 3px; overflow: hidden;
+  margin: 1rem 0; font-family: 'Fira Code', 'Courier New', monospace;
+}
+.terminal-bar {
+  padding: 7px 14px; display: flex; align-items: center;
+  gap: 6px; border-bottom-width: 1px; border-bottom-style: solid;
+}
+.term-dot { width: 9px; height: 9px; border-radius: 50%; }
+.term-dot-r { background: #ff5f56; }
+.term-dot-y { background: #ffbd2e; }
+.term-dot-g { background: #27c93f; }
+.terminal-title { font-size: 0.61rem; margin-left: 6px; letter-spacing: 0.1em; font-family: monospace; }
+.terminal-body { padding: 1.2rem 1.4rem; font-size: 0.77rem; line-height: 2.1; overflow-x: auto; }
+
+/* ── Shared Note/Callout ───────────────────────────────────── */
+.callout {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1rem 1.2rem; border-radius: 3px;
+  margin: 1rem 0; font-size: 0.85rem;
+  border-width: 1px; border-style: solid;
+}
+.callout-icon { font-size: 1rem; line-height: 1.6; flex-shrink: 0; }
+.callout p { margin: 0; }
+.callout strong { color: #fff; }
+
+/* ── Shared Checklist ──────────────────────────────────────── */
+.checklist { list-style: none; margin: 0.8rem 0; }
+.checklist li {
+  display: flex; align-items: flex-start; gap: 0.7rem;
+  padding: 0.42rem 0; font-size: 0.85rem;
+  border-bottom-width: 1px; border-bottom-style: solid;
+  border-color: rgba(255,255,255,0.04);
+}
+.checklist li:last-child { border-bottom: none; }
+
+/* ── Progress bar ──────────────────────────────────────────── */
+.progress-wrap { margin-bottom: 2rem; }
+.progress-label { font-family: monospace; font-size: 0.61rem; letter-spacing: 0.15em; margin-bottom: 5px; }
+.progress-track { height: 2px; }
+.progress-fill  { height: 100%; transition: width 0.5s ease; }
+
+/* ── Day Header ────────────────────────────────────────────── */
+.day-header {
+  display: flex; gap: 1.5rem; align-items: flex-start;
+  margin-bottom: 2rem; padding-bottom: 1.5rem;
+  border-bottom-width: 1px; border-bottom-style: solid;
+}
+.day-number {
+  font-size: 5rem; line-height: 0.85;
+  opacity: 0.1; min-width: 105px; font-weight: 800;
+}
+.day-tags { margin-top: 0.4rem; }
+.day-tag {
+  font-family: monospace; font-size: 0.59rem;
+  padding: 2px 9px; margin-right: 4px;
+  border-radius: 2px; letter-spacing: 0.08em;
+  border-width: 1px; border-style: solid;
+}
+
+/* ── Section label ─────────────────────────────────────────── */
+.section-label {
+  font-family: monospace; font-size: 0.61rem;
+  letter-spacing: 0.25em; margin: 2rem 0 0.8rem;
+}
+
+/* ── Card ──────────────────────────────────────────────────── */
+.card { border-radius: 3px; padding: 1.5rem; margin-bottom: 1.2rem; border-width: 1px; border-style: solid; }
+.card-label {
+  font-family: monospace; font-size: 0.61rem;
+  letter-spacing: 0.2em; margin-bottom: 0.9rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.card p  { font-size: 0.87rem; margin-bottom: 0.5rem; }
+.card p:last-child { margin-bottom: 0; }
+
+/* ── Outline Table ─────────────────────────────────────────── */
+.outline-wrap  { max-width: 1160px; margin: 0 auto; padding: 0 2rem 2rem; position: relative; z-index: 1; }
+.outline-box   { border-radius: 4px; overflow: hidden; border-width: 1px; border-style: solid; }
+.outline-header{ padding: 0.85rem 1.4rem; border-bottom-width: 1px; border-bottom-style: solid; display: flex; align-items: center; justify-content: space-between; }
+
+/* ── Two / Three column grids ─────────────────────────────── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .day-number { font-size: 3rem; min-width: 70px; }
+  .day-header { gap: 1rem; }
+}
+
+@media (max-width: 480px) {
+  .outline-header { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .terminal-body  { font-size: 0.68rem; }
+}
+
+/* ── Back-to-top button ────────────────────────────────────── */
+#back-to-top {
+  position: fixed; bottom: 2rem; right: 2rem;
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; opacity: 0; transition: opacity 0.3s;
+  z-index: 999; color: #fff; text-decoration: none;
+}
+#back-to-top.visible { opacity: 1; }
+
+/* ── Navigation breadcrumb ─────────────────────────────────── */
+.breadcrumb {
+  font-family: monospace; font-size: 0.65rem;
+  letter-spacing: 0.1em; padding: 0.6rem 2rem;
+  border-bottom-width: 1px; border-bottom-style: solid;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.breadcrumb a { text-decoration: none; transition: opacity 0.15s; }
+.breadcrumb a:hover { opacity: 0.7; }
+.breadcrumb span { opacity: 0.4; }
+
+/* ── Week nav (bottom prev/next) ───────────────────────────── */
+.week-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 2rem; margin-top: 2rem;
+  border-top-width: 1px; border-top-style: solid;
+  max-width: 1160px; margin-left: auto; margin-right: auto;
+}
+.week-nav a {
+  font-family: monospace; font-size: 0.72rem; letter-spacing: 0.08em;
+  text-decoration: none; padding: 0.6rem 1.2rem;
+  border-width: 1px; border-style: solid; border-radius: 2px;
+  transition: all 0.15s; display: flex; align-items: center; gap: 0.5rem;
+}
+.week-nav a:hover { opacity: 0.75; }
+.week-nav .disabled { opacity: 0.25; pointer-events: none; }
+
+/* ── Print styles ──────────────────────────────────────────── */
+@media print {
+  header, .dnav, #back-to-top, .week-nav, .breadcrumb { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .card, .terminal, .callout { border-color: #ccc !important; break-inside: avoid; }
+}

@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cybersecurity Bootcamp — Phase 1, Week 2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap');
+
+:root {
+  --bg:       #07080f;
+  --surface:  #0d0f1c;
+  --card:     #111425;
+  --border:   #1c2040;
+  --accent:   #5b8dff;
+  --accent2:  #ff6b35;
+  --accent3:  #00e5a0;
+  --warn:     #ffc444;
+  --text:     #bdc8e8;
+  --muted:    #4a5680;
+  --red:      #ff4757;
+  --purple:   #c77dff;
+  --mono:     'JetBrains Mono', monospace;
+  --sans:     'Inter', sans-serif;
+  --display:  'Rajdhani', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.7;
+  min-height:100vh;
+}
+
+/* grid background */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(91,141,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91,141,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events:none;z-index:0;
+}
+
+/* ── HEADER ── */
+header{
+  border-bottom:1px solid var(--border);
+  padding:0 2rem;
+  background:rgba(7,8,15,0.95);
+  backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:100;
+}
+.header-inner{
+  max-width:1120px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:60px;
+}
+.logo{
+  font-family:var(--display);
+  font-size:1.1rem;font-weight:700;
+  color:#fff;letter-spacing:0.08em;
+}
+.logo span{color:var(--accent);}
+.week-badge{
+  font-family:var(--mono);font-size:0.68rem;
+  color:var(--accent3);
+  border:1px solid rgba(0,229,160,0.3);
+  padding:4px 14px;letter-spacing:0.12em;
+  background:rgba(0,229,160,0.06);
+}
+
+/* ── HERO ── */
+.hero{
+  max-width:1120px;margin:0 auto;
+  padding:3.5rem 2rem 2.5rem;
+  position:relative;z-index:1;
+}
+.hero-eyebrow{
+  font-family:var(--mono);font-size:0.7rem;
+  color:var(--accent);letter-spacing:0.25em;
+  margin-bottom:0.9rem;opacity:0.9;
+}
+.hero h1{
+  font-family:var(--display);
+  font-size:clamp(1.8rem,4.5vw,3rem);
+  font-weight:700;color:#fff;
+  line-height:1.1;margin-bottom:1rem;
+}
+.hero h1 em{
+  color:var(--accent);font-style:normal;
+  text-shadow:0 0 30px rgba(91,141,255,0.35);
+}
+.hero-sub{max-width:600px;color:var(--muted);font-size:0.92rem;margin-bottom:2rem;}
+.hero-pills{display:flex;gap:0.6rem;flex-wrap:wrap;}
+.pill{
+  font-family:var(--mono);font-size:0.68rem;
+  padding:5px 14px;border-radius:20px;
+  letter-spacing:0.08em;
+}
+.pill-blue{background:rgba(91,141,255,0.12);color:var(--accent);border:1px solid rgba(91,141,255,0.25);}
+.pill-green{background:rgba(0,229,160,0.1);color:var(--accent3);border:1px solid rgba(0,229,160,0.2);}
+.pill-orange{background:rgba(255,107,53,0.1);color:var(--accent2);border:1px solid rgba(255,107,53,0.2);}
+
+/* ── DAY NAV ── */
+.day-nav{
+  max-width:1120px;margin:0 auto;
+  padding:0 2rem;
+  display:flex;gap:0;
+  border-bottom:1px solid var(--border);
+  position:relative;z-index:1;
+  overflow-x:auto;
+}
+.day-tab{
+  font-family:var(--mono);font-size:0.72rem;
+  padding:12px 22px;border:none;
+  background:transparent;color:var(--muted);
+  cursor:pointer;border-bottom:2px solid transparent;
+  transition:all 0.2s;letter-spacing:0.06em;
+  white-space:nowrap;
+}
+.day-tab:hover{color:var(--text);}
+.day-tab.active{
+  color:var(--accent);
+  border-bottom-color:var(--accent);
+  background:rgba(91,141,255,0.05);
+}
+
+/* ── CONTENT ── */
+.content-wrap{
+  max-width:1120px;margin:0 auto;
+  padding:2.5rem 2rem;
+  position:relative;z-index:1;
+}
+.day-panel{display:none;}
+.day-panel.active{display:block;}
+
+/* ── DAY HEADER ── */
+.day-header{
+  display:flex;align-items:flex-start;gap:1.5rem;
+  margin-bottom:2rem;padding-bottom:1.5rem;
+  border-bottom:1px solid var(--border);
+}
+.day-num{
+  font-family:var(--display);
+  font-size:4rem;font-weight:700;
+  color:var(--border);line-height:1;
+  min-width:90px;
+  background:linear-gradient(135deg,var(--border),transparent);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.day-info h2{
+  font-family:var(--display);font-size:1.4rem;
+  font-weight:700;color:#fff;margin-bottom:0.4rem;
+}
+.day-info p{color:var(--muted);font-size:0.87rem;}
+.tag{
+  font-family:var(--mono);font-size:0.62rem;
+  padding:3px 9px;margin-right:5px;
+  letter-spacing:0.08em;border-radius:2px;
+}
+.t-th{background:rgba(199,125,255,0.12);color:var(--purple);border:1px solid rgba(199,125,255,0.25);}
+.t-lb{background:rgba(0,229,160,0.1);color:var(--accent3);border:1px solid rgba(0,229,160,0.2);}
+.t-tl{background:rgba(91,141,255,0.1);color:var(--accent);border:1px solid rgba(91,141,255,0.2);}
+
+/* ── PROGRESS ── */
+.prog-wrap{margin-bottom:2rem;}
+.prog-label{font-family:var(--mono);font-size:0.67rem;color:var(--muted);letter-spacing:0.12em;margin-bottom:5px;}
+.prog-track{height:2px;background:var(--border);border-radius:2px;}
+.prog-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width 0.6s ease;}
+
+/* ── CARDS ── */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:6px;padding:1.5rem;
+  margin-bottom:1.2rem;
+}
+.card-label{
+  font-family:var(--mono);font-size:0.67rem;
+  color:var(--accent3);letter-spacing:0.18em;
+  margin-bottom:0.9rem;
+  display:flex;align-items:center;gap:0.6rem;
+}
+.card-label::before{
+  content:'';width:8px;height:2px;
+  background:var(--accent3);
+  box-shadow:0 0 6px var(--accent3);
+}
+.card h3{font-size:1rem;font-weight:600;color:#e8eeff;margin-bottom:0.5rem;}
+.card p{color:var(--text);font-size:0.88rem;margin-bottom:0.5rem;}
+.card p:last-child{margin-bottom:0;}
+
+/* ── OSI LAYERS (signature element) ── */
+.osi-stack{
+  display:flex;flex-direction:column;gap:3px;
+  margin:1.2rem 0;
+}
+.osi-layer{
+  display:grid;
+  grid-template-columns:60px 1fr 1fr;
+  gap:0;
+  border-radius:4px;
+  overflow:hidden;
+  transition:transform 0.15s;
+  cursor:default;
+}
+.osi-layer:hover{transform:translateX(4px);}
+.osi-num{
+  font-family:var(--mono);font-size:0.8rem;font-weight:600;
+  display:flex;align-items:center;justify-content:center;
+  padding:10px;color:#fff;
+}
+.osi-name{
+  font-family:var(--display);font-size:0.95rem;font-weight:600;
+  display:flex;align-items:center;padding:10px 14px;
+  color:#fff;border-left:1px solid rgba(255,255,255,0.05);
+}
+.osi-detail{
+  font-size:0.78rem;color:rgba(255,255,255,0.6);
+  display:flex;align-items:center;padding:10px 14px;
+  border-left:1px solid rgba(255,255,255,0.05);
+}
+.l7{background:linear-gradient(90deg,#1a0a2e,#2d0a4e);}
+.l7 .osi-num{background:#6b21a8;}
+.l6{background:linear-gradient(90deg,#1a0f2e,#2d1a4e);}
+.l6 .osi-num{background:#7c3aed;}
+.l5{background:linear-gradient(90deg,#0f1a2e,#1a2d4e);}
+.l5 .osi-num{background:#2563eb;}
+.l4{background:linear-gradient(90deg,#0a1a28,#0d2e42);}
+.l4 .osi-num{background:#0e7490;}
+.l3{background:linear-gradient(90deg,#0a1f1a,#0d3328);}
+.l3 .osi-num{background:#065f46;}
+.l2{background:linear-gradient(90deg,#1a1a0a,#2e2e0d);}
+.l2 .osi-num{background:#713f12;}
+.l1{background:linear-gradient(90deg,#1a0a0a,#2e0d0d);}
+.l1 .osi-num{background:#7f1d1d;}
+.osi-attack{
+  font-family:var(--mono);font-size:0.68rem;
+  color:var(--warn);background:rgba(255,196,68,0.08);
+  border:1px solid rgba(255,196,68,0.2);
+  border-radius:3px;padding:2px 7px;margin-left:0.4rem;
+}
+
+/* ── PACKET DIAGRAM ── */
+.packet-diagram{
+  display:flex;margin:1.2rem 0;overflow-x:auto;
+  border:1px solid var(--border);border-radius:4px;
+  overflow:hidden;
+}
+.pkt-field{
+  padding:14px 10px;text-align:center;
+  border-right:1px solid rgba(255,255,255,0.06);
+  flex:1;min-width:80px;
+}
+.pkt-field:last-child{border-right:none;}
+.pkt-name{font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;margin-bottom:4px;}
+.pkt-val{font-family:var(--mono);font-size:0.78rem;font-weight:600;color:#fff;}
+.pkt-bits{font-size:0.65rem;color:var(--muted);margin-top:2px;}
+.pf-blue{background:rgba(91,141,255,0.1);}
+.pf-green{background:rgba(0,229,160,0.08);}
+.pf-orange{background:rgba(255,107,53,0.08);}
+.pf-purple{background:rgba(199,125,255,0.08);}
+.pf-yellow{background:rgba(255,196,68,0.08);}
+
+/* ── PROTOCOL CARD ── */
+.proto-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1rem;margin-bottom:1.2rem;
+}
+.proto-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-top:2px solid var(--accent);
+  border-radius:4px;padding:1.2rem;
+}
+.proto-card.red{border-top-color:var(--red);}
+.proto-card.orange{border-top-color:var(--accent2);}
+.proto-card.green{border-top-color:var(--accent3);}
+.proto-card.purple{border-top-color:var(--purple);}
+.proto-card.warn{border-top-color:var(--warn);}
+.proto-name{
+  font-family:var(--display);font-size:1rem;font-weight:700;
+  color:#fff;margin-bottom:0.3rem;
+}
+.proto-port{
+  font-family:var(--mono);font-size:0.68rem;
+  color:var(--accent);margin-bottom:0.6rem;
+}
+.proto-desc{font-size:0.82rem;color:var(--muted);margin-bottom:0.6rem;}
+.proto-attack{
+  font-size:0.78rem;color:var(--red);
+  background:rgba(255,71,87,0.07);
+  border:1px solid rgba(255,71,87,0.2);
+  border-radius:3px;padding:0.5rem 0.7rem;
+}
+.proto-attack strong{color:var(--warn);}
+
+/* ── TERMINAL ── */
+.terminal{
+  background:#030509;
+  border:1px solid var(--border);
+  border-radius:5px;overflow:hidden;margin:1rem 0;
+}
+.t-bar{
+  background:#0b0d1a;
+  padding:8px 14px;display:flex;align-items:center;gap:6px;
+  border-bottom:1px solid var(--border);
+}
+.dot{width:10px;height:10px;border-radius:50%;}
+.d-r{background:#ff5f56;}.d-y{background:#ffbd2e;}.d-g{background:#27c93f;}
+.t-title{font-family:var(--mono);font-size:0.67rem;color:var(--muted);margin-left:0.5rem;letter-spacing:0.1em;}
+.t-body{
+  padding:1.2rem 1.4rem;font-family:var(--mono);
+  font-size:0.79rem;line-height:2;color:#8ba3c7;
+}
+.p{color:#4ade80;}.cmd{color:#e2e8f0;}.out{color:#4a5680;}
+.hi{color:var(--accent3);}.warn{color:var(--warn);}.err{color:var(--red);}
+.comment{color:#2d3a5a;}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:0.83rem;margin:1rem 0;}
+.tbl th{
+  background:var(--surface);color:var(--accent);
+  font-family:var(--mono);font-size:0.67rem;letter-spacing:0.12em;
+  text-align:left;padding:10px 14px;border:1px solid var(--border);
+}
+.tbl td{padding:9px 14px;border:1px solid var(--border);color:var(--text);vertical-align:top;}
+.tbl tr:nth-child(even) td{background:rgba(255,255,255,0.02);}
+.tbl tr:hover td{background:rgba(91,141,255,0.04);}
+
+/* ── CALLOUT ── */
+.callout{
+  display:flex;gap:1rem;align-items:flex-start;
+  padding:1rem 1.2rem;border-radius:4px;margin:1rem 0;font-size:0.86rem;
+}
+.c-info{background:rgba(91,141,255,0.07);border:1px solid rgba(91,141,255,0.2);}
+.c-warn{background:rgba(255,196,68,0.07);border:1px solid rgba(255,196,68,0.22);}
+.c-danger{background:rgba(255,71,87,0.07);border:1px solid rgba(255,71,87,0.22);}
+.c-green{background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.2);}
+.c-icon{font-size:1rem;line-height:1.6;flex-shrink:0;}
+.callout p{color:var(--text);margin:0;}
+.callout strong{color:#fff;}
+
+/* ── CHECKLIST ── */
+.cklist{list-style:none;margin:0.8rem 0;}
+.cklist li{
+  display:flex;align-items:flex-start;gap:0.7rem;
+  padding:0.45rem 0;font-size:0.86rem;color:var(--text);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.cklist li:last-child{border-bottom:none;}
+.cklist li::before{content:'›';color:var(--accent3);flex-shrink:0;margin-top:1px;font-size:1rem;}
+
+/* ── QUIZ ── */
+.quiz-q-block{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:5px;padding:1.4rem;margin-bottom:1rem;
+}
+.q-text{font-size:0.9rem;font-weight:600;color:#e2e8f0;margin-bottom:1rem;}
+.q-opts{display:flex;flex-direction:column;gap:0.5rem;}
+.q-opt{
+  display:flex;align-items:flex-start;gap:0.7rem;
+  padding:0.65rem 1rem;border:1px solid var(--border);
+  border-radius:3px;cursor:pointer;font-size:0.83rem;color:var(--text);
+  transition:all 0.15s;user-select:none;
+}
+.q-opt:hover{border-color:var(--accent);color:#fff;background:rgba(91,141,255,0.05);}
+.q-opt.correct{border-color:var(--accent3);background:rgba(0,229,160,0.08);color:var(--accent3);}
+.q-opt.wrong{border-color:var(--red);background:rgba(255,71,87,0.07);color:var(--red);}
+.q-key{font-family:var(--mono);font-size:0.7rem;color:var(--muted);min-width:18px;flex-shrink:0;padding-top:1px;}
+.q-fb{
+  margin-top:0.8rem;font-size:0.81rem;padding:0.6rem 1rem;
+  border-radius:3px;display:none;
+}
+.q-fb.show{display:block;}
+.q-fb.correct{background:rgba(0,229,160,0.1);color:var(--accent3);border:1px solid rgba(0,229,160,0.25);}
+.q-fb.wrong{background:rgba(255,71,87,0.1);color:var(--red);border:1px solid rgba(255,71,87,0.25);}
+
+/* ── WIRESHARK SIMULATION ── */
+.ws-frame{
+  background:#030509;border:1px solid var(--border);
+  border-radius:5px;overflow:hidden;margin:1rem 0;
+}
+.ws-bar{
+  background:#0b0d1a;padding:8px 14px;
+  font-family:var(--mono);font-size:0.67rem;color:var(--accent);
+  border-bottom:1px solid var(--border);letter-spacing:0.1em;
+}
+.ws-table{width:100%;border-collapse:collapse;font-size:0.74rem;font-family:var(--mono);}
+.ws-table th{background:#0f1220;color:var(--muted);padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.ws-table td{padding:5px 10px;border-bottom:1px solid rgba(255,255,255,0.03);}
+.ws-table tr.http{background:rgba(0,229,160,0.06);color:#a7f3d0;}
+.ws-table tr.dns{background:rgba(199,125,255,0.06);color:#ddd6fe;}
+.ws-table tr.tcp{background:rgba(91,141,255,0.05);color:#bfdbfe;}
+.ws-table tr.arp{background:rgba(255,196,68,0.06);color:#fde68a;}
+.ws-table tr.tls{background:rgba(255,107,53,0.06);color:#fed7aa;}
+.ws-table tr:hover{opacity:0.85;}
+
+/* ── SUBNET CALCULATOR ── */
+.subnet-calc{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:5px;padding:1.4rem;margin:1rem 0;
+}
+.subnet-calc h4{font-family:var(--display);font-size:1rem;color:#fff;margin-bottom:1rem;}
+.sc-row{display:flex;gap:0.6rem;align-items:center;margin-bottom:0.8rem;flex-wrap:wrap;}
+.sc-input{
+  background:var(--surface);border:1px solid var(--border);
+  color:#fff;font-family:var(--mono);font-size:0.85rem;
+  padding:8px 12px;border-radius:3px;flex:1;min-width:160px;
+  outline:none;transition:border-color 0.2s;
+}
+.sc-input:focus{border-color:var(--accent);}
+.sc-btn{
+  background:rgba(91,141,255,0.15);border:1px solid var(--accent);
+  color:var(--accent);font-family:var(--mono);font-size:0.78rem;
+  padding:8px 18px;border-radius:3px;cursor:pointer;
+  transition:all 0.15s;letter-spacing:0.06em;
+}
+.sc-btn:hover{background:rgba(91,141,255,0.3);}
+.sc-result{
+  font-family:var(--mono);font-size:0.8rem;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:3px;padding:1rem;margin-top:0.8rem;
+  line-height:2;color:var(--text);display:none;
+}
+.sc-result.show{display:block;}
+.sc-result .lbl{color:var(--muted);}
+.sc-result .val{color:var(--accent3);}
+
+/* ── SECTION LABEL ── */
+.sec-lbl{
+  font-family:var(--mono);font-size:0.67rem;color:var(--muted);
+  letter-spacing:0.22em;text-transform:uppercase;
+  margin:2rem 0 0.8rem;
+}
+
+/* ── MISC ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:680px){.two-col{grid-template-columns:1fr;}}
+.hl{color:var(--accent);font-weight:600;}
+.hl-g{color:var(--accent3);font-weight:600;}
+.hl-r{color:var(--red);font-weight:600;}
+.hl-o{color:var(--accent2);font-weight:600;}
+.hl-w{color:var(--warn);font-weight:600;}
+hr.div{border:none;border-top:1px solid var(--border);margin:2rem 0;}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);
+  padding:1.5rem 2rem;text-align:center;
+  font-family:var(--mono);font-size:0.68rem;color:var(--muted);
+  letter-spacing:0.1em;max-width:1120px;margin:2rem auto 0;
+  position:relative;z-index:1;
+}
+</style>
+<link rel="stylesheet" href="../css/shared.css"/>
+</head>
+<body>
+<nav class="breadcrumb" style="background:var(--surface,#090c12);border-bottom-color:var(--border,#141b26);color:var(--muted,#253040);">
+  <a href="../index.html" style="color:var(--accent,#3b82f6);">LESSON HUB</a>
+  <span>/</span>
+  <span style="color:var(--text,#b0c0d8);">Phase 1</span>
+  <span>/</span>
+  <span style="color:#fff;">Week 2</span>
+</nav>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">CYBER<span>BOOT</span>CAMP</div>
+    <div class="week-badge">PHASE 1 · WEEK 2 · NETWORKING & PROTOCOLS</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">// PHASE 1 — FOUNDATIONS → WEEK 2 OF 2</div>
+  <h1>Networking &amp; Protocols —<br><em>How Data Actually Moves</em></h1>
+  <p class="hero-sub">Seven deep-dive days into OSI, TCP/IP, Wireshark, DNS, HTTP, ARP, cryptography, firewalls, and OSINT. Understanding networks is understanding every attack surface.</p>
+  <div class="hero-pills">
+    <span class="pill pill-blue">OSI Model</span>
+    <span class="pill pill-blue">TCP/IP Stack</span>
+    <span class="pill pill-green">Wireshark</span>
+    <span class="pill pill-green">Packet Analysis</span>
+    <span class="pill pill-orange">DNS Attacks</span>
+    <span class="pill pill-orange">ARP Poisoning</span>
+    <span class="pill pill-blue">Cryptography</span>
+    <span class="pill pill-green">OSINT</span>
+  </div>
+</div>
+
+<!-- DAY TABS -->
+<div class="day-nav">
+  <button class="day-tab active" onclick="showDay(0)">Day 8 — OSI &amp; TCP/IP</button>
+  <button class="day-tab" onclick="showDay(1)">Day 9 — Protocols</button>
+  <button class="day-tab" onclick="showDay(2)">Day 10 — Wireshark</button>
+  <button class="day-tab" onclick="showDay(3)">Day 11 — Firewalls &amp; IDS</button>
+  <button class="day-tab" onclick="showDay(4)">Day 12 — Cryptography</button>
+  <button class="day-tab" onclick="showDay(5)">Day 13 — OSINT</button>
+  <button class="day-tab" onclick="showDay(6)">Day 14 — Review &amp; Labs</button>
+</div>
+
+<div class="content-wrap">
+
+<!-- ═══════════════════ DAY 8 ═══════════════════ -->
+<div class="day-panel active" id="day-0">
+
+  <div class="day-header">
+    <div class="day-num">08</div>
+    <div class="day-info">
+      <h2>OSI Model &amp; TCP/IP — The Network Bible</h2>
+      <p><span class="tag t-th">THEORY</span> Subnetting · CIDR · IP Addressing · Protocol Stack</p>
+    </div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-label">WEEK 2 PROGRESS — DAY 8 OF 14</div>
+    <div class="prog-track"><div class="prog-fill" style="width:57%"></div></div>
+  </div>
+
+  <div class="callout c-info">
+    <div class="c-icon">📡</div>
+    <p><strong>Why this matters for hacking:</strong> Every attack is a network event. Every packet you send, capture, or forge has a home on the OSI stack. When you do an ARP spoof, you're attacking Layer 2. When you exploit a web app, you're working Layer 7. You cannot understand attack tools without understanding the layer they operate at.</p>
+  </div>
+
+  <div class="sec-lbl">// 8.1 — THE OSI MODEL</div>
+  <div class="card">
+    <div class="card-label">7-Layer Reference Model</div>
+    <p>OSI (Open Systems Interconnection) is a conceptual framework describing how data travels from an application on one computer to an application on another. Each layer has a specific job and talks to the layers directly above and below it.</p>
+    <p style="margin-top:0.6rem">The mnemonic: <span class="hl">"Please Do Not Throw Sausage Pizza Away"</span> → Physical, Data Link, Network, Transport, Session, Presentation, Application.</p>
+  </div>
+
+  <div class="osi-stack">
+    <div class="osi-layer l7">
+      <div class="osi-num">7</div>
+      <div class="osi-name">Application</div>
+      <div class="osi-detail">HTTP, DNS, FTP, SMTP, SSH — what users interact with <span class="osi-attack">SQL Injection · XSS</span></div>
+    </div>
+    <div class="osi-layer l6">
+      <div class="osi-num">6</div>
+      <div class="osi-name">Presentation</div>
+      <div class="osi-detail">Encryption, encoding, compression — SSL/TLS lives here <span class="osi-attack">SSL Stripping</span></div>
+    </div>
+    <div class="osi-layer l5">
+      <div class="osi-num">5</div>
+      <div class="osi-name">Session</div>
+      <div class="osi-detail">Managing connections between apps — session tokens <span class="osi-attack">Session Hijack</span></div>
+    </div>
+    <div class="osi-layer l4">
+      <div class="osi-num">4</div>
+      <div class="osi-name">Transport</div>
+      <div class="osi-detail">TCP/UDP — ports, reliability, flow control <span class="osi-attack">SYN Flood · Port Scan</span></div>
+    </div>
+    <div class="osi-layer l3">
+      <div class="osi-num">3</div>
+      <div class="osi-name">Network</div>
+      <div class="osi-detail">IP addressing, routing — packets travel here <span class="osi-attack">IP Spoofing · ICMP Flood</span></div>
+    </div>
+    <div class="osi-layer l2">
+      <div class="osi-num">2</div>
+      <div class="osi-name">Data Link</div>
+      <div class="osi-detail">MAC addresses, frames, switches — LAN level <span class="osi-attack">ARP Poison · MAC Flood</span></div>
+    </div>
+    <div class="osi-layer l1">
+      <div class="osi-num">1</div>
+      <div class="osi-name">Physical</div>
+      <div class="osi-detail">Cables, wireless signals, hardware bits <span class="osi-attack">Cable Tap · Jamming</span></div>
+    </div>
+  </div>
+
+  <div class="callout c-warn">
+    <div class="c-icon">💡</div>
+    <p><strong>Attack-mapping drill:</strong> When you learn any new attack, immediately ask: "What OSI layer does this operate at?" A port scanner probes Layer 4 (Transport). Wireshark captures at Layer 2. A phishing email exploits the human at Layer 8 (the joke layer not in OSI — the human layer). This mental habit will make you a better analyst.</p>
+  </div>
+
+  <div class="sec-lbl">// 8.2 — TCP/IP: THE REAL PROTOCOL STACK</div>
+  <div class="card">
+    <div class="card-label">TCP/IP vs OSI</div>
+    <p>While OSI is a theoretical model, TCP/IP is what the internet actually uses. It collapses the 7 OSI layers into 4. TCP/IP is what you'll interact with in Wireshark, nmap, and every exploit.</p>
+  </div>
+
+  <table class="tbl">
+    <tr><th>TCP/IP LAYER</th><th>OSI EQUIVALENT</th><th>KEY PROTOCOLS</th><th>SECURITY TOOLS OPERATING HERE</th></tr>
+    <tr><td><span class="hl">Application</span></td><td>Layers 5, 6, 7</td><td>HTTP, DNS, FTP, SSH, SMTP, DHCP</td><td>Burp Suite, sqlmap, curl, nikto</td></tr>
+    <tr><td><span class="hl">Transport</span></td><td>Layer 4</td><td>TCP, UDP</td><td>nmap (port scan), netcat, hping3</td></tr>
+    <tr><td><span class="hl">Internet</span></td><td>Layer 3</td><td>IP, ICMP, ARP</td><td>nmap (host discovery), ping, traceroute</td></tr>
+    <tr><td><span class="hl">Network Access</span></td><td>Layers 1, 2</td><td>Ethernet, Wi-Fi (802.11), MAC</td><td>Wireshark, aircrack-ng, arpspoof</td></tr>
+  </table>
+
+  <div class="sec-lbl">// 8.3 — THE TCP THREE-WAY HANDSHAKE</div>
+  <div class="card">
+    <div class="card-label">How TCP Connections Are Established</div>
+    <p>Every TCP connection starts with a 3-way handshake. Understanding this is fundamental to understanding port scanning, SYN floods, and TCP session hijacking.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="t-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div><div class="t-title">TCP HANDSHAKE — WHAT HAPPENS WHEN YOU CONNECT</div></div>
+    <div class="t-body"><span class="comment">CLIENT                           SERVER
+  │                                  │</span>
+<span class="hi">SYN</span>  ──────────────────────────────► │   <span class="comment">"I want to connect; my seq# is 1000"</span>
+  │                                  │
+  │ ◄────────────────────────────── <span class="hi">SYN-ACK</span>  <span class="comment">"OK, my seq# is 5000, your ACK# is 1001"</span>
+  │                                  │
+<span class="hi">ACK</span>  ──────────────────────────────► │   <span class="comment">"Got it. Your ACK# is 5001. Connection established!"</span>
+  │                                  │
+<span class="comment">═══════════════ DATA FLOWS ════════════════</span>
+
+<span class="warn"># ATTACK: SYN Flood (DoS at Layer 4)
+# Attacker sends thousands of SYN packets, never completes ACK
+# Server allocates resources waiting for ACKs → runs out of memory → crashes</span>
+
+<span class="comment"># ATTACK: Nmap SYN Scan (-sS)
+# Sends SYN → gets SYN-ACK (port open!) → sends RST (never completes handshake)
+# Faster and stealthier than a full connect scan</span></div>
+  </div>
+
+  <div class="sec-lbl">// 8.4 — IP ADDRESSING &amp; SUBNETTING</div>
+  <div class="card">
+    <div class="card-label">IPv4 Addressing</div>
+    <p>An IPv4 address is 32 bits written as 4 octets (e.g., <span class="hl">192.168.1.100</span>). The subnet mask defines which part is the network and which is the host. As a pentester, you must calculate subnets quickly — they define your target scope.</p>
+  </div>
+
+  <table class="tbl">
+    <tr><th>CLASS</th><th>RANGE</th><th>DEFAULT MASK</th><th>HOSTS</th><th>USE</th></tr>
+    <tr><td>A</td><td>1.0.0.0 – 126.0.0.0</td><td>/8 (255.0.0.0)</td><td>16,777,214</td><td>Large enterprises, ISPs</td></tr>
+    <tr><td>B</td><td>128.0.0.0 – 191.255.0.0</td><td>/16 (255.255.0.0)</td><td>65,534</td><td>Medium organizations</td></tr>
+    <tr><td>C</td><td>192.0.0.0 – 223.255.255.0</td><td>/24 (255.255.255.0)</td><td>254</td><td>Small networks — most common</td></tr>
+  </table>
+
+  <div class="card">
+    <div class="card-label">Private vs Public IP Ranges (Critical for Recon)</div>
+    <table class="tbl">
+      <tr><th>RANGE</th><th>CIDR</th><th>PRIVATE/PUBLIC</th><th>YOU'LL SEE THIS IN...</th></tr>
+      <tr><td>10.0.0.0 – 10.255.255.255</td><td>/8</td><td>Private</td><td>Large internal networks, VPNs, data centers</td></tr>
+      <tr><td>172.16.0.0 – 172.31.255.255</td><td>/12</td><td>Private</td><td>Corporate networks</td></tr>
+      <tr><td>192.168.0.0 – 192.168.255.255</td><td>/16</td><td>Private</td><td>Home routers, small office, your lab</td></tr>
+      <tr><td>127.0.0.1</td><td>/8</td><td>Loopback</td><td>localhost — always refers to the machine itself</td></tr>
+      <tr><td>Everything else</td><td>—</td><td>Public</td><td>Routable on the internet — attackable from anywhere</td></tr>
+    </table>
+  </div>
+
+  <!-- Interactive Subnet Calculator -->
+  <div class="subnet-calc">
+    <h4>🖥️ Interactive Subnet Calculator</h4>
+    <div class="sc-row">
+      <input class="sc-input" id="sc-ip" placeholder="IP Address (e.g. 192.168.1.100)" />
+      <input class="sc-input" id="sc-cidr" placeholder="CIDR prefix (e.g. 24)" type="number" min="1" max="32"/>
+      <button class="sc-btn" onclick="calcSubnet()">CALCULATE</button>
+    </div>
+    <div class="sc-result" id="sc-result"></div>
+  </div>
+
+  <div class="sec-lbl">// DAY 8 — QUIZ</div>
+  <div class="quiz-q-block">
+    <div class="q-text">An nmap SYN scan sends a SYN packet and receives a SYN-ACK. It then immediately sends a RST. Which OSI layer is nmap operating at for port discovery, and why is this scan considered "stealthy"?</div>
+    <div class="q-opts">
+      <div class="q-opt" onclick="ans(this,'wrong','Layer 7 is the Application layer — HTTP, DNS, etc. nmap\'s port scanning works at the transport level using TCP flags.')"><span class="q-key">A</span> Layer 7 — because it mimics normal application traffic</div>
+      <div class="q-opt" onclick="ans(this,'correct','Correct! Layer 4 (Transport) — nmap manipulates raw TCP flags (SYN, RST). It\'s stealthy because it never completes the 3-way handshake, so the OS never opens a full socket, meaning the connection never appears in application logs. Many older IDS systems only log completed connections. Modern IDS catches this, but it\'s still stealthier than a full-connect scan (-sT).')"><span class="q-key">B</span> Layer 4 — it never completes the TCP handshake so no full connection is logged</div>
+      <div class="q-opt" onclick="ans(this,'wrong','Layer 3 is the IP/Network layer. While IP headers are involved, the scan logic operates on TCP (Layer 4) flags.')"><span class="q-key">C</span> Layer 3 — it uses raw IP packets</div>
+      <div class="q-opt" onclick="ans(this,'wrong','Layer 2 is the Data Link layer (MAC, Ethernet frames). nmap SYN scans operate above this level.')"><span class="q-key">D</span> Layer 2 — it uses Ethernet frames directly</div>
+    </div>
+    <div class="q-fb" id="qf-0-0"></div>
+  </div>
+
+</div><!-- day-0 -->
+
+
+<!-- ═══════════════════ DAY 9 ═══════════════════ -->
+<div class="day-panel" id="day-1">
+
+  <div class="day-header">
+    <div class="day-num">09</div>
+    <div class="day-info">
+      <h2>Key Protocols &amp; Their Weaknesses</h2>
+      <p><span class="tag t-th">THEORY</span><span class="tag t-lb">LAB</span> DNS · DHCP · ARP · HTTP/S · FTP · SMTP</p>
+    </div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-label">WEEK 2 PROGRESS — DAY 9 OF 14</div>
+    <div class="prog-track"><div class="prog-fill" style="width:64%"></div></div>
+  </div>
+
+  <div class="callout c-info">
+    <div class="c-icon">⚡</div>
+    <p><strong>Attacker's mindset:</strong> Every protocol was designed for functionality, not security. Most were invented in the 1970s–90s when the internet was a trusted academic network. The security holes aren't bugs — they're architectural decisions that made sense at the time. Your job is to understand the design well enough to exploit the gaps.</p>
+  </div>
+
+  <div class="sec-lbl">// 9.1 — DNS: THE INTERNET'S PHONE BOOK</div>
+
+  <div class="card">
+    <div class="card-label">How DNS Resolution Works</div>
+    <p>DNS (Domain Name System) translates human-readable names like <span class="hl">google.com</span> into IP addresses like <span class="hl">142.250.80.46</span>. It's hierarchical, distributed, and <span class="hl-r">fundamentally unauthenticated</span> — anyone on your network can lie to you about what IP a domain resolves to.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="t-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div><div class="t-title">DNS RESOLUTION — STEP BY STEP</div></div>
+    <div class="t-body"><span class="comment">You type: https://bank.com in your browser</span>
+
+<span class="hi">Step 1:</span> Browser checks its own DNS cache → not found
+<span class="hi">Step 2:</span> Ask OS resolver → checks /etc/hosts → not found
+<span class="hi">Step 3:</span> Ask your configured DNS server (e.g., 8.8.8.8)
+<span class="hi">Step 4:</span> DNS server checks its cache → not found
+<span class="hi">Step 5:</span> DNS server asks Root Server → "Go ask .com TLD servers"
+<span class="hi">Step 6:</span> Ask .com TLD server → "Go ask bank.com's authoritative NS"
+<span class="hi">Step 7:</span> Ask authoritative nameserver → "bank.com = 1.2.3.4"
+<span class="hi">Step 8:</span> Response cached, returned to browser → browser connects to 1.2.3.4
+
+<span class="warn"># ATTACK: DNS Spoofing / Cache Poisoning
+# Attacker poisons a DNS cache so bank.com → attacker's IP
+# Victim never knows — URL looks correct, but they're on a fake site</span>
+
+<span class="comment"># DNS Recon commands you'll use daily:</span>
+<span class="p">$</span> <span class="cmd">nslookup bank.com</span>
+<span class="p">$</span> <span class="cmd">dig bank.com ANY</span>          <span class="comment"># Full DNS record dump</span>
+<span class="p">$</span> <span class="cmd">dig +short MX bank.com</span>   <span class="comment"># Mail servers (useful for phishing recon)</span>
+<span class="p">$</span> <span class="cmd">dig -x 1.2.3.4</span>           <span class="comment"># Reverse DNS lookup</span>
+<span class="p">$</span> <span class="cmd">host -t AXFR bank.com ns1.bank.com</span>  <span class="comment"># Zone transfer attempt (often succeeds!)</span></div>
+  </div>
+
+  <div class="callout c-danger">
+    <div class="c-icon">🔥</div>
+    <p><strong>DNS Zone Transfer Attack:</strong> If a DNS server is misconfigured to allow zone transfers (AXFR requests) from anyone, an attacker can dump the entire DNS zone — getting a full list of every subdomain, server, and internal hostname for a company. This is free recon gold. Always test: <code>dig AXFR @ns1.target.com target.com</code></p>
+  </div>
+
+  <div class="sec-lbl">// 9.2 — ARP: THE LOCAL NETWORK LIAR</div>
+
+  <div class="card">
+    <div class="card-label">ARP — Address Resolution Protocol</div>
+    <p>ARP translates IP addresses to MAC addresses on a local network. "Who has IP 192.168.1.1? Tell me your MAC address so I can send frames to you." The critical flaw: <span class="hl-r">ARP has no authentication. Any device can claim any IP.</span> This is the foundation of Man-in-the-Middle attacks on local networks.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="t-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div><div class="t-title">ARP POISONING ATTACK — HOW IT WORKS</div></div>
+    <div class="t-body"><span class="comment">LEGITIMATE SCENARIO:
+  Victim (192.168.1.5) wants to reach Gateway (192.168.1.1)
+  ARP Request: "Who has 192.168.1.1?"
+  ARP Reply from router: "That's me! My MAC is AA:BB:CC:DD:EE:FF"</span>
+
+<span class="warn">ARP POISON ATTACK:
+  Attacker sends fake ARP replies to BOTH victim and gateway:
+  → To Victim:   "192.168.1.1 is at MY MAC (attacker)"
+  → To Gateway:  "192.168.1.5 is at MY MAC (attacker)"
+  
+  Now ALL traffic flows: Victim → Attacker → Gateway
+  Attacker is in the middle — can read, modify, or drop all packets</span>
+
+<span class="comment"># Execute ARP poison (on your lab only!):</span>
+<span class="p">$</span> <span class="cmd">echo 1 > /proc/sys/net/ipv4/ip_forward</span>  <span class="comment"># Enable IP forwarding (don't drop packets)</span>
+<span class="p">$</span> <span class="cmd">arpspoof -i eth0 -t 192.168.56.101 192.168.56.1</span>  <span class="comment"># Poison victim</span>
+<span class="p">$</span> <span class="cmd">arpspoof -i eth0 -t 192.168.56.1 192.168.56.101</span>  <span class="comment"># Poison gateway</span>
+<span class="comment"># Now run Wireshark — you see ALL victim's traffic</span>
+
+<span class="comment"># Check your ARP table:</span>
+<span class="p">$</span> <span class="cmd">arp -n</span>
+<span class="out">Address          HWtype  HWaddress           Iface
+192.168.56.1     ether   08:00:27:aa:bb:cc   eth0
+192.168.56.101   ether   08:00:27:dd:ee:ff   eth0</span></div>
+  </div>
+
+  <div class="sec-lbl">// 9.3 — HTTP vs HTTPS</div>
+
+  <div class="proto-grid">
+    <div class="proto-card red">
+      <div class="proto-name">HTTP</div>
+      <div class="proto-port">TCP Port 80 · Plaintext</div>
+      <div class="proto-desc">HyperText Transfer Protocol. All data — including passwords, cookies, form data — is sent in plaintext. Anyone on the same network can read every byte.</div>
+      <div class="proto-attack"><strong>Attacks:</strong> Credential sniffing, session hijacking, content injection, MITM modification of pages in transit</div>
+    </div>
+    <div class="proto-card green">
+      <div class="proto-name">HTTPS</div>
+      <div class="proto-port">TCP Port 443 · TLS Encrypted</div>
+      <div class="proto-desc">HTTP over TLS. Data is encrypted end-to-end. Even if captured, encrypted traffic reveals only the destination IP, not content. Certificates prove server identity.</div>
+      <div class="proto-attack"><strong>Attacks:</strong> SSL stripping (downgrade to HTTP), certificate spoofing with fake CA, TLS protocol vulnerabilities (BEAST, POODLE, Heartbleed)</div>
+    </div>
+    <div class="proto-card orange">
+      <div class="proto-name">FTP</div>
+      <div class="proto-port">TCP Port 21 (control) · 20 (data)</div>
+      <div class="proto-desc">File Transfer Protocol. Credentials and data sent in plaintext. Anonymous FTP login (username: anonymous) is often enabled and exposes files publicly.</div>
+      <div class="proto-attack"><strong>Attacks:</strong> Credential sniffing, anonymous login, FTP bounce attack, brute-force login</div>
+    </div>
+    <div class="proto-card purple">
+      <div class="proto-name">SMTP</div>
+      <div class="proto-port">TCP Port 25 / 587 / 465</div>
+      <div class="proto-desc">Simple Mail Transfer Protocol. Sends email. The "From" field is completely unauthenticated — trivially spoofed. Open relays allow anyone to send email through your server.</div>
+      <div class="proto-attack"><strong>Attacks:</strong> Email spoofing (phishing), open relay abuse, header injection, SMTP user enumeration (VRFY/EXPN)</div>
+    </div>
+    <div class="proto-card warn">
+      <div class="proto-name">DHCP</div>
+      <div class="proto-port">UDP Port 67/68</div>
+      <div class="proto-desc">Auto-assigns IP addresses. When a device joins a network, it broadcasts "DHCP Discover" — whoever replies first with DHCP Offer wins. No authentication.</div>
+      <div class="proto-attack"><strong>Attacks:</strong> Rogue DHCP server (attacker responds first, assigns own gateway → MITM entire network), DHCP starvation (exhaust IP pool with fake requests)</div>
+    </div>
+    <div class="proto-card">
+      <div class="proto-name">SSH</div>
+      <div class="proto-port">TCP Port 22 · Encrypted</div>
+      <div class="proto-desc">Secure Shell. Encrypted terminal access. Replaced Telnet (plaintext). Key-based auth is far stronger than password-based. Configuration errors are the main weakness.</div>
+      <div class="proto-attack"><strong>Attacks:</strong> Brute-force passwords, weak key algorithms, SSH tunneling (legitimate but used to bypass firewalls), exposed private keys in git repos</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">// DAY 9 — QUIZ</div>
+  <div class="quiz-q-block">
+    <div class="q-text">You're on the same Wi-Fi as a colleague who logs into an internal system over HTTP. Using Wireshark, you can see their username and password in plaintext. They then switch to HTTPS. What changes?</div>
+    <div class="q-opts">
+      <div class="q-opt" onclick="ans(this,'wrong','You can still see packets with HTTPS — but TLS encrypts the content. You see the destination IP and certificate info, but the actual data (credentials, page content) is ciphertext you cannot read without the private key.')"><span class="q-key">A</span> Nothing — you can still read all their data with Wireshark</div>
+      <div class="q-opt" onclick="ans(this,'wrong','The packets don\'t disappear — they\'re still captured. They\'re just encrypted. Wireshark shows them as TLS Application Data records with unreadable payload.')"><span class="q-key">B</span> Their packets disappear from Wireshark completely</div>
+      <div class="q-opt" onclick="ans(this,'correct','Correct! With HTTPS/TLS, you can still capture the packets in Wireshark, and you can see metadata (destination IP, certificate, SNI — Server Name Indication reveals the hostname). But the actual payload is encrypted with TLS. Without the server\'s private key or a MITM proxy, you cannot read credentials, cookies, or any content. This is why HTTPS is mandatory for anything sensitive.')"><span class="q-key">C</span> You can still capture packets and see the destination, but payload content is encrypted and unreadable</div>
+      <div class="q-opt" onclick="ans(this,'wrong','Using a different port (443 vs 80) doesn\'t alone stop capture. The protection comes from TLS encryption, not the port number.')"><span class="q-key">D</span> HTTPS uses port 443 which is blocked by default network policies</div>
+    </div>
+    <div class="q-fb" id="qf-1-0"></div>
+  </div>
+
+  <div class="sec-lbl">// DAY 9 — LAB</div>
+  <div class="card">
+    <div class="card-label">Lab Tasks</div>
+    <ul class="cklist">
+      <li>Run <code>dig google.com ANY</code> — identify all record types (A, AAAA, MX, NS, TXT). What does each mean?</li>
+      <li>Try a zone transfer against <code>zonetransfer.me</code> — this is a deliberately vulnerable DNS server for learning: <code>dig AXFR @nsztm1.digi.ninja zonetransfer.me</code></li>
+      <li>Check your ARP table: <code>arp -n</code>. Identify your gateway's MAC address.</li>
+      <li>Use curl to see HTTP headers: <code>curl -I http://metasploitable.lab/</code> vs <code>curl -I https://google.com</code></li>
+      <li>Connect to Metasploitable's FTP: <code>ftp 192.168.56.101</code> — try username <code>anonymous</code> with any password. What files are exposed?</li>
+    </ul>
+  </div>
+
+</div><!-- day-1 -->
+
+
+<!-- ═══════════════════ DAY 10 ═══════════════════ -->
+<div class="day-panel" id="day-2">
+
+  <div class="day-header">
+    <div class="day-num">10</div>
+    <div class="day-info">
+      <h2>Wireshark — Packet Analysis Mastery</h2>
+      <p><span class="tag t-tl">TOOL</span><span class="tag t-lb">LAB</span> Capture · Filter · HTTP · DNS · TCP Handshakes</p>
+    </div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-label">WEEK 2 PROGRESS — DAY 10 OF 14</div>
+    <div class="prog-track"><div class="prog-fill" style="width:71%"></div></div>
+  </div>
+
+  <div class="callout c-info">
+    <div class="c-icon">🦈</div>
+    <p><strong>Wireshark</strong> is the world's most widely used network protocol analyzer. It captures every packet on a network interface and lets you dissect it layer by layer. Defenders use it to find attacks. Attackers use it during MITM to harvest credentials. Forensics teams use it to reconstruct incidents. You must be fluent.</p>
+  </div>
+
+  <div class="sec-lbl">// 10.1 — SIMULATED WIRESHARK CAPTURE</div>
+  <p style="font-size:0.85rem;color:var(--muted);margin-bottom:0.8rem;">This is what a real Wireshark capture looks like during a typical browsing session. Click any row to understand what you're seeing.</p>
+
+  <div class="ws-frame">
+    <div class="ws-bar">📦 Wireshark — Capture: eth0 — 47 packets captured</div>
+    <table class="ws-table">
+      <tr>
+        <th>No.</th><th>Time</th><th>Source</th><th>Destination</th><th>Protocol</th><th>Length</th><th>Info</th>
+      </tr>
+      <tr class="arp">
+        <td>1</td><td>0.000</td><td>192.168.1.100</td><td>Broadcast</td><td>ARP</td><td>42</td><td>Who has 192.168.1.1? Tell 192.168.1.100</td>
+      </tr>
+      <tr class="arp">
+        <td>2</td><td>0.001</td><td>192.168.1.1</td><td>192.168.1.100</td><td>ARP</td><td>42</td><td>192.168.1.1 is at 08:00:27:aa:bb:cc</td>
+      </tr>
+      <tr class="dns">
+        <td>3</td><td>0.012</td><td>192.168.1.100</td><td>8.8.8.8</td><td>DNS</td><td>73</td><td>Standard query 0x1a2b A bank.com</td>
+      </tr>
+      <tr class="dns">
+        <td>4</td><td>0.034</td><td>8.8.8.8</td><td>192.168.1.100</td><td>DNS</td><td>89</td><td>Standard query response A 1.2.3.4</td>
+      </tr>
+      <tr class="tcp">
+        <td>5</td><td>0.041</td><td>192.168.1.100</td><td>1.2.3.4</td><td>TCP</td><td>66</td><td>52341 → 443 [SYN] Seq=0 Win=65535</td>
+      </tr>
+      <tr class="tcp">
+        <td>6</td><td>0.052</td><td>1.2.3.4</td><td>192.168.1.100</td><td>TCP</td><td>66</td><td>443 → 52341 [SYN, ACK] Seq=0 Ack=1</td>
+      </tr>
+      <tr class="tcp">
+        <td>7</td><td>0.053</td><td>192.168.1.100</td><td>1.2.3.4</td><td>TCP</td><td>54</td><td>52341 → 443 [ACK] Seq=1 Ack=1</td>
+      </tr>
+      <tr class="tls">
+        <td>8</td><td>0.054</td><td>192.168.1.100</td><td>1.2.3.4</td><td>TLSv1.3</td><td>320</td><td>Client Hello (SNI=bank.com)</td>
+      </tr>
+      <tr class="tls">
+        <td>9</td><td>0.071</td><td>1.2.3.4</td><td>192.168.1.100</td><td>TLSv1.3</td><td>1448</td><td>Server Hello, Certificate</td>
+      </tr>
+      <tr class="http">
+        <td>12</td><td>0.120</td><td>192.168.1.100</td><td>10.0.0.5</td><td>HTTP</td><td>421</td><td>GET /login.php HTTP/1.1 (PLAINTEXT!)</td>
+      </tr>
+      <tr class="http">
+        <td>14</td><td>0.145</td><td>192.168.1.100</td><td>10.0.0.5</td><td>HTTP</td><td>612</td><td>POST /login.php username=admin&amp;password=hunter2</td>
+      </tr>
+      <tr class="http">
+        <td>15</td><td>0.201</td><td>10.0.0.5</td><td>192.168.1.100</td><td>HTTP</td><td>890</td><td>HTTP/1.1 200 OK (text/html)</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="callout c-danger">
+    <div class="c-icon">🚨</div>
+    <p><strong>Look at rows 12 and 14:</strong> An HTTP POST request containing <code>username=admin&password=hunter2</code> — fully readable in Wireshark. This is a real credential capture. Anyone on the same network segment running Wireshark would see this. This is why HTTP login forms are catastrophically insecure.</p>
+  </div>
+
+  <div class="sec-lbl">// 10.2 — WIRESHARK DISPLAY FILTERS (MEMORIZE THESE)</div>
+
+  <div class="terminal">
+    <div class="t-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div><div class="t-title">WIRESHARK FILTERS — THE ONES YOU'LL USE EVERY DAY</div></div>
+    <div class="t-body"><span class="comment"># ── PROTOCOL FILTERS ─────────────────────────────────────────</span>
+http                           <span class="comment"># Show only HTTP traffic</span>
+dns                            <span class="comment"># Show only DNS queries/responses</span>
+tcp                            <span class="comment"># TCP traffic only</span>
+arp                            <span class="comment"># ARP packets only</span>
+tls                            <span class="comment"># TLS/HTTPS traffic</span>
+icmp                           <span class="comment"># Ping traffic</span>
+
+<span class="comment"># ── IP FILTERS ───────────────────────────────────────────────</span>
+ip.addr == 192.168.56.101      <span class="comment"># Any traffic to/from this IP</span>
+ip.src == 192.168.56.100       <span class="comment"># Traffic FROM this IP only</span>
+ip.dst == 8.8.8.8              <span class="comment"># Traffic TO this IP only</span>
+!(ip.addr == 192.168.56.1)     <span class="comment"># Exclude gateway traffic</span>
+
+<span class="comment"># ── PORT FILTERS ─────────────────────────────────────────────</span>
+tcp.port == 80                 <span class="comment"># HTTP</span>
+tcp.port == 443                <span class="comment"># HTTPS</span>
+tcp.port == 22                 <span class="comment"># SSH</span>
+tcp.dstport == 21              <span class="comment"># FTP connections outbound</span>
+
+<span class="comment"># ── CONTENT FILTERS ──────────────────────────────────────────</span>
+http.request.method == "POST"  <span class="comment"># Form submissions (login forms!)</span>
+http contains "password"       <span class="comment"># Packets with "password" in payload</span>
+dns.qry.name contains "bank"   <span class="comment"># DNS queries for bank-related domains</span>
+http.response.code == 200      <span class="comment"># Successful HTTP responses</span>
+
+<span class="comment"># ── TCP FLAG FILTERS ─────────────────────────────────────────</span>
+tcp.flags.syn == 1             <span class="comment"># SYN packets (connection attempts)</span>
+tcp.flags.reset == 1           <span class="comment"># RST packets (abrupt termination)</span>
+tcp.flags == 0x002             <span class="comment"># Only SYN (no ACK) — port scans!</span>
+
+<span class="comment"># ── COMBINED (most useful in real work) ──────────────────────</span>
+http.request.method == "POST" and http contains "pass"
+ip.src == 192.168.56.101 and tcp.port == 80
+dns and ip.src != 8.8.8.8     <span class="comment"># DNS from unexpected servers</span></div>
+  </div>
+
+  <div class="sec-lbl">// 10.3 — READING A PACKET IN DETAIL</div>
+
+  <div class="card">
+    <div class="card-label">Anatomy of an HTTP GET Request Packet</div>
+    <p>When you click on a packet in Wireshark, you see all layers expanded. This is OSI made visible.</p>
+  </div>
+
+  <div class="packet-diagram">
+    <div class="pkt-field pf-blue">
+      <div class="pkt-name">ETHERNET II</div>
+      <div class="pkt-val">Layer 2</div>
+      <div class="pkt-bits">Src MAC: AA:BB:CC<br>Dst MAC: 08:00:27</div>
+    </div>
+    <div class="pkt-field pf-green">
+      <div class="pkt-name">IPv4</div>
+      <div class="pkt-val">Layer 3</div>
+      <div class="pkt-bits">Src: 192.168.1.100<br>Dst: 10.0.0.5<br>TTL: 64</div>
+    </div>
+    <div class="pkt-field pf-orange">
+      <div class="pkt-name">TCP</div>
+      <div class="pkt-val">Layer 4</div>
+      <div class="pkt-bits">SrcPort: 52341<br>DstPort: 80<br>Flags: PSH ACK</div>
+    </div>
+    <div class="pkt-field pf-purple">
+      <div class="pkt-name">HTTP</div>
+      <div class="pkt-val">Layer 7</div>
+      <div class="pkt-bits">GET /login HTTP/1.1<br>Host: 10.0.0.5<br>Cookie: session=abc123</div>
+    </div>
+    <div class="pkt-field pf-yellow">
+      <div class="pkt-name">DATA</div>
+      <div class="pkt-val">Payload</div>
+      <div class="pkt-bits">username=admin<br>&password=hunter2</div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">// DAY 10 — LAB</div>
+  <div class="card">
+    <div class="card-label">Lab: Live Packet Capture on Your Kali VM</div>
+    <ul class="cklist">
+      <li>Open Wireshark on Kali. Start capture on eth0.</li>
+      <li>From the terminal: <code>ping 192.168.56.101</code>. In Wireshark, filter <code>icmp</code>. See the echo requests and replies.</li>
+      <li>Open a browser to <code>http://192.168.56.101</code> (Metasploitable web). Filter <code>http</code>. Find the HTTP GET request. Expand all layers.</li>
+      <li>Filter <code>tcp.flags == 0x002</code> while running <code>nmap -sS 192.168.56.101</code> in another terminal. You'll see the SYN flood from nmap — this is what a port scan looks like on the wire.</li>
+      <li>Filter <code>arp</code>. What ARP requests do you see? Who is the network gateway?</li>
+      <li><strong>Challenge:</strong> Download the sample PCAP file from <code>https://wiki.wireshark.org/SampleCaptures</code> — open it in Wireshark and answer: what protocols are present? What IPs are communicating?</li>
+    </ul>
+  </div>
+
+</div><!-- day-2 -->
+
+
+<!-- ═══════════════════ DAY 11 ═══════════════════ -->
+<div class="day-panel" id="day-3">
+
+  <div class="day-header">
+    <div class="day-num">11</div>
+    <div class="day-info">
+      <h2>Firewalls &amp; IDS/IPS</h2>
+      <p><span class="tag t-th">THEORY</span><span class="tag t-lb">LAB</span> iptables · nftables · Snort · Detection Rules</p>
+    </div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-label">WEEK 2 PROGRESS — DAY 11 OF 14</div>
+    <div class="prog-track"><div class="prog-fill" style="width:78%"></div></div>
+  </div>
+
+  <div class="callout c-info">
+    <div class="c-icon">🧱</div>
+    <p><strong>Attacker perspective + defender perspective:</strong> You need to understand firewalls both to build effective defenses and to bypass them during pentesting. A firewall that blocks port 80 outbound? Attacker tunnels C2 traffic over DNS or HTTPS. You must think both ways.</p>
+  </div>
+
+  <div class="sec-lbl">// 11.1 — FIREWALL TYPES</div>
+
+  <table class="tbl">
+    <tr><th>TYPE</th><th>WHAT IT INSPECTS</th><th>EXAMPLE</th><th>BYPASS TECHNIQUE</th></tr>
+    <tr>
+      <td><span class="hl">Packet Filter</span></td>
+      <td>IP, port, protocol headers only. Stateless — each packet judged independently.</td>
+      <td>Basic router ACLs, early iptables rules</td>
+      <td>Fragment packets to split headers across multiple packets</td>
+    </tr>
+    <tr>
+      <td><span class="hl">Stateful Firewall</span></td>
+      <td>Tracks connection state (SYN/ESTABLISHED/CLOSE). Knows if packet is part of legitimate session.</td>
+      <td>iptables with conntrack, Windows Firewall</td>
+      <td>Hijack existing established sessions, use allowed ports for tunneling</td>
+    </tr>
+    <tr>
+      <td><span class="hl">Application Firewall (WAF)</span></td>
+      <td>Inspects Layer 7 payload — can detect SQL injection patterns, XSS, malformed HTTP</td>
+      <td>ModSecurity, Cloudflare WAF, AWS WAF</td>
+      <td>Encoding bypass (URL encoding, Unicode, case variation), splitting payloads</td>
+    </tr>
+    <tr>
+      <td><span class="hl">NGFW (Next-Gen)</span></td>
+      <td>Deep packet inspection, application awareness, user identity, SSL inspection</td>
+      <td>Palo Alto, Fortinet, Check Point</td>
+      <td>Use legitimate applications (Teams, Slack) for C2; encrypt custom protocols</td>
+    </tr>
+  </table>
+
+  <div class="sec-lbl">// 11.2 — iptables MASTERY</div>
+
+  <div class="terminal">
+    <div class="t-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div><div class="t-title">iptables — LINUX FIREWALL COMMANDS</div></div>
+    <div class="t-body"><span class="comment"># View current rules (the first thing you check on any system)</span>
+<span class="p">$</span> <span class="cmd">iptables -L -n -v</span>          <span class="comment"># -n = numeric (don't resolve DNS), -v = verbose</span>
+<span class="p">$</span> <span class="cmd">iptables -L -n -v --line-numbers</span>  <span class="comment"># with rule numbers for deletion</span>
+
+<span class="comment"># Three default chains:</span>
+<span class="hi">INPUT</span>   → Packets DESTINED for this machine
+<span class="hi">OUTPUT</span>  → Packets ORIGINATING from this machine  
+<span class="hi">FORWARD</span> → Packets PASSING THROUGH this machine (router)
+
+<span class="comment"># ── ALLOW rules ──────────────────────────────────────────────</span>
+<span class="p">$</span> <span class="cmd">iptables -A INPUT -p tcp --dport 22 -j ACCEPT</span>   <span class="comment"># Allow SSH in</span>
+<span class="p">$</span> <span class="cmd">iptables -A INPUT -p tcp --dport 80 -j ACCEPT</span>   <span class="comment"># Allow HTTP in</span>
+<span class="p">$</span> <span class="cmd">iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT</span>
+
+<span class="comment"># ── BLOCK rules ──────────────────────────────────────────────</span>
+<span class="p">$</span> <span class="cmd">iptables -A INPUT -s 10.0.0.5 -j DROP</span>          <span class="comment"># Block specific attacker IP</span>
+<span class="p">$</span> <span class="cmd">iptables -A INPUT -p tcp --dport 23 -j DROP</span>    <span class="comment"># Block Telnet</span>
+
+<span class="comment"># ── DEFAULT POLICY (crucial for security) ────────────────────</span>
+<span class="p">$</span> <span class="cmd">iptables -P INPUT DROP</span>       <span class="comment"># Default: DROP all incoming (whitelist approach)</span>
+<span class="p">$</span> <span class="cmd">iptables -P OUTPUT ACCEPT</span>    <span class="comment"># Default: allow all outgoing</span>
+<span class="p">$</span> <span class="cmd">iptables -P FORWARD DROP</span>     <span class="comment"># Default: don't route</span>
+
+<span class="warn"># ATTACKER RECON: Check iptables on a compromised machine
+# iptables rules tell you what's protected and what ports are open
+# They also tell you about network topology (FORWARD rules reveal routing)</span>
+
+<span class="comment"># Save and restore rules:</span>
+<span class="p">$</span> <span class="cmd">iptables-save > /etc/iptables/rules.v4</span>
+<span class="p">$</span> <span class="cmd">iptables-restore < /etc/iptables/rules.v4</span></div>
+  </div>
+
+  <div class="sec-lbl">// 11.3 — IDS vs IPS: DETECTION VS PREVENTION</div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-label">IDS — Intrusion Detection System</div>
+      <h3>🔍 Detects &amp; Alerts</h3>
+      <p>Monitors network/system activity and generates alerts when suspicious patterns are detected. <span class="hl-r">Does NOT block</span> — it only watches and reports. Like a security camera.</p>
+      <p style="margin-top:0.5rem">Examples: Snort (detection mode), Zeek/Bro, OSSEC</p>
+    </div>
+    <div class="card">
+      <div class="card-label">IPS — Intrusion Prevention System</div>
+      <h3>🛡️ Detects &amp; Blocks</h3>
+      <p>Sits inline in the network traffic path. Detects AND actively drops/blocks malicious packets in real-time. Like a security guard who can also tackle intruders.</p>
+      <p style="margin-top:0.5rem">Examples: Snort (inline mode), Suricata, Fail2ban</p>
+    </div>
+  </div>
+
+  <div class="sec-lbl">// 11.4 — SNORT RULES (How Detection Works)</div>
+
+  <div class="terminal">
+    <div class="t-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div><div class="t-title">SNORT RULE ANATOMY</div></div>
+    <div class="t-body"><span class="comment"># RULE STRUCTURE:
+# action  proto  src_ip   src_port  direction  dst_ip   dst_port  (options)</span>
+
+<span class="hi">alert</span> tcp any any -> any 22 (msg:"SSH Brute Force Attempt"; threshold: type both, track by_src, count 5, seconds 60; sid:1000001;)
+
+<span class="comment">Breaking this down:
+  alert          → generate an alert (IDS) or block (IPS)
+  tcp            → TCP protocol
+  any any        → from any source IP and port
+  ->             → direction (→ means to destination)
+  any 22         → to any IP, port 22 (SSH)
+  msg:           → human-readable alert message
+  threshold:     → only alert if 5+ attempts in 60 seconds (reduce noise)
+  sid:           → unique rule identifier</span>
+
+<span class="comment"># More example rules:</span>
+
+<span class="hi">alert</span> tcp any any -> any 80 (msg:"SQL Injection Attempt"; content:"1=1"; http_uri; sid:1000002;)
+
+<span class="hi">alert</span> icmp any any -> any any (msg:"Ping Sweep Detected"; threshold: type both, track by_src, count 10, seconds 5; sid:1000003;)
+
+<span class="hi">alert</span> tcp any any -> any any (msg:"Nmap SYN Scan"; flags:S; threshold: type both, track by_src, count 20, seconds 5; sid:1000004;)
+
+<span class="warn"># KEY INSIGHT: Attackers who know these rules can craft attacks
+# that evade them — different encoding, slower scanning, fragmented packets
+# This is why "defense in depth" matters — no single control stops everything</span></div>
+  </div>
+
+  <div class="sec-lbl">// DAY 11 — QUIZ</div>
+  <div class="quiz-q-block">
+    <div class="q-text">A company blocks all outbound traffic except port 443 (HTTPS). An attacker has compromised an internal machine. How would they most likely establish a C2 (command and control) channel out?</div>
+    <div class="q-opts">
+      <div class="q-opt" onclick="ans(this,'wrong','Port 80 is blocked. Attackers adapt to what\'s available.')"><span class="q-key">A</span> Use port 80 HTTP — it\'s the standard web port</div>
+      <div class="q-opt" onclick="ans(this,'wrong','Port 4444 is a classic Metasploit default — but it\'s not port 443 so the firewall blocks it. This is why real attackers don\'t use default ports.')"><span class="q-key">B</span> Use Metasploit\'s default port 4444</div>
+      <div class="q-opt" onclick="ans(this,'correct','Correct! HTTPS (port 443) is allowed and encrypted — the firewall can\'t inspect the contents without SSL inspection. Attackers use HTTPS-based C2 frameworks (like Cobalt Strike, Sliver, or Covenant) that disguise malicious traffic as normal HTTPS web browsing. The firewall sees valid TLS on port 443 and passes it. This is why next-gen firewalls with TLS inspection exist — and why attackers then use certificate pinning and other evasion techniques.')"><span class="q-key">C</span> Tunnel C2 traffic over HTTPS (port 443) — it\'s allowed and encrypted</div>
+      <div class="q-opt" onclick="ans(this,'wrong','DNS tunneling is also a real technique (encoding data in DNS queries over UDP 53) — but the question specifies only 443 is allowed for TCP, and DNS tunneling is typically flagged by behavioral analysis.')"><span class="q-key">D</span> Use DNS tunneling over UDP port 53</div>
+    </div>
+    <div class="q-fb" id="qf-3-0"></div>
+  </div>
+
+</div><!-- day-3 -->
+
+
+<!-- ═══════════════════ DAY 12 ═══════════════════ -->
+<div class="day-panel" id="day-4">
+
+  <div class="day-header">
+    <div class="day-num">12</div>
+    <div class="day-info">
+      <h2>Cryptography Fundamentals</h2>
+      <p><span class="tag t-th">THEORY</span> Symmetric · Asymmetric · Hashing · TLS/SSL · PKI</p>
+    </div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-label">WEEK 2 PROGRESS — DAY 12 OF 14</div>
+    <div class="prog-track"><div class="prog-fill" style="width:86%"></div></div>
+  </div>
+
+  <div class="callout c-info">
+    <div class="c-icon">🔐</div>
+    <p><strong>Why cryptography matters for hackers:</strong> You'll crack password hashes with hashcat. You'll bypass TLS misconfiguration. You'll forge JWT tokens. You'll exploit weak random number generators. All of these require understanding what cryptography is supposed to do — so you can recognize when it fails.</p>
+  </div>
+
+  <div class="sec-lbl">// 12.1 — SYMMETRIC ENCRYPTION</div>
+  <div class="card">
+    <div class="card-label">One Key, Two Operations</div>
+    <p>Symmetric encryption uses the <span class="hl">same key</span> to both encrypt and decrypt. It's fast, efficient, and used for bulk data encryption. The problem: how do you securely share the key?</p>
+  </div>
+
+  <table class="tbl">
+    <tr><th>ALGORITHM</th><th>KEY SIZE</th><th>STATUS</th><th>ATTACK / NOTES</th></tr>
+    <tr><td>AES-256</td><td>256-bit</td><td><span class="hl-g">SECURE ✓</span></td><td>Gold standard. Used in TLS, disk encryption, VPNs. Brute-force: computationally infeasible.</td></tr>
+    <tr><td>AES-128</td><td>128-bit</td><td><span class="hl-g">SECURE ✓</span></td><td>Still secure. Faster than AES-256. Most web TLS uses this.</td></tr>
+    <tr><td>DES</td><td>56-bit</td><td><span class="hl-r">BROKEN ✗</span></td><td>Cracked in 22 hours in 1998. Never use. Still found in legacy systems.</td></tr>
+    <tr><td>3DES</td><td>112-bit effective</td><td><span class="hl-w">DEPRECATED</span></td><td>Vulnerable to SWEET32 attack. Being phased out. Still in some enterprise.</td></tr>
+    <tr><td>RC4</td><td>Variable</td><td><span class="hl-r">BROKEN ✗</span></td><td>Used to be in WEP Wi-Fi (crackable in minutes). Forbidden in TLS since 2015.</td></tr>
+  </table>
+
+  <div class="sec-lbl">// 12.2 — ASYMMETRIC ENCRYPTION (PUBLIC KEY)</div>
+  <div class="card">
+    <div class="card-label">Two Keys — The Key Exchange Solution</div>
+    <p>Asymmetric encryption uses a <span class="hl">key pair</span>: a public key (shareable with everyone) and a private key (never shared). What one key encrypts, only the other can decrypt. This solves the key-exchange problem.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="t-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div><div class="t-title">HOW ASYMMETRIC CRYPTO WORKS IN PRACTICE</div></div>
+    <div class="t-body"><span class="comment">SCENARIO 1: Secure Message to You
+  Alice wants to send you a secret message.
+  You give Alice your PUBLIC KEY (safe to share with anyone).
+  Alice encrypts the message with YOUR PUBLIC KEY.
+  Only YOUR PRIVATE KEY can decrypt it.
+  → Even Alice can't decrypt it after encrypting.</span>
+
+<span class="comment">SCENARIO 2: Digital Signature (Proving Identity)
+  You sign a document with YOUR PRIVATE KEY.
+  Anyone with YOUR PUBLIC KEY can verify the signature.
+  → Proves the document came from you (only you have the private key).
+  → Used in code signing, TLS certificates, email (S/MIME, PGP).</span>
+
+<span class="hi">RSA</span>     → Most common. Key sizes: 2048 (minimum), 4096 (recommended). Slow.
+<span class="hi">ECDSA</span>   → Elliptic curve. Smaller keys, same strength. Used in modern TLS, Bitcoin.
+<span class="hi">Ed25519</span> → Modern elliptic curve. Very fast. Used in SSH keys (preferred over RSA).
+
+<span class="warn"># ATTACK: If the private key is exposed, game over.
+# Common mistakes: 
+# - Committing private keys to GitHub (automated scanners find these in minutes)
+# - Storing private keys without passphrase protection
+# - Using weak keys (RSA-512 cracked; RSA-1024 factored)</span></div>
+  </div>
+
+  <div class="sec-lbl">// 12.3 — HASHING: ONE-WAY FUNCTIONS</div>
+
+  <div class="card">
+    <div class="card-label">Hashing — Not Encryption</div>
+    <p>A hash function takes input of any size and produces a fixed-length output (digest). It's <span class="hl">one-way</span> — you cannot reverse a hash to get the original. This is how passwords are stored: the database stores the hash, never the plaintext.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="t-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div><div class="t-title">HASHING IN ACTION — AND CRACKING IT</div></div>
+    <div class="t-body"><span class="comment"># Generate hashes of the same password:</span>
+<span class="p">$</span> <span class="cmd">echo -n "password123" | md5sum</span>
+<span class="out">482c811da5d5b4bc6d497ffa98491e38</span>   <span class="comment">← MD5 (BROKEN — DO NOT USE)</span>
+
+<span class="p">$</span> <span class="cmd">echo -n "password123" | sha1sum</span>
+<span class="out">cbfdac6008f9cab4083784cbd1874f76618d2a97</span>   <span class="comment">← SHA1 (deprecated)</span>
+
+<span class="p">$</span> <span class="cmd">echo -n "password123" | sha256sum</span>
+<span class="out">ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f</span>   <span class="comment">← SHA-256 (OK for data)</span>
+
+<span class="warn"># For PASSWORDS, use these (they're slow on purpose):</span>
+bcrypt    → $2b$12$... (work factor = 2^12 = 4096 iterations)
+Argon2id  → Best modern choice. Used by password managers.
+scrypt    → Memory-hard. Resists GPU cracking.
+PBKDF2    → Used by WPA2, iOS, many web frameworks.
+
+<span class="comment"># CRACKING: Hashcat — GPU-accelerated hash cracking</span>
+<span class="p">$</span> <span class="cmd">hashcat -m 0 hash.txt rockyou.txt</span>          <span class="comment"># -m 0 = MD5</span>
+<span class="p">$</span> <span class="cmd">hashcat -m 1000 ntlm.txt rockyou.txt</span>       <span class="comment"># -m 1000 = NTLM (Windows)</span>
+<span class="p">$</span> <span class="cmd">hashcat -m 3200 bcrypt.txt rockyou.txt</span>     <span class="comment"># -m 3200 = bcrypt (SLOW)</span>
+<span class="p">$</span> <span class="cmd">hashcat -m 0 hash.txt -a 3 ?a?a?a?a?a?a</span>  <span class="comment"># Brute-force all 6-char combos</span>
+
+<span class="hi">Cracking speed comparison on a single RTX 4090:</span>
+<span class="out">MD5:     164,000,000,000 hashes/sec  → 8-char password cracked in seconds
+NTLM:    289,000,000,000 hashes/sec  → Even faster
+bcrypt:       184,000 hashes/sec     → 8-char password: years to crack</span></div>
+  </div>
+
+  <div class="sec-lbl">// 12.4 — TLS/SSL &amp; PKI</div>
+
+  <div class="card">
+    <div class="card-label">How HTTPS Actually Works</div>
+    <p>TLS (Transport Layer Security) combines asymmetric and symmetric encryption. Asymmetric is used to securely exchange a symmetric session key. Then symmetric (AES) handles the bulk data. This is the TLS Handshake.</p>
+  </div>
+
+  <div class="terminal">
+    <div class="t-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div><div class="t-title">TLS 1.3 HANDSHAKE (SIMPLIFIED)</div></div>
+    <div class="t-body"><span class="hi">1. Client Hello</span>     → "I support TLS 1.3, here are my cipher suites, here's my random value"
+<span class="hi">2. Server Hello</span>     → "OK, we'll use TLS_AES_256_GCM_SHA384, here's my certificate"
+<span class="hi">3. Certificate</span>      → Server sends its TLS certificate (signed by a trusted CA)
+<span class="hi">4. Client verifies</span>  → Is certificate signed by a CA I trust? Has it expired? Does CN match hostname?
+<span class="hi">5. Key Exchange</span>     → Client and server compute shared session key (Diffie-Hellman)
+<span class="hi">6. Encrypted Data</span>   → All subsequent data encrypted with AES using the shared key
+
+<span class="comment"># INSPECT a site's certificate:</span>
+<span class="p">$</span> <span class="cmd">openssl s_client -connect bank.com:443 -showcerts</span>
+<span class="p">$</span> <span class="cmd">curl -vI https://bank.com 2>&1 | grep -A5 "SSL"</span>
+
+<span class="warn"># Common TLS vulnerabilities to look for:
+# - Expired certificates (causes warnings, sometimes accepted anyway)
+# - Self-signed certs (no CA verification → trivially MITM'd)
+# - Old TLS versions (TLS 1.0/1.1 → vulnerable to BEAST, POODLE)
+# - Weak cipher suites (RC4, DES, export-grade)
+# - HSTS not set (allows SSL stripping attack)</span></div>
+  </div>
+
+  <div class="sec-lbl">// DAY 12 — QUIZ</div>
+  <div class="quiz-q-block">
+    <div class="q-text">A database breach exposes 10 million passwords stored as MD5 hashes. An attacker has a GPU cluster. Why are MD5 password hashes considered catastrophically weak, even though MD5 is a one-way function?</div>
+    <div class="q-opts">
+      <div class="q-opt" onclick="ans(this,'wrong','MD5 can be reversed to a kind of input — but not necessarily the original. The real issue is GPU speed and rainbow tables, not reversibility.')"><span class="q-key">A</span> MD5 can be mathematically reversed to recover the original password</div>
+      <div class="q-opt" onclick="ans(this,'correct','Correct! MD5 is designed to be fast — that\'s its flaw for passwords. A single RTX 4090 GPU can compute 164 billion MD5 hashes per second. Combined with rainbow tables (pre-computed hash:plaintext databases) and wordlists like rockyou.txt, 80%+ of real-world MD5 passwords can be cracked in hours. "One-way" doesn\'t mean uncrackable — it means brute-force is required. MD5\'s speed makes brute-force trivial. Password hashing algorithms like bcrypt are intentionally slow (milliseconds per hash) to make this infeasible.')"><span class="q-key">B</span> MD5 is too fast — GPUs can compute billions of MD5 hashes per second making brute-force and rainbow tables trivial</div>
+      <div class="q-opt" onclick="ans(this,'wrong','MD5 not using salt is a separate problem (and important!) but the core issue with MD5 specifically is its speed, not salting alone.')"><span class="q-key">C</span> MD5 doesn\'t use a salt so all identical passwords have identical hashes</div>
+      <div class="q-opt" onclick="ans(this,'wrong','MD5 produces 128-bit hashes — collision resistance issues exist but aren\'t the primary attack vector for password cracking. That\'s GPU speed + dictionary attacks.')"><span class="q-key">D</span> MD5 only produces 32-bit hashes which are too short</div>
+    </div>
+    <div class="q-fb" id="qf-4-0"></div>
+  </div>
+
+</div><!-- day-4 -->
+
+
+<!-- ═══════════════════ DAY 13 ═══════════════════ -->
+<div class="day-panel" id="day-5">
+
+  <div class="day-header">
+    <div class="day-num">13</div>
+    <div class="day-info">
+      <h2>OSINT — Open Source Intelligence</h2>
+      <p><span class="tag t-tl">TOOL</span><span class="tag t-lb">LAB</span> theHarvester · Shodan · Google Dorks · Maltego</p>
+    </div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-label">WEEK 2 PROGRESS — DAY 13 OF 14</div>
+    <div class="prog-track"><div class="prog-fill" style="width:93%"></div></div>
+  </div>
+
+  <div class="callout c-info">
+    <div class="c-icon">🔎</div>
+    <p><strong>OSINT = Hacking without touching the target.</strong> Before sending a single packet to a target network, elite pentesters and real attackers spend hours or days gathering intelligence from public sources. This is called passive reconnaissance. Zero network traffic to the target. Zero detection risk. Maximum intelligence.</p>
+  </div>
+
+  <div class="sec-lbl">// 13.1 — THE OSINT FRAMEWORK</div>
+
+  <div class="proto-grid">
+    <div class="proto-card">
+      <div class="proto-name">Google Dorks</div>
+      <div class="proto-port">Search Engine Intelligence</div>
+      <div class="proto-desc">Using advanced Google search operators to find information Google has indexed about a target — including sensitive files, login pages, and exposed data.</div>
+      <div class="proto-attack"><strong>Free · Passive · Powerful</strong></div>
+    </div>
+    <div class="proto-card green">
+      <div class="proto-name">theHarvester</div>
+      <div class="proto-port">Email &amp; Subdomain Harvesting</div>
+      <div class="proto-desc">Automated tool that scrapes search engines, LinkedIn, Shodan, and other sources to find email addresses, employee names, subdomains, and IP addresses for a target domain.</div>
+      <div class="proto-attack"><strong>Built into Kali · Fast · Automated</strong></div>
+    </div>
+    <div class="proto-card orange">
+      <div class="proto-name">Shodan</div>
+      <div class="proto-port">Search Engine for Devices</div>
+      <div class="proto-desc">Indexes internet-connected devices — servers, cameras, routers, industrial control systems — by banner and service. Find exposed services without scanning yourself.</div>
+      <div class="proto-attack"><strong>shodan.io · API access · Powerful filters</strong></div>
+    </div>
+    <div class="proto-card purple">
+      <div class="proto-name">Maltego</div>
+      <div class="proto-port">Visual OSINT &amp; Link Analysis</div>
+      <div class="proto-desc">Graphically maps relationships between people, organizations, domains, IPs, emails. Transforms data through APIs to reveal connections. Used by law enforcement and red teams.</div>
+      <div class="proto-attack"><strong>Community Edition: free · Requires registration</strong></div>
+    </div>
+    <div class="proto-card warn">
+      <div class="proto-name">WHOIS / DNS Records</div>
+      <div class="proto-port">Domain Registration Intelligence</div>
+      <div class="proto-desc">WHOIS reveals domain registrant info (often redacted now, but historically gold). DNS records (A, MX, NS, TXT, SPF, DKIM) reveal infrastructure and email security posture.</div>
+      <div class="proto-attack"><strong>whois · dig · dnsdumpster.com</strong></div>
+    </div>
+    <div class="proto-card red">
+      <div class="proto-name">LinkedIn / Social Media</div>
+      <div class="proto-port">Human Intelligence</div>
+      <div class="proto-desc">Employee names, roles, tech stacks mentioned in job postings, GitHub repos with leaked credentials, executive email format patterns for spear-phishing.</div>
+      <div class="proto-attack"><strong>Free · High value · Phishing setup</strong></div>
+    </div>
+  </div>
+
+  <div class="sec-lbl">// 13.2 — GOOGLE DORKS MASTERCLASS</div>
+
+  <div class="terminal">
+    <div class="t-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div><div class="t-title">GOOGLE DORKING — FIND WHAT SHOULDN'T BE PUBLIC</div></div>
+    <div class="t-body"><span class="comment"># ── SITE OPERATORS ───────────────────────────────────────────</span>
+site:target.com                     <span class="comment"># All indexed pages for target.com</span>
+site:target.com filetype:pdf        <span class="comment"># PDFs on target.com (often contain metadata)</span>
+site:target.com inurl:admin         <span class="comment"># Admin pages on target.com</span>
+site:target.com inurl:login         <span class="comment"># Login portals</span>
+
+<span class="comment"># ── FILE TYPE HUNTING ─────────────────────────────────────────</span>
+filetype:sql site:target.com        <span class="comment"># SQL database files (critical!)</span>
+filetype:env site:target.com        <span class="comment"># .env files with API keys/DB passwords</span>
+filetype:log site:target.com        <span class="comment"># Log files (usernames, errors, paths)</span>
+filetype:xls site:target.com "password"  <span class="comment"># Excel files containing "password"</span>
+filetype:bak site:target.com        <span class="comment"># Backup files often left exposed</span>
+
+<span class="comment"># ── CREDENTIAL HUNTING ───────────────────────────────────────</span>
+"target.com" "password" filetype:txt
+intext:"password" site:target.com
+site:pastebin.com "target.com" "password"   <span class="comment"># Pastes with leaked credentials</span>
+site:github.com "target.com" password       <span class="comment"># GitHub code leaks</span>
+
+<span class="comment"># ── SENSITIVE PAGES ──────────────────────────────────────────</span>
+intitle:"Index of" site:target.com          <span class="comment"># Open directory listings</span>
+intitle:"phpMyAdmin" site:target.com        <span class="comment"># Exposed phpMyAdmin</span>
+inurl:".git" site:target.com                <span class="comment"># Exposed .git directories (source code leak!)</span>
+inurl:"/wp-admin" site:target.com           <span class="comment"># WordPress admin pages</span>
+
+<span class="warn"># Comprehensive Google Dork database: exploit-db.com/google-hacking-database
+# (GHDB — thousands of pre-built dorks categorized by vulnerability type)</span></div>
+  </div>
+
+  <div class="sec-lbl">// 13.3 — theHarvester IN ACTION</div>
+
+  <div class="terminal">
+    <div class="t-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div><div class="t-title">theHarvester — EMAIL & SUBDOMAIN HARVESTING</div></div>
+    <div class="t-body"><span class="p">$</span> <span class="cmd">theHarvester -d targetcorp.com -b all -l 500</span>
+<span class="comment"># -d = domain to search
+# -b = data sources (all = use everything available)
+# -l = limit results to 500</span>
+
+<span class="out">*******************************************************************
+*  _   _                                            _             *
+* | |_| |__   ___    /\  /\__ _ _ ____   _____  ___| |_ ___ _ __ *
+*  | __| '_ \ / _ \  / /_/ / _` | '__\ \ / / _ \/ __| __/ _ \ '__|*
+*  | |_| | | |  __/ / __  / (_| | |   \ V /  __/\__ \ ||  __/ |  *
+*   \__|_| |_|\___| \/ /_/ \__,_|_|    \_/ \___||___/\__\___|_|  *
+
+[*] Target: targetcorp.com
+
+[*] Searching Google...
+[*] Searching LinkedIn...
+[*] Searching Shodan...
+
+Emails found:
+--------------
+j.smith@targetcorp.com
+admin@targetcorp.com
+cto@targetcorp.com
+hr@targetcorp.com
+support@targetcorp.com
+
+Hosts found:
+-------------
+mail.targetcorp.com:203.0.113.10
+vpn.targetcorp.com:203.0.113.25
+dev.targetcorp.com:10.0.0.50        ← INTERNAL IP leaked! Dev server
+staging.targetcorp.com:203.0.113.30 ← Staging server — often less hardened
+jenkins.targetcorp.com:203.0.113.35 ← CI/CD server — frequent attack target</span>
+
+<span class="warn"># What to do with this:
+# Emails → phishing targets, username format discovery
+# Subdomains → expanded attack surface (test each one separately!)
+# Internal IPs in DNS → network architecture leakage
+# Special servers (VPN, Jenkins, dev) → high-value targets</span></div>
+  </div>
+
+  <div class="sec-lbl">// 13.4 — SHODAN: THE INTERNET'S MOST DANGEROUS SEARCH ENGINE</div>
+
+  <div class="terminal">
+    <div class="t-bar"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div><div class="t-title">SHODAN QUERIES</div></div>
+    <div class="t-body"><span class="comment"># Search at shodan.io — requires free account</span>
+
+org:"Target Corporation"            <span class="comment"># Find all IPs registered to an organization</span>
+hostname:"targetcorp.com"           <span class="comment"># All Shodan-indexed hosts for the domain</span>
+net:"203.0.113.0/24"               <span class="comment"># All devices in an IP range</span>
+
+<span class="comment"># Finding specific vulnerable services:</span>
+product:"Apache httpd" version:"2.2"      <span class="comment"># Old Apache versions (EOL)</span>
+product:"Microsoft IIS" version:"6.0"     <span class="comment"># IIS 6.0 = WebDAV RCE vulnerability</span>
+"default password" port:23               <span class="comment"># Telnet with default passwords</span>
+port:3389 country:US                     <span class="comment"># All US RDP servers (exposed RDP!)</span>
+"220" "230 Login successful" port:21     <span class="comment"># FTP with anonymous login enabled</span>
+has_screenshot:true port:5900            <span class="comment"># VNC with screenshots visible!</span>
+
+<span class="warn"># Real Shodan finds (yes, these actually exist):
+# Industrial control systems with no password
+# Medical devices accessible from internet  
+# Traffic cameras with admin/admin
+# Nuclear facility SCADA systems
+# This is why "security by obscurity" fails</span></div>
+  </div>
+
+  <div class="sec-lbl">// DAY 13 — LAB</div>
+  <div class="card">
+    <div class="card-label">Lab: OSINT on a Legitimate Target</div>
+    <div class="callout c-warn" style="margin-bottom:0.8rem">
+      <div class="c-icon">⚠️</div>
+      <p><strong>Ethics:</strong> Only perform OSINT on companies that have bug bounty programs authorizing this, or domains you own. The exercises below use public infrastructure and are fully legal.</p>
+    </div>
+    <ul class="cklist">
+      <li>Run theHarvester on <code>bugcrowd.com</code>: <code>theHarvester -d bugcrowd.com -b google,bing -l 100</code></li>
+      <li>Google Dork: Search <code>site:github.com "bugcrowd.com" password</code> — what comes up?</li>
+      <li>DNS dump: <code>dig bugcrowd.com ANY</code> + <code>dnsdumpster.com</code> — map all subdomains</li>
+      <li>WHOIS: <code>whois bugcrowd.com</code> — who registered it? When? What nameservers?</li>
+      <li>Shodan (free account): Search <code>hostname:bugcrowd.com</code> — what services are indexed?</li>
+      <li>Check Wayback Machine (web.archive.org) — what did their site look like 5 years ago?</li>
+    </ul>
+  </div>
+
+</div><!-- day-5 -->
+
+
+<!-- ═══════════════════ DAY 14 ═══════════════════ -->
+<div class="day-panel" id="day-6">
+
+  <div class="day-header">
+    <div class="day-num">14</div>
+    <div class="day-info">
+      <h2>Review, TryHackMe &amp; Week 2 CTF</h2>
+      <p><span class="tag t-lb">LAB</span> Full Week Consolidation · Networking CTF · Phase 1 Complete</p>
+    </div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-label">WEEK 2 PROGRESS — COMPLETE ✓ — PHASE 1 COMPLETE ✓</div>
+    <div class="prog-track"><div class="prog-fill" style="width:100%"></div></div>
+  </div>
+
+  <div class="callout c-green">
+    <div class="c-icon">🏆</div>
+    <p><strong>Phase 1 Complete!</strong> You've covered 14 days of foundational cybersecurity — from the CIA Triad to live packet analysis to OSINT. Phase 2 starts Monday with enumeration, Nmap mastery, and web application reconnaissance. Today is about solidifying everything.</p>
+  </div>
+
+  <div class="sec-lbl">// 14.1 — WEEK 2 KNOWLEDGE REVIEW</div>
+
+  <table class="tbl">
+    <tr><th>TOPIC</th><th>KEY SKILL GAINED</th><th>ATTACK RELEVANCE</th></tr>
+    <tr><td>OSI + TCP/IP</td><td>Map any attack to its protocol layer; read TCP flags</td><td>Understand what every tool does and why</td></tr>
+    <tr><td>TCP Handshake</td><td>Read SYN/ACK/RST in Wireshark; explain SYN flood</td><td>nmap scans, DoS attacks, session hijacking</td></tr>
+    <tr><td>Subnetting/CIDR</td><td>Calculate network/broadcast/host ranges</td><td>Define scope, find live hosts, pivot targeting</td></tr>
+    <tr><td>DNS</td><td>dig, nslookup, zone transfers, record types</td><td>DNS poisoning, zone transfer data leaks, OSINT</td></tr>
+    <tr><td>ARP</td><td>Explain/execute ARP poisoning in lab</td><td>MITM on local network, credential capture</td></tr>
+    <tr><td>HTTP vs HTTPS</td><td>Capture and read HTTP credentials in Wireshark</td><td>Credential sniffing, MITM, SSL stripping</td></tr>
+    <tr><td>Wireshark</td><td>Display filters, packet dissection, follow streams</td><td>Traffic analysis, incident response, forensics</td></tr>
+    <tr><td>Firewalls/IDS</td><td>Read/write iptables rules; understand Snort syntax</td><td>Bypassing defenses, building detections</td></tr>
+    <tr><td>Cryptography</td><td>Symmetric/asymmetric/hashing — when each is used</td><td>Password cracking, TLS attacks, JWT forgery</td></tr>
+    <tr><td>OSINT</td><td>Google dorks, theHarvester, Shodan queries</td><td>Passive recon — zero-detection target profiling</td></tr>
+  </table>
+
+  <div class="sec-lbl">// 14.2 — FINAL WEEK 2 QUIZ</div>
+
+  <div class="quiz-q-block">
+    <div class="q-text">You run <strong>theHarvester</strong> on a target and discover the subdomain <code>jenkins.targetcorp.com</code>. Why is a Jenkins server specifically interesting to an attacker?</div>
+    <div class="q-opts">
+      <div class="q-opt" onclick="ans(this,'wrong','Jenkins isn\'t primarily a web server. Its significance is its role in the software build pipeline.')"><span class="q-key">A</span> Jenkins is a web server that typically runs on port 80 with weak defaults</div>
+      <div class="q-opt" onclick="ans(this,'correct','Correct! Jenkins is a CI/CD (Continuous Integration/Continuous Deployment) server. It\'s a goldmine for attackers because: (1) it often has access to source code repositories, (2) it stores credentials for production deployments in its pipeline configs, (3) it can execute arbitrary code as part of build jobs, (4) it often has network access to production systems, and (5) it\'s frequently left with weak authentication or default credentials since it\'s "just" a dev tool. Compromising Jenkins often means compromising the entire software supply chain.')"><span class="q-key">B</span> Jenkins is a CI/CD server with access to source code, deployment credentials, and code execution capabilities</div>
+      <div class="q-opt" onclick="ans(this,'wrong','Email servers are typically mail.domain.com or smtp.domain.com. Jenkins is a build automation platform.')"><span class="q-key">C</span> Jenkins is an email server that often has weak spam filtering</div>
+      <div class="q-opt" onclick="ans(this,'wrong','Jenkins doesn\'t specifically store user passwords. Its value is source code access, build credentials, and code execution in the deployment pipeline.')"><span class="q-key">D</span> Jenkins stores all user passwords in a plaintext database</div>
+    </div>
+    <div class="q-fb" id="qf-6-0"></div>
+  </div>
+
+  <div class="quiz-q-block">
+    <div class="q-text">A Wireshark filter shows: <code>tcp.flags == 0x002</code> with thousands of packets from 192.168.1.50 to 192.168.1.100 targeting sequential ports (21, 22, 23, 25...). What is happening, and how would a Snort IDS catch it?</div>
+    <div class="q-opts">
+      <div class="q-opt" onclick="ans(this,'wrong','DDoS (Distributed Denial of Service) involves flooding a target with traffic — usually from many sources, not sequential port probing.')"><span class="q-key">A</span> A DDoS attack from 192.168.1.50</div>
+      <div class="q-opt" onclick="ans(this,'correct','Correct! tcp.flags == 0x002 means SYN flag only — this is the nmap SYN stealth scan pattern. Sequential port targeting from one IP is a classic port scan signature. Snort would catch it with a rule like: alert tcp any any -> any any (flags:S; threshold: type both, track by_src, count 20, seconds 5; msg:"Port Scan Detected"; sid:9001;) — which triggers if more than 20 SYN packets come from the same source in 5 seconds.')"><span class="q-key">B</span> A port scan (nmap -sS) — SYN-only packets to sequential ports from one source; Snort catches it by counting SYN packets per source over time</div>
+      <div class="q-opt" onclick="ans(this,'wrong','ARP poisoning uses ARP protocol packets, not TCP SYN packets. You\'d filter for "arp" to see that.')"><span class="q-key">C</span> An ARP poisoning attack using TCP SYN packets</div>
+      <div class="q-opt" onclick="ans(this,'wrong','A SYN flood targets one port with massive traffic to exhaust server resources. This shows sequential ports — that\'s discovery/reconnaissance, not exhaustion.')"><span class="q-key">D</span> A SYN flood DoS attack against sequential ports</div>
+    </div>
+    <div class="q-fb" id="qf-6-1"></div>
+  </div>
+
+  <div class="sec-lbl">// 14.3 — PHASE 1 FINAL LABS</div>
+
+  <div class="card">
+    <div class="card-label">TryHackMe Rooms — Complete This Week</div>
+    <ul class="cklist">
+      <li><strong>Introductory Networking</strong> — OSI, TCP/IP, subnetting walkthrough with exercises</li>
+      <li><strong>Network Services</strong> — SMB, Telnet, FTP, NFS enumeration and exploitation</li>
+      <li><strong>Wireshark: The Basics</strong> — Official Wireshark room with real PCAP challenges</li>
+      <li><strong>Pre-Security: How the Web Works</strong> — HTTP, DNS, web fundamentals</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Networking CTF Challenges — PicoCTF</div>
+    <ul class="cklist">
+      <li><strong>Packets Primer</strong> — Analyze a PCAP and find the flag in plaintext traffic</li>
+      <li><strong>Wireshark doo dooo do doo</strong> — Filter and extract data from captured traffic</li>
+      <li><strong>Wireshark twoo twooo two twoo</strong> — Intermediate PCAP analysis</li>
+      <li><strong>m00nwalk</strong> — Decode data hidden in network traffic</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Phase 1 Capstone: Full Recon on Metasploitable</div>
+    <ul class="cklist">
+      <li><strong>Passive:</strong> WHOIS, DNS dig, Shodan search for your Metasploitable IP</li>
+      <li><strong>Active:</strong> Run your Python port scanner + nmap -sV against it</li>
+      <li><strong>Capture:</strong> Wireshark running while you browse http://192.168.56.101 — find HTTP credentials</li>
+      <li><strong>Document:</strong> Write a one-page recon report: what you found, how, and what it means for an attacker</li>
+      <li><strong>ARP:</strong> Execute ARP poisoning in your lab (Kali → Metasploitable). Verify in Wireshark you see the target's traffic.</li>
+    </ul>
+  </div>
+
+  <div class="sec-lbl">// PHASE 2 PREVIEW</div>
+  <div class="card">
+    <div class="card-label">What's Coming in Phase 2 (Week 3–4)</div>
+    <div class="two-col">
+      <div>
+        <p><span class="hl">Week 3 — Enumeration &amp; Scanning</span></p>
+        <ul class="cklist" style="margin-top:0.4rem">
+          <li>Nmap deep dive — every scan type, NSE scripts</li>
+          <li>Web recon: Gobuster, ffuf, subdomain brute-force</li>
+          <li>Vulnerability scanning: OpenVAS / Nessus</li>
+          <li>Active Directory recon: BloodHound, enum4linux</li>
+          <li>Burp Suite setup and intercepting first requests</li>
+        </ul>
+      </div>
+      <div>
+        <p><span class="hl">Week 4 — First Exploits</span></p>
+        <ul class="cklist" style="margin-top:0.4rem">
+          <li>Metasploit Framework — your first real exploit</li>
+          <li>SQL Injection — manual + automated (sqlmap)</li>
+          <li>XSS, CSRF, SSRF — web vulnerabilities deep dive</li>
+          <li>Password attacks: Hashcat, John, credential stuffing</li>
+          <li>First HackTheBox machine — full walkthrough</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout c-green">
+    <div class="c-icon">✅</div>
+    <p><strong>Phase 1 Complete — Week 2 Checklist:</strong> Before moving to Phase 2, verify you can: (1) explain the OSI model and map attacks to layers, (2) read Wireshark filters and dissect packets, (3) explain how ARP poisoning works and execute it in your lab, (4) crack an MD5 hash with hashcat using rockyou.txt, (5) run a full OSINT profile on a target domain using theHarvester + Google dorks + Shodan, and (6) write iptables rules to allow/block specific traffic.</p>
+  </div>
+
+</div><!-- day-6 -->
+
+</div><!-- content-wrap -->
+
+<footer>PHASE 1 COMPLETE · WEEK 2 OF 2 · CYBERSECURITY BOOTCAMP · NEXT: PHASE 2 — ENUMERATION & FIRST EXPLOITS</footer>
+
+<script>
+function showDay(i){
+  document.querySelectorAll('.day-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.day-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('day-'+i).classList.add('active');
+  document.querySelectorAll('.day-tab')[i].classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function ans(el,type,explanation){
+  const q=el.closest('.quiz-q-block');
+  if(q.dataset.answered)return;
+  q.dataset.answered='1';
+  q.querySelectorAll('.q-opt').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='0.45';});
+  el.style.opacity='1';
+  el.classList.add(type);
+  const fb=q.querySelector('.q-fb');
+  if(fb){fb.classList.add('show',type);fb.textContent=explanation;}
+}
+
+function calcSubnet(){
+  const ipStr=document.getElementById('sc-ip').value.trim();
+  const cidr=parseInt(document.getElementById('sc-cidr').value.trim());
+  const res=document.getElementById('sc-result');
+
+  if(!ipStr||isNaN(cidr)||cidr<1||cidr>32){
+    res.className='sc-result show';
+    res.innerHTML='<span style="color:#ff4757">⚠ Enter a valid IP and CIDR (1–32)</span>';
+    return;
+  }
+  const parts=ipStr.split('.').map(Number);
+  if(parts.length!==4||parts.some(p=>isNaN(p)||p<0||p>255)){
+    res.className='sc-result show';
+    res.innerHTML='<span style="color:#ff4757">⚠ Invalid IP address format</span>';
+    return;
+  }
+  const ipInt=parts.reduce((acc,o)=>(acc<<8)|o,0)>>>0;
+  const mask=cidr===0?0:(0xFFFFFFFF<<(32-cidr))>>>0;
+  const network=(ipInt&mask)>>>0;
+  const broadcast=(network|(~mask>>>0))>>>0;
+  const first=(network+1)>>>0;
+  const last=(broadcast-1)>>>0;
+  const hosts=cidr>=31?Math.pow(2,32-cidr):Math.pow(2,32-cidr)-2;
+  const toIP=n=>[(n>>>24)&0xFF,(n>>>16)&0xFF,(n>>>8)&0xFF,n&0xFF].join('.');
+  const subnetMask=toIP(mask);
+  res.className='sc-result show';
+  res.innerHTML=`
+<span class="lbl">Network Address   </span><span class="val">${toIP(network)} / ${cidr}</span>
+<span class="lbl">Subnet Mask       </span><span class="val">${subnetMask}</span>
+<span class="lbl">Broadcast Address </span><span class="val">${toIP(broadcast)}</span>
+<span class="lbl">First Usable Host </span><span class="val">${cidr<31?toIP(first):'N/A'}</span>
+<span class="lbl">Last Usable Host  </span><span class="val">${cidr<31?toIP(last):'N/A'}</span>
+<span class="lbl">Usable Hosts      </span><span class="val">${hosts.toLocaleString()}</span>
+<span class="lbl">Your IP in Range? </span><span class="val">${(ipInt>=network&&ipInt<=broadcast)?'✓ YES':'✗ NO'}</span>`;
+}
+</script>
+
+<div class="week-nav" style="border-top-color:var(--border,#141b26);max-width:1160px;margin:2rem auto 0;padding:2rem;display:flex;justify-content:space-between;align-items:center;">
+  <a href="week1.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">← Previous Week</a>
+  <a href="../index.html" style="color:var(--teal,#2dd4bf);border-color:rgba(45,212,191,0.3);">⌂ Lesson Hub</a>
+  <a href="week3.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">Next Week →</a>
+</div>
+
+<a href="#" id="back-to-top" title="Back to top">↑</a>
+
+<script src="../js/shared.js"></script>
+</body>
+</html>

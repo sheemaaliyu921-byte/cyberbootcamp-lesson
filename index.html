@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="CyberBootcamp — 8-Week Cybersecurity Bootcamp. Beginner to Professional."/>
+<meta name="robots" content="noindex"/> <!-- Keep lessons private from search engines -->
+<title>CyberBootcamp — Lesson Hub</title>
+<link rel="stylesheet" href="css/shared.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #06080c;
+  --surface: #090c12;
+  --card:    #0d1018;
+  --border:  #141b26;
+  --accent:  #3b82f6;
+  --teal:    #2dd4bf;
+  --amber:   #f59e0b;
+  --red:     #ef4444;
+  --green:   #22c55e;
+  --purple:  #a855f7;
+  --text:    #b0c0d8;
+  --muted:   #253040;
+  --mono:    'Roboto Mono', monospace;
+  --sans:    'Space Grotesk', sans-serif;
+  --display: 'Barlow Condensed', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:var(--sans); font-size:15px; line-height:1.7; }
+
+/* ── HEADER ── */
+header { background:rgba(6,8,12,0.98); border-bottom:1px solid var(--border); padding:0 2rem; position:sticky; top:0; z-index:100; backdrop-filter:blur(10px); }
+.header-inner { max-width:1160px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:60px; }
+.logo { font-family:var(--display); font-size:1.2rem; font-weight:800; color:#fff; letter-spacing:0.06em; text-decoration:none; }
+.logo em { color:var(--accent); font-style:normal; }
+.header-badge { font-family:var(--mono); font-size:0.6rem; color:var(--teal); border:1px solid rgba(45,212,191,0.3); padding:4px 12px; letter-spacing:0.14em; background:rgba(45,212,191,0.05); }
+
+/* ── HERO ── */
+.hero { max-width:1160px; margin:0 auto; padding:5rem 2rem 3rem; text-align:center; }
+.hero-eyebrow { font-family:var(--mono); font-size:0.62rem; color:var(--muted); letter-spacing:0.28em; margin-bottom:1rem; }
+.hero h1 { font-family:var(--display); font-size:clamp(2.5rem,7vw,5.5rem); color:#fff; font-weight:800; line-height:0.95; letter-spacing:0.02em; margin-bottom:1.2rem; }
+.hero h1 .accent { color:var(--accent); }
+.hero-sub { max-width:520px; margin:0 auto 2rem; color:var(--muted); font-size:0.95rem; line-height:1.75; }
+.hero-tags { display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; margin-bottom:3rem; }
+.hero-tag { font-family:var(--mono); font-size:0.62rem; padding:4px 12px; border-radius:2px; letter-spacing:0.06em; }
+.tag-blue   { background:rgba(59,130,246,0.09); color:var(--accent); border:1px solid rgba(59,130,246,0.25); }
+.tag-teal   { background:rgba(45,212,191,0.07); color:var(--teal);   border:1px solid rgba(45,212,191,0.2); }
+.tag-amber  { background:rgba(245,158,11,0.07); color:var(--amber);  border:1px solid rgba(245,158,11,0.2); }
+.tag-red    { background:rgba(239,68,68,0.07);  color:var(--red);    border:1px solid rgba(239,68,68,0.2); }
+.tag-purple { background:rgba(168,85,247,0.08); color:var(--purple); border:1px solid rgba(168,85,247,0.2); }
+.tag-green  { background:rgba(34,197,94,0.07);  color:var(--green);  border:1px solid rgba(34,197,94,0.2); }
+
+/* ── PHASE LABEL ── */
+.phase-label { font-family:var(--mono); font-size:0.65rem; color:var(--muted); letter-spacing:0.25em; text-align:center; margin:3rem 0 1.2rem; }
+.phase-label span { color:var(--accent); }
+
+/* ── WEEK GRID ── */
+.weeks-grid { max-width:1160px; margin:0 auto; padding:0 2rem; display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:1rem; }
+
+.week-card {
+  background:var(--card); border:1px solid var(--border); border-radius:4px;
+  padding:1.5rem; text-decoration:none; color:inherit;
+  transition:all 0.18s; position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.week-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.week-card.phase1::before { background:linear-gradient(90deg,#3b82f6,#2dd4bf); }
+.week-card.phase2::before { background:linear-gradient(90deg,#f59e0b,#ef4444); }
+.week-card.phase3::before { background:linear-gradient(90deg,#a855f7,#ec4899); }
+.week-card.phase4::before { background:linear-gradient(90deg,#22c55e,#2dd4bf); }
+.week-card:hover { border-color:rgba(59,130,246,0.4); transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,0.4); }
+
+.week-num { font-family:var(--mono); font-size:0.62rem; color:var(--muted); letter-spacing:0.15em; margin-bottom:0.6rem; }
+.week-title { font-family:var(--display); font-size:1.25rem; font-weight:700; color:#fff; letter-spacing:0.03em; margin-bottom:0.4rem; }
+.week-sub { font-size:0.82rem; color:var(--muted); line-height:1.55; margin-bottom:1rem; flex:1; }
+.week-topics { display:flex; flex-wrap:wrap; gap:0.35rem; margin-bottom:1rem; }
+.week-topic { font-family:var(--mono); font-size:0.58rem; padding:2px 7px; border-radius:2px; color:var(--muted); border:1px solid var(--border); }
+.week-footer { display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:1rem; border-top:1px solid var(--border); }
+.week-days { font-family:var(--mono); font-size:0.6rem; color:var(--muted); letter-spacing:0.1em; }
+.week-arrow { font-size:0.8rem; color:var(--accent); transition:transform 0.15s; }
+.week-card:hover .week-arrow { transform:translateX(4px); }
+
+/* ── STATS ── */
+.stats-row { max-width:1160px; margin:4rem auto 0; padding:2rem; border-top:1px solid var(--border); display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:2rem; text-align:center; }
+.stat-n { font-family:var(--display); font-size:2.5rem; font-weight:800; color:var(--accent); }
+.stat-l { font-family:var(--mono); font-size:0.62rem; color:var(--muted); letter-spacing:0.14em; margin-top:2px; }
+
+/* ── FOOTER ── */
+footer { max-width:1160px; margin:3rem auto 0; padding:2rem; text-align:center; border-top:1px solid var(--border); }
+footer p { font-family:var(--mono); font-size:0.62rem; color:var(--muted); letter-spacing:0.1em; }
+
+/* ── RESPONSIVE ── */
+@media (max-width:640px) {
+  .hero { padding:3rem 1.5rem 2rem; }
+  .weeks-grid { padding:0 1rem; }
+  .stats-row { padding:1.5rem; gap:1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo">CYBER<em>BOOT</em>CAMP</a>
+    <span class="header-badge">LESSON HUB · 8 WEEKS</span>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="hero-eyebrow">// BEGINNER → PROFESSIONAL · OFFENSIVE + DEFENSIVE</div>
+    <h1>8-Week<br/><span class="accent">Cybersecurity</span><br/>Bootcamp</h1>
+    <p class="hero-sub">A structured, hands-on curriculum covering every major area of cybersecurity — from Linux fundamentals to Active Directory attacks, from SIEM detection to cloud security.</p>
+    <div class="hero-tags">
+      <span class="hero-tag tag-blue">Linux & Networking</span>
+      <span class="hero-tag tag-red">Exploitation</span>
+      <span class="hero-tag tag-purple">Active Directory</span>
+      <span class="hero-tag tag-amber">AV Evasion & C2</span>
+      <span class="hero-tag tag-teal">SIEM & Detection</span>
+      <span class="hero-tag tag-green">Cloud Security</span>
+    </div>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase-label">// <span>PHASE 1</span> — FOUNDATIONS</div>
+  <div class="weeks-grid">
+
+    <a href="weeks/week1.html" class="week-card phase1">
+      <div class="week-num">WEEK 01 · DAYS 1–7</div>
+      <div class="week-title">Foundations</div>
+      <div class="week-sub">CIA Triad, threat actors, Linux/Windows fundamentals, lab setup, Python scripting, and your first CTF challenge.</div>
+      <div class="week-topics">
+        <span class="week-topic">CIA Triad</span>
+        <span class="week-topic">Linux</span>
+        <span class="week-topic">Windows</span>
+        <span class="week-topic">Python</span>
+        <span class="week-topic">Lab Setup</span>
+        <span class="week-topic">CTF</span>
+      </div>
+      <div class="week-footer">
+        <span class="week-days">7 DAYS · 7 QUIZZES</span>
+        <span class="week-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="weeks/week2.html" class="week-card phase1">
+      <div class="week-num">WEEK 02 · DAYS 8–14</div>
+      <div class="week-title">Networking</div>
+      <div class="week-sub">OSI/TCP-IP, protocols and their weaknesses, Wireshark packet analysis, firewalls, IDS, cryptography, and OSINT.</div>
+      <div class="week-topics">
+        <span class="week-topic">OSI Model</span>
+        <span class="week-topic">Wireshark</span>
+        <span class="week-topic">Cryptography</span>
+        <span class="week-topic">OSINT</span>
+        <span class="week-topic">Firewalls</span>
+      </div>
+      <div class="week-footer">
+        <span class="week-days">7 DAYS · 7 QUIZZES</span>
+        <span class="week-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase-label">// <span>PHASE 2</span> — ENUMERATION & EXPLOITATION</div>
+  <div class="weeks-grid">
+
+    <a href="weeks/week3.html" class="week-card phase2">
+      <div class="week-num">WEEK 03 · DAYS 15–21</div>
+      <div class="week-title">Enumeration</div>
+      <div class="week-sub">Nmap mastery, web recon with Gobuster/ffuf, vulnerability scanning, BloodHound AD recon, and Burp Suite setup.</div>
+      <div class="week-topics">
+        <span class="week-topic">Nmap</span>
+        <span class="week-topic">Gobuster</span>
+        <span class="week-topic">BloodHound</span>
+        <span class="week-topic">Burp Suite</span>
+        <span class="week-topic">OpenVAS</span>
+      </div>
+      <div class="week-footer">
+        <span class="week-days">7 DAYS · 7 QUIZZES</span>
+        <span class="week-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="weeks/week4.html" class="week-card phase2">
+      <div class="week-num">WEEK 04 · DAYS 22–28</div>
+      <div class="week-title">Exploitation</div>
+      <div class="week-sub">Metasploit, SQL injection, XSS, CSRF, SSRF, XXE, IDOR, OWASP Top 10, Hashcat, and HackTheBox machines.</div>
+      <div class="week-topics">
+        <span class="week-topic">Metasploit</span>
+        <span class="week-topic">SQLi</span>
+        <span class="week-topic">XSS</span>
+        <span class="week-topic">OWASP</span>
+        <span class="week-topic">Hashcat</span>
+      </div>
+      <div class="week-footer">
+        <span class="week-days">7 DAYS · 7 QUIZZES</span>
+        <span class="week-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase-label">// <span>PHASE 3</span> — ADVANCED OFFENSIVE</div>
+  <div class="weeks-grid">
+
+    <a href="weeks/week5.html" class="week-card phase3">
+      <div class="week-num">WEEK 05 · DAYS 29–35</div>
+      <div class="week-title">Privilege Escalation</div>
+      <div class="week-sub">Linux/Windows privesc, post-exploitation, Mimikatz, Kerberoasting, DCSync, Golden Ticket, and lateral movement.</div>
+      <div class="week-topics">
+        <span class="week-topic">PrivEsc</span>
+        <span class="week-topic">Mimikatz</span>
+        <span class="week-topic">Kerberoasting</span>
+        <span class="week-topic">DCSync</span>
+        <span class="week-topic">PtH</span>
+      </div>
+      <div class="week-footer">
+        <span class="week-days">7 DAYS · 7 QUIZZES</span>
+        <span class="week-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="weeks/week6.html" class="week-card phase3">
+      <div class="week-num">WEEK 06 · DAYS 36–42</div>
+      <div class="week-title">Red Team</div>
+      <div class="week-sub">AV evasion, AMSI bypass, custom payloads, C2 frameworks (Sliver), wireless attacks, report writing, and phase capstone.</div>
+      <div class="week-topics">
+        <span class="week-topic">AV Evasion</span>
+        <span class="week-topic">Sliver C2</span>
+        <span class="week-topic">Wireless</span>
+        <span class="week-topic">JWT Attacks</span>
+        <span class="week-topic">Reports</span>
+      </div>
+      <div class="week-footer">
+        <span class="week-days">7 DAYS · 7 QUIZZES</span>
+        <span class="week-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase-label">// <span>PHASE 4</span> — DEFENSIVE SECURITY</div>
+  <div class="weeks-grid">
+
+    <a href="weeks/week7.html" class="week-card phase4">
+      <div class="week-num">WEEK 07 · DAYS 43–49</div>
+      <div class="week-title">Detection & IR</div>
+      <div class="week-sub">SIEM with Splunk/ELK, log analysis, threat detection, Snort/Suricata IDS, incident response lifecycle, and memory forensics.</div>
+      <div class="week-topics">
+        <span class="week-topic">Splunk</span>
+        <span class="week-topic">Sigma Rules</span>
+        <span class="week-topic">Snort</span>
+        <span class="week-topic">Volatility</span>
+        <span class="week-topic">Forensics</span>
+      </div>
+      <div class="week-footer">
+        <span class="week-days">7 DAYS · 7 QUIZZES</span>
+        <span class="week-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="weeks/week8.html" class="week-card phase4">
+      <div class="week-num">WEEK 08 · DAYS 50–56</div>
+      <div class="week-title">Hardening & Cloud</div>
+      <div class="week-sub">CIS Benchmarks, network segmentation, zero-trust, MITRE ATT&CK, malware analysis, AWS security, and purple team. Final capstone.</div>
+      <div class="week-topics">
+        <span class="week-topic">CIS Hardening</span>
+        <span class="week-topic">Zero Trust</span>
+        <span class="week-topic">ATT&CK</span>
+        <span class="week-topic">AWS Security</span>
+        <span class="week-topic">Purple Team</span>
+      </div>
+      <div class="week-footer">
+        <span class="week-days">7 DAYS · 7 QUIZZES + GRADUATION</span>
+        <span class="week-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div><div class="stat-n">56</div><div class="stat-l">LESSON DAYS</div></div>
+    <div><div class="stat-n">56</div><div class="stat-l">QUIZZES</div></div>
+    <div><div class="stat-n">80+</div><div class="stat-l">TOOLS COVERED</div></div>
+    <div><div class="stat-n">40+</div><div class="stat-l">ATT&CK TECHNIQUES</div></div>
+    <div><div class="stat-n">4</div><div class="stat-l">PHASES</div></div>
+    <div><div class="stat-n">1</div><div class="stat-l">GOAL: PRO</div></div>
+  </div>
+
+</main>
+
+<footer>
+  <p>CYBERBOOTCAMP · ALL LESSONS · USE ← → ARROW KEYS TO NAVIGATE DAYS WITHIN EACH WEEK</p>
+</footer>
+
+<a href="#" id="back-to-top" title="Back to top">↑</a>
+<script src="js/shared.js"></script>
+</body>
+</html>

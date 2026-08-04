@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cybersecurity Bootcamp — Phase 4, Week 7</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Teko:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg:      #050c08;
+  --surface: #08120a;
+  --card:    #0c1a0e;
+  --border:  #132418;
+  --accent:  #00ff88;   /* terminal green — SOC analyst signature */
+  --dim:     #00cc6a;
+  --cold:    #38bdf8;
+  --amber:   #fbbf24;
+  --red:     #f87171;
+  --purple:  #a78bfa;
+  --text:    #b8d4bc;
+  --muted:   #2d5035;
+  --mono:    'Inconsolata', monospace;
+  --sans:    'Plus Jakarta Sans', sans-serif;
+  --display: 'Teko', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.7;min-height:100vh;}
+
+/* Signature: CRT phosphor glow effect — left-side vertical green beam */
+body::before{
+  content:'';position:fixed;left:0;top:0;width:3px;height:100vh;
+  background:linear-gradient(to bottom,transparent,var(--accent),transparent);
+  opacity:0.3;pointer-events:none;z-index:0;
+  animation:beam 4s ease-in-out infinite;
+}
+@keyframes beam{0%,100%{opacity:0.15;}50%{opacity:0.45;}}
+
+/* ── HEADER ── */
+header{background:rgba(5,12,8,0.97);border-bottom:1px solid var(--border);padding:0 2rem;position:sticky;top:0;z-index:200;}
+.hi{max-width:1160px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px;}
+.logo{font-family:var(--mono);font-size:0.82rem;font-weight:700;color:var(--accent);letter-spacing:0.08em;}
+.logo span{color:var(--muted);}
+.wbadge{font-family:var(--mono);font-size:0.61rem;color:var(--dim);border:1px solid rgba(0,255,136,0.25);padding:4px 13px;letter-spacing:0.14em;background:rgba(0,255,136,0.04);}
+
+/* ── HERO ── */
+.hero{max-width:1160px;margin:0 auto;padding:3.5rem 2rem 2rem;position:relative;z-index:1;}
+.eyebrow{font-family:var(--mono);font-size:0.63rem;color:var(--muted);letter-spacing:0.28em;margin-bottom:0.8rem;}
+.hero h1{font-family:var(--display);font-size:clamp(2.4rem,6vw,5rem);color:#fff;line-height:0.95;font-weight:700;letter-spacing:0.02em;margin-bottom:1rem;}
+.hero h1 .gl{color:var(--accent);text-shadow:0 0 30px rgba(0,255,136,0.3);}
+.hsub{max-width:580px;color:var(--muted);font-size:0.91rem;line-height:1.75;margin-bottom:1.8rem;}
+.htags{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.htag{font-family:var(--mono);font-size:0.62rem;padding:4px 11px;border-radius:2px;letter-spacing:0.06em;}
+.ta{background:rgba(0,255,136,0.08);color:var(--accent);border:1px solid rgba(0,255,136,0.22);}
+.tb{background:rgba(56,189,248,0.07);color:var(--cold);border:1px solid rgba(56,189,248,0.2);}
+.tc{background:rgba(251,191,36,0.07);color:var(--amber);border:1px solid rgba(251,191,36,0.2);}
+.td{background:rgba(248,113,113,0.07);color:var(--red);border:1px solid rgba(248,113,113,0.2);}
+.te{background:rgba(167,139,250,0.07);color:var(--purple);border:1px solid rgba(167,139,250,0.2);}
+
+/* ── OUTLINE TABLE ── */
+.outline-wrap{max-width:1160px;margin:0 auto;padding:0 2rem 2rem;position:relative;z-index:1;}
+.outline-box{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.outline-hdr{background:var(--surface);padding:0.85rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.outline-hdr-l{font-family:var(--mono);font-size:0.61rem;color:var(--accent);letter-spacing:0.2em;}
+.outline-hdr-r{font-family:var(--mono);font-size:0.59rem;color:var(--muted);}
+.otbl{width:100%;border-collapse:collapse;font-size:0.81rem;}
+.otbl th{background:var(--surface);color:var(--dim);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.13em;text-align:left;padding:9px 13px;border:1px solid var(--border);}
+.otbl td{padding:10px 13px;border:1px solid var(--border);color:var(--text);vertical-align:top;}
+.otbl tr:nth-child(even) td{background:rgba(255,255,255,0.013);}
+.otbl tr:hover td{background:rgba(0,255,136,0.03);}
+.od{font-family:var(--mono);font-size:0.74rem;color:var(--accent);font-weight:900;}
+.ot{font-weight:600;color:#e8f5e9;}
+.ok{font-family:var(--mono);font-size:0.73rem;color:var(--dim);}
+
+/* ── DAY NAV ── */
+.dnav{max-width:1160px;margin:0 auto;padding:0 2rem;display:flex;border-bottom:1px solid var(--border);position:relative;z-index:1;overflow-x:auto;}
+.dtab{font-family:var(--mono);font-size:0.65rem;padding:12px 16px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.16s;white-space:nowrap;letter-spacing:0.04em;}
+.dtab:hover{color:var(--text);}
+.dtab.on{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ── CONTENT ── */
+.wrap{max-width:1160px;margin:0 auto;padding:2.5rem 2rem;position:relative;z-index:1;}
+.pnl{display:none;}.pnl.on{display:block;}
+
+/* ── DAY HEADER ── */
+.dh{display:flex;gap:1.5rem;align-items:flex-start;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.dnum{font-family:var(--display);font-size:5rem;line-height:0.85;color:var(--accent);opacity:0.1;min-width:105px;font-weight:700;}
+.dinfo h2{font-family:var(--display);font-size:1.6rem;color:#fff;font-weight:700;letter-spacing:0.04em;margin-bottom:0.35rem;}
+.dinfo p{color:var(--muted);font-size:0.84rem;}
+.stag{font-family:var(--mono);font-size:0.59rem;padding:2px 9px;margin-right:4px;border-radius:2px;letter-spacing:0.08em;}
+.sth{background:rgba(167,139,250,0.09);color:var(--purple);border:1px solid rgba(167,139,250,0.22);}
+.slb{background:rgba(0,255,136,0.07);color:var(--accent);border:1px solid rgba(0,255,136,0.18);}
+.stl{background:rgba(56,189,248,0.07);color:var(--cold);border:1px solid rgba(56,189,248,0.18);}
+
+/* ── PROGRESS ── */
+.pb{margin-bottom:2rem;}
+.pbl{font-family:var(--mono);font-size:0.61rem;color:var(--muted);letter-spacing:0.15em;margin-bottom:5px;}
+.pbt{height:2px;background:var(--border);}
+.pbf{height:100%;background:linear-gradient(90deg,var(--accent),var(--cold));transition:width .5s;}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.5rem;margin-bottom:1.2rem;}
+.clbl{font-family:var(--mono);font-size:0.61rem;color:var(--dim);letter-spacing:0.2em;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.5rem;}
+.clbl::before{content:'●';font-size:0.45rem;color:var(--accent);}
+.card h3{font-size:1rem;font-weight:700;color:#e8f5e9;margin-bottom:0.5rem;}
+.card p{color:var(--text);font-size:0.87rem;margin-bottom:0.5rem;}
+.card p:last-child{margin-bottom:0;}
+
+/* ── TERMINAL ── */
+.trm{background:#010a03;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin:1rem 0;}
+.tbar{background:#060f07;padding:7px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);}
+.d{width:9px;height:9px;border-radius:50%;}
+.dr{background:#ff5f56;}.dy{background:#ffbd2e;}.dg{background:#27c93f;}
+.ttl{font-family:var(--mono);font-size:0.61rem;color:var(--muted);margin-left:6px;letter-spacing:0.1em;}
+.tbody{padding:1.2rem 1.4rem;font-family:var(--mono);font-size:0.77rem;line-height:2.1;color:#1a4a28;}
+.pr{color:var(--accent);}.cm{color:#c8e8cc;}.co{color:#0d3320;}
+.ha{color:var(--accent);}.hc{color:var(--red);}.ham{color:var(--amber);}
+.hl2{color:var(--dim);}.hb{color:var(--cold);}.hg{color:var(--muted);}
+.hp{color:var(--purple);}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:0.81rem;margin:1rem 0;}
+.tbl th{background:var(--surface);color:var(--dim);font-family:var(--mono);font-size:0.61rem;letter-spacing:0.13em;text-align:left;padding:9px 13px;border:1px solid var(--border);}
+.tbl td{padding:9px 13px;border:1px solid var(--border);color:var(--text);vertical-align:top;}
+.tbl tr:nth-child(even) td{background:rgba(255,255,255,0.013);}
+.tbl tr:hover td{background:rgba(0,255,136,0.025);}
+
+/* ── CALLOUT ── */
+.note{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.2rem;border-radius:3px;margin:1rem 0;font-size:0.85rem;}
+.ni{background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.18);}
+.nw{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2);}
+.nd{background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);}
+.ng{background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.15);}
+.nico{font-size:1rem;line-height:1.6;flex-shrink:0;}
+.note p{color:var(--text);margin:0;}.note strong{color:#fff;}
+
+/* ── CHECKLIST ── */
+.ck{list-style:none;margin:0.8rem 0;}
+.ck li{display:flex;align-items:flex-start;gap:0.7rem;padding:0.42rem 0;font-size:0.85rem;color:var(--text);border-bottom:1px solid rgba(255,255,255,0.04);}
+.ck li:last-child{border-bottom:none;}
+.ck li::before{content:'$';color:var(--accent);flex-shrink:0;font-family:var(--mono);font-size:0.8rem;padding-top:1px;}
+
+/* ── QUIZ ── */
+.qb{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.4rem;margin-bottom:1rem;}
+.qt{font-size:0.88rem;font-weight:600;color:#e8f5e9;margin-bottom:1rem;}
+.qopts{display:flex;flex-direction:column;gap:0.44rem;}
+.qo{display:flex;align-items:flex-start;gap:0.65rem;padding:0.6rem 1rem;border:1px solid var(--border);border-radius:2px;cursor:pointer;font-size:0.81rem;color:var(--text);transition:all 0.14s;user-select:none;}
+.qo:hover{border-color:var(--accent);color:#fff;background:rgba(0,255,136,0.04);}
+.qo.correct{border-color:var(--accent);background:rgba(0,255,136,0.07);color:var(--accent);}
+.qo.wrong{border-color:var(--red);background:rgba(248,113,113,0.07);color:var(--red);}
+.qk{font-family:var(--mono);font-size:0.67rem;color:var(--muted);min-width:16px;flex-shrink:0;padding-top:1px;}
+.qfb{margin-top:0.8rem;font-size:0.79rem;padding:0.6rem 1rem;border-radius:2px;display:none;}
+.qfb.show{display:block;}
+.qfb.correct{background:rgba(0,255,136,0.07);color:var(--accent);border:1px solid rgba(0,255,136,0.2);}
+.qfb.wrong{background:rgba(248,113,113,0.07);color:var(--red);border:1px solid rgba(248,113,113,0.2);}
+
+/* ── SPLUNK DASHBOARD SIM ── */
+.splunk-win{background:#04080a;border:1px solid var(--border);border-radius:4px;overflow:hidden;margin:1rem 0;}
+.splunk-bar{background:#08101a;padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.6rem;}
+.splunk-title{font-family:var(--mono);font-size:0.65rem;color:var(--cold);letter-spacing:0.08em;}
+.splunk-body{padding:1.2rem 1.4rem;font-family:var(--mono);font-size:0.76rem;line-height:2;}
+.spl-prompt{color:var(--cold);}
+.spl-cmd{color:#e8f0ff;}
+.spl-comment{color:#1a3050;}
+.spl-result{color:var(--accent);}
+.spl-field{color:var(--amber);}
+.spl-val{color:var(--purple);}
+.spl-alert{color:var(--red);font-weight:700;}
+
+/* ── LOG VIEWER ── */
+.log-view{background:#01060a;border:1px solid var(--border);border-radius:3px;padding:1.2rem 1.4rem;margin:1rem 0;font-family:var(--mono);font-size:0.74rem;line-height:2;overflow-x:auto;}
+.lv-ts{color:var(--muted);}
+.lv-host{color:var(--cold);}
+.lv-proc{color:var(--amber);}
+.lv-msg{color:var(--text);}
+.lv-id{color:var(--purple);}
+.lv-ok{color:var(--accent);}
+.lv-warn{color:var(--amber);}
+.lv-fail{color:var(--red);}
+
+/* ── IR LIFECYCLE ── */
+.ir-phases{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin:1rem 0;}
+.ir-phase{display:grid;grid-template-columns:50px 160px 1fr;border-bottom:1px solid var(--border);}
+.ir-phase:last-child{border-bottom:none;}
+.irp-n{display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.4rem;color:var(--accent);background:var(--surface);border-right:1px solid var(--border);font-weight:700;}
+.irp-name{font-family:var(--mono);font-size:0.73rem;font-weight:700;display:flex;align-items:center;padding:12px 14px;background:var(--surface);border-right:1px solid var(--border);color:#e8f5e9;word-break:break-word;}
+.irp-desc{padding:12px 14px;font-size:0.82rem;color:var(--text);}
+
+/* ── SIGMA RULE ── */
+.sigma{background:#020c04;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:3px;padding:1.2rem 1.4rem;margin:1rem 0;font-family:var(--mono);font-size:0.76rem;line-height:1.9;color:var(--muted);}
+.sg-key{color:var(--cold);}.sg-val{color:var(--accent);}.sg-str{color:var(--amber);}.sg-comment{color:#0a2a10;}
+
+/* ── EVENT ID CARDS ── */
+.evid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.8rem;margin:1rem 0;}
+.evid-card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1rem 1.1rem;}
+.evid-id{font-family:var(--mono);font-size:1rem;font-weight:900;color:var(--accent);margin-bottom:0.2rem;}
+.evid-name{font-size:0.84rem;font-weight:600;color:#e8f5e9;margin-bottom:0.4rem;}
+.evid-desc{font-size:0.78rem;color:var(--muted);}
+.evid-card.warn .evid-id{color:var(--amber);}
+.evid-card.crit .evid-id{color:var(--red);}
+
+/* ── SECTION LABEL ── */
+.slbl{font-family:var(--mono);font-size:0.61rem;color:var(--muted);letter-spacing:0.25em;margin:2rem 0 0.8rem;}
+
+/* ── TWO COL ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:700px){.two{grid-template-columns:1fr;}.dnum{font-size:3rem;min-width:70px;}.ir-phase{grid-template-columns:40px 1fr;}.irp-name{display:none;}}
+
+/* helpers */
+.hl{color:var(--accent);font-weight:600;}
+.hcr{color:var(--red);font-weight:600;}
+.ham2{color:var(--amber);font-weight:600;}
+.hbl{color:var(--cold);font-weight:600;}
+.hpp{color:var(--purple);font-weight:600;}
+
+footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-family:var(--mono);font-size:0.63rem;color:var(--muted);letter-spacing:0.1em;max-width:1160px;margin:2rem auto 0;position:relative;z-index:1;}
+</style>
+<link rel="stylesheet" href="../css/shared.css"/>
+</head>
+<body>
+<nav class="breadcrumb" style="background:var(--surface,#090c12);border-bottom-color:var(--border,#141b26);color:var(--muted,#253040);">
+  <a href="../index.html" style="color:var(--accent,#3b82f6);">LESSON HUB</a>
+  <span>/</span>
+  <span style="color:var(--text,#b0c0d8);">Phase 4</span>
+  <span>/</span>
+  <span style="color:#fff;">Week 7</span>
+</nav>
+
+<header>
+  <div class="hi">
+    <div class="logo">CYBER<span>BOOT</span>CAMP <span>// PHASE 4</span></div>
+    <div class="wbadge">WEEK 7 · DETECTION · MONITORING · INCIDENT RESPONSE</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="eyebrow">// PHASE 4 — DEFENSIVE SECURITY → WEEK 7 OF 8</div>
+  <h1>DETECT.<br>RESPOND.<br><span class="gl">CONTAIN.</span></h1>
+  <p class="hsub">Seven days switching sides — from attacker to defender. SIEM mastery with Splunk and ELK, deep log analysis, writing detection rules that catch the exact attacks you ran in Phases 2 and 3, Snort/Suricata IDS, incident response lifecycle, and digital forensics fundamentals.</p>
+  <div class="htags">
+    <span class="htag ta">Splunk / ELK</span>
+    <span class="htag tb">Log Analysis</span>
+    <span class="htag tc">Sigma Rules</span>
+    <span class="htag td">Snort / Suricata</span>
+    <span class="htag te">Incident Response</span>
+    <span class="htag ta">Disk Forensics</span>
+    <span class="htag tb">Memory Forensics</span>
+  </div>
+</div>
+
+<!-- OUTLINE TABLE -->
+<div class="outline-wrap">
+  <div class="outline-box">
+    <div class="outline-hdr">
+      <span class="outline-hdr-l">WEEK 7 — DAILY OUTLINE</span>
+      <span class="outline-hdr-r">PHASE 4 · DAYS 43–49</span>
+    </div>
+    <table class="otbl">
+      <thead>
+        <tr>
+          <th style="width:75px">DAY</th>
+          <th style="width:200px">TOPIC</th>
+          <th>WHAT YOU'LL LEARN</th>
+          <th style="width:170px">KEY TOOLS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="od">Day 43</td><td class="ot">SIEM Fundamentals</td><td>What a SIEM is and why every enterprise runs one. Splunk vs ELK architecture. Ingesting log sources, index structure, field extraction. Building dashboards. SPL (Search Processing Language) from first principles — search, eval, stats, table, where, rex. Your first detection dashboard for failed logins.</td><td class="ok">Splunk, ELK Stack, SPL</td></tr>
+        <tr><td class="od">Day 44</td><td class="ot">Log Analysis</td><td>Windows Security Event IDs that matter (4624, 4625, 4648, 4688, 4698, 4720, 4732, 7045). Linux auth.log, syslog, and /var/log structure. Web server access log analysis. Parsing with grep/awk pipelines. Identifying brute-force, lateral movement, and persistence in raw log data.</td><td class="ok">Event Viewer, auditd, grep, Splunk</td></tr>
+        <tr><td class="od">Day 45</td><td class="ot">Threat Detection</td><td>Writing Splunk SPL detection queries for real attacks: port scans, brute-force, Mimikatz (LSASS access), Pass-the-Hash (4624 logon type 3), Kerberoasting (4769), scheduled task creation (4698), new service (7045). Introduction to Sigma rules — vendor-agnostic detection format. Converting Sigma to SPL and Snort.</td><td class="ok">Splunk SPL, Sigma, sigmac</td></tr>
+        <tr><td class="od">Day 46</td><td class="ot">IDS/IPS — Snort & Suricata</td><td>Network-based intrusion detection vs host-based. Snort rule syntax deep dive: action, protocol, source, destination, options (content, pcre, threshold, sid, rev). Writing rules to detect Nmap scans, SQL injection, XSS, reverse shells, C2 beaconing. Suricata advantages: multi-threaded, built-in EVE JSON logging, protocol detection. Alert tuning to reduce false positives.</td><td class="ok">Snort, Suricata, EVE JSON</td></tr>
+        <tr><td class="od">Day 47</td><td class="ot">Incident Response</td><td>The 6-phase IR lifecycle (Preparation → Identification → Containment → Eradication → Recovery → Lessons Learned). IR playbooks for ransomware, account compromise, and data exfiltration. Triage methodology: what to do in the first 15 minutes of an incident. Chain of custody. Communication with management. Legal considerations.</td><td class="ok">IR playbooks, Velociraptor, TheHive</td></tr>
+        <tr><td class="od">Day 48</td><td class="ot">Digital Forensics I</td><td>Forensics methodology and order of volatility. Disk imaging with dd and FTK Imager — bit-for-bit copies preserving evidence. File system structure: MFT, inodes, slack space, deleted file recovery. File carving with foremost/scalpel. Autopsy for graphical forensics analysis. Metadata extraction and timeline creation.</td><td class="ok">FTK Imager, Autopsy, dd, foremost</td></tr>
+        <tr><td class="od">Day 49</td><td class="ot">Digital Forensics II + Review</td><td>Memory forensics with Volatility 3: process listing (windows.pslist), network connections (windows.netstat), injected code detection (malfind), extracting strings from process memory, dumping process executables. Volatility plugins for detecting Mimikatz artifacts and hollowed processes. Week 7 capstone: analyze a provided malware-infected memory image and write a one-page forensic report.</td><td class="ok">Volatility 3, strings, yara</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="dnav">
+  <button class="dtab on" onclick="show(0)">Day 43 — SIEM</button>
+  <button class="dtab" onclick="show(1)">Day 44 — Log Analysis</button>
+  <button class="dtab" onclick="show(2)">Day 45 — Threat Detection</button>
+  <button class="dtab" onclick="show(3)">Day 46 — IDS/IPS</button>
+  <button class="dtab" onclick="show(4)">Day 47 — Incident Response</button>
+  <button class="dtab" onclick="show(5)">Day 48 — Forensics I</button>
+  <button class="dtab" onclick="show(6)">Day 49 — Forensics II</button>
+</div>
+
+<div class="wrap">
+
+<!-- ════════ DAY 43 ════════ -->
+<div class="pnl on" id="p0">
+  <div class="dh">
+    <div class="dnum">43</div>
+    <div class="dinfo">
+      <h2>SIEM FUNDAMENTALS</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> Splunk · ELK Stack · SPL · Dashboards · Log Ingestion</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 7 PROGRESS — DAY 43 OF 49</div><div class="pbt"><div class="pbf" style="width:86%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">🛡️</div>
+    <p><strong>Welcome to the Blue Team.</strong> Everything you did in Phases 2 and 3 left traces. A SOC analyst's job is to find those traces before the damage is done. A SIEM (Security Information and Event Management) system collects logs from every source across the environment, normalises them, and lets analysts search, alert, and dashboard them. Today you become the analyst hunting your own attacks.</p>
+  </div>
+
+  <div class="slbl">// 43.1 — WHAT IS A SIEM?</div>
+  <div class="two">
+    <div class="card">
+      <div class="clbl">SIEM ARCHITECTURE</div>
+      <p>A SIEM has three jobs: <span class="hl">collect</span> logs from every device and application, <span class="hl">correlate</span> events across sources to detect attack patterns, and <span class="hl">alert</span> analysts when something suspicious matches a rule. Think of it as the nervous system of a SOC.</p>
+      <p style="margin-top:0.6rem">Without a SIEM: an attacker moves laterally across 15 machines, and each machine's local log sees only one hop. With a SIEM: all 15 logs arrive in one place and the full lateral movement chain is visible.</p>
+    </div>
+    <div class="card">
+      <div class="clbl">SPLUNK VS ELK</div>
+      <table class="tbl" style="margin:0;font-size:0.78rem;">
+        <tr><th>FEATURE</th><th>SPLUNK</th><th>ELK STACK</th></tr>
+        <tr><td>Cost</td><td>Commercial ($)</td><td>Free (open source)</td></tr>
+        <tr><td>Ease of use</td><td>Excellent GUI</td><td>Steeper learning curve</td></tr>
+        <tr><td>Query language</td><td>SPL</td><td>KQL / Lucene</td></tr>
+        <tr><td>Industry use</td><td>Enterprise standard</td><td>Growing rapidly</td></tr>
+        <tr><td>Student access</td><td>Free (500MB/day)</td><td>Fully free</td></tr>
+        <tr><td>Start with</td><td colspan="2" style="text-align:center;color:var(--accent)">Both — different jobs use different tools</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="slbl">// 43.2 — SPL: SEARCH PROCESSING LANGUAGE</div>
+  <div class="note nw">
+    <div class="nico">💡</div>
+    <p><strong>SPL reads left to right like a pipeline.</strong> Each command takes the results of the previous command as input. Search → transform → display. Once you understand the pipeline model, any SPL query becomes readable.</p>
+  </div>
+
+  <div class="splunk-win">
+    <div class="splunk-bar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="splunk-title">Splunk Search &amp; Reporting — SPL REFERENCE</span></div>
+    <div class="splunk-body">
+<span class="spl-comment">| ── BASIC SEARCH ────────────────────────────────────────────────────</span>
+<span class="spl-cmd">index=windows_logs EventCode=4625</span>          <span class="spl-comment">| failed login events</span>
+<span class="spl-cmd">index=* sourcetype=syslog "Failed password"</span> <span class="spl-comment">| SSH failures from any index</span>
+<span class="spl-cmd">index=web_logs status=404 | head 100</span>       <span class="spl-comment">| first 100 404 errors</span>
+
+<span class="spl-comment">| ── TIME MODIFIERS ──────────────────────────────────────────────────</span>
+<span class="spl-cmd">index=windows_logs earliest=-24h latest=now</span>
+<span class="spl-cmd">index=windows_logs earliest="01/15/2024:00:00:00" latest="01/15/2024:23:59:59"</span>
+
+<span class="spl-comment">| ── STATS — aggregate and count ─────────────────────────────────────</span>
+<span class="spl-cmd">index=windows_logs EventCode=4625
+| stats count by src_ip, Account_Name
+| sort -count</span>
+<span class="spl-result">src_ip           Account_Name    count
+10.0.0.50        Administrator   847    ← brute-force attacker!
+10.0.0.50        john.smith      312
+192.168.1.5      admin           45</span>
+
+<span class="spl-comment">| ── TABLE — display specific fields ─────────────────────────────────</span>
+<span class="spl-cmd">index=windows_logs EventCode=4624
+| table _time, src_ip, Account_Name, Logon_Type, Workstation_Name
+| sort -_time</span>
+
+<span class="spl-comment">| ── EVAL — create computed fields ───────────────────────────────────</span>
+<span class="spl-cmd">index=web_logs
+| eval response_kb = bytes / 1024
+| where response_kb > 1000
+| table _time, uri, src_ip, response_kb</span>
+<span class="spl-comment">| Large responses — potential data exfiltration?</span>
+
+<span class="spl-comment">| ── REX — extract fields with regex ─────────────────────────────────</span>
+<span class="spl-cmd">index=syslog sourcetype=linux_secure
+| rex field=_raw "Failed password for (?P&lt;username&gt;\S+) from (?P&lt;attacker_ip&gt;\S+)"
+| stats count by username, attacker_ip
+| sort -count</span>
+
+<span class="spl-comment">| ── TRANSACTION — group related events ──────────────────────────────</span>
+<span class="spl-cmd">index=windows_logs EventCode IN (4625,4624)
+| transaction src_ip maxspan=5m
+| where eventcount > 5 AND match(_raw,"4624")
+| table src_ip, eventcount, duration</span>
+<span class="spl-comment">| Finds IPs that failed multiple times then succeeded — credential spray!</span>
+
+<span class="spl-comment">| ── ALERT THRESHOLD ─────────────────────────────────────────────────</span>
+<span class="spl-cmd">index=windows_logs EventCode=4625
+| bucket _time span=5m
+| stats count by _time, src_ip
+| where count > 20</span>
+<span class="spl-comment">| Triggers when any IP has 20+ failed logins in 5 minutes</span>
+    </div>
+  </div>
+
+  <div class="slbl">// 43.3 — ELK STACK: THE FREE ALTERNATIVE</div>
+  <div class="card">
+    <div class="clbl">ELASTICSEARCH · LOGSTASH · KIBANA</div>
+    <p><span class="hl">Elasticsearch</span> stores and indexes logs. <span class="hl">Logstash</span> (or Beats agents) collects and ships logs from endpoints. <span class="hl">Kibana</span> is the web UI for searching, dashboarding, and alerting. Combined they replicate most of Splunk's functionality for free.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">ELK STACK — SETUP ON KALI (QUICK INSTALL)</div></div>
+    <div class="tbody"><span class="co"># Install Elasticsearch and Kibana:</span>
+<span class="pr">$</span> <span class="cm">wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -</span>
+<span class="pr">$</span> <span class="cm">echo "deb https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list</span>
+<span class="pr">$</span> <span class="cm">sudo apt update && sudo apt install elasticsearch kibana -y</span>
+<span class="pr">$</span> <span class="cm">sudo systemctl start elasticsearch kibana</span>
+<span class="co"># Access Kibana: http://localhost:5601</span>
+
+<span class="co"># Install Winlogbeat on Windows target to ship logs to ELK:</span>
+<span class="co"># winlogbeat.yml:</span>
+<span class="ha">winlogbeat.event_logs:
+  - name: Security
+  - name: System
+  - name: Application
+output.elasticsearch:
+  hosts: ["192.168.56.100:9200"]</span>
+
+<span class="co"># Install Filebeat on Linux target to ship /var/log:</span>
+<span class="pr">$</span> <span class="cm">sudo apt install filebeat -y</span>
+<span class="pr">$</span> <span class="cm">sudo filebeat modules enable system</span>
+<span class="pr">$</span> <span class="cm">sudo filebeat setup && sudo systemctl start filebeat</span>
+
+<span class="co"># KQL query in Kibana (equivalent to Splunk SPL):</span>
+<span class="ha">event.code: 4625 AND winlog.event_data.LogonType: 3</span>   <span class="co"># Failed network logons</span>
+<span class="ha">event.code: 4624 AND source.ip: "10.0.0.50"</span>           <span class="co"># Successful logins from IP</span></div>
+  </div>
+
+  <div class="slbl">// DAY 43 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You write this SPL query: <code>index=windows_logs EventCode=4625 | stats count by src_ip | sort -count | head 10</code>. It returns <code>192.168.1.50 = 3,847 failures</code> in the last hour. What does this almost certainly indicate, and what is your immediate next step as a SOC analyst?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','A misconfigured service would produce failures against a specific local account, likely from localhost or a service account IP — not an external IP with nearly 4,000 attempts in an hour.')"><span class="qk">A</span> A misconfigured service — 3,847 failures is normal for some applications</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! 3,847 failed login attempts in one hour from a single IP is a textbook brute-force or password spraying attack. Next steps in order: (1) Pivot — query what accounts were targeted: add <code>| stats count by src_ip, Account_Name</code>. If many accounts each with few attempts = password spray (slow, hard to detect). If one account with many attempts = brute force. (2) Check for success — critically important: <code>index=windows_logs EventCode=4624 src_ip="192.168.1.50"</code> — did ANY login succeed? A success after failures = compromised account. (3) Contain — block the source IP at the firewall immediately if this is live. (4) Escalate — open an incident ticket. (5) Check the IP in threat intel (VirusTotal, AbuseIPDB). Never just dismiss high-volume failure alerts.')"><span class="qk">B</span> Brute-force or password spray attack — pivot to check targeted accounts, immediately check if any 4624 (success) event followed from the same IP, then block at firewall</div>
+      <div class="qo" onclick="qa(this,'wrong','While a port scan can cause some log noise, failed login events (4625) specifically require an authentication attempt — not raw port scanning. This is a credential attack.')"><span class="qk">C</span> Nmap port scan — port scanners generate failed connection events</div>
+      <div class="qo" onclick="qa(this,'wrong','Waiting for more data when you have a clear attack signal wastes critical containment time. Act on the evidence you have.')"><span class="qk">D</span> Probably a false positive — wait for more data before acting</div>
+    </div>
+    <div class="qfb" id="q0"></div>
+  </div>
+
+  <div class="slbl">// DAY 43 — LAB</div>
+  <div class="card">
+    <div class="clbl">LAB TASKS</div>
+    <ul class="ck">
+      <li>Install Splunk Free on your Kali VM. Download and ingest the BOTS (Boss of the SOC) dataset — the best free Splunk training dataset available at github.com/splunk/botsv1.</li>
+      <li>Run the basic SPL queries from section 43.2. Understand what each pipeline stage does before moving to the next.</li>
+      <li>Build a dashboard panel showing failed logins per hour over the last 24 hours as a bar chart.</li>
+      <li>TryHackMe room: <strong>"Splunk: Basics"</strong> — guided SPL practice with real log data.</li>
+      <li>TryHackMe room: <strong>"Splunk 2"</strong> — intermediate investigation using the BOTS dataset.</li>
+    </ul>
+  </div>
+</div><!-- /p0 -->
+
+
+<!-- ════════ DAY 44 ════════ -->
+<div class="pnl" id="p1">
+  <div class="dh">
+    <div class="dnum">44</div>
+    <div class="dinfo">
+      <h2>LOG ANALYSIS</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> Windows Event IDs · Linux Auth Logs · Web Logs · Parsing Pipelines</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 7 PROGRESS — DAY 44 OF 49</div><div class="pbt"><div class="pbf" style="width:88%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">📋</div>
+    <p><strong>Logs are the attacker's footprints.</strong> Every command run, every login attempted, every file opened — all of it leaves entries in log files. The challenge isn't finding the footprints. It's knowing which logs to look at, which fields matter, and what normal looks like so that abnormal stands out instantly.</p>
+  </div>
+
+  <div class="slbl">// 44.1 — CRITICAL WINDOWS EVENT IDs</div>
+  <div class="evid-grid">
+    <div class="evid-card">
+      <div class="evid-id">4624</div>
+      <div class="evid-name">Successful Logon</div>
+      <div class="evid-desc">Account successfully logged on. Key fields: Logon Type (2=interactive, 3=network, 10=remote, 7=unlock). Type 3 at unusual hours or from unusual IPs = lateral movement.</div>
+    </div>
+    <div class="evid-card warn">
+      <div class="evid-id">4625</div>
+      <div class="evid-name">Failed Logon</div>
+      <div class="evid-desc">Account failed to log on. Sub Status codes reveal why: 0xC000006A = wrong password, 0xC0000064 = username doesn't exist. High volume = brute force.</div>
+    </div>
+    <div class="evid-card warn">
+      <div class="evid-id">4648</div>
+      <div class="evid-name">Logon with Explicit Credentials</div>
+      <div class="evid-desc">A process used explicit credentials (runas). Mimikatz Pass-the-Hash and lateral movement with psexec generate this. Flag: 4648 from non-admin accounts.</div>
+    </div>
+    <div class="evid-card crit">
+      <div class="evid-id">4688</div>
+      <div class="evid-name">Process Creation</div>
+      <div class="evid-desc">New process created. With command-line logging enabled this is gold — reveals cmd.exe /c whoami, powershell -enc, mimikatz.exe. Most underused detection source.</div>
+    </div>
+    <div class="evid-card crit">
+      <div class="evid-id">4698</div>
+      <div class="evid-name">Scheduled Task Created</div>
+      <div class="evid-desc">A scheduled task was created. Persistence mechanism. Legitimate tasks have recognisable names — random strings or typo-squatted names are red flags.</div>
+    </div>
+    <div class="evid-card crit">
+      <div class="evid-id">4720</div>
+      <div class="evid-name">User Account Created</div>
+      <div class="evid-desc">New user account created. Attackers add backdoor accounts after compromise. Any 4720 outside of IT change windows should be investigated immediately.</div>
+    </div>
+    <div class="evid-card warn">
+      <div class="evid-id">4732</div>
+      <div class="evid-name">Member Added to Group</div>
+      <div class="evid-desc">User added to a security group. 4732 where Group=Administrators or Domain Admins is a critical escalation event. Alert immediately.</div>
+    </div>
+    <div class="evid-card crit">
+      <div class="evid-id">7045</div>
+      <div class="evid-name">New Service Installed</div>
+      <div class="evid-desc">A service was installed. PSExec creates a temporary service — you'll see 7045 immediately before a PSExec session. Also used for malware persistence.</div>
+    </div>
+    <div class="evid-card crit">
+      <div class="evid-id">4769</div>
+      <div class="evid-name">Kerberos Service Ticket</div>
+      <div class="evid-desc">Kerberos TGS ticket requested. Kerberoasting generates 4769 events with Ticket Encryption Type 0x17 (RC4) — a strong indicator when volume is high or from unusual accounts.</div>
+    </div>
+  </div>
+
+  <div class="slbl">// 44.2 — READING WINDOWS EVENT LOGS</div>
+  <div class="log-view">
+<span class="lv-ts">2024-01-15 02:34:17</span> <span class="lv-host">WIN-WS01</span> <span class="lv-id">EventID: <span class="lv-fail">4625</span></span> <span class="lv-msg">An account failed to log on.</span>
+  <span class="lv-msg">Account Name: Administrator</span>
+  <span class="lv-msg">Workstation Name: KALI</span>
+  <span class="lv-msg">Source Network Address: <span class="lv-fail">10.10.10.50</span></span>    <span class="lv-fail">← external machine, 2AM, admin account</span>
+  <span class="lv-msg">Logon Type: <span class="lv-warn">3</span></span>                          <span class="lv-warn">← network logon (not local)</span>
+  <span class="lv-msg">Failure Reason: Unknown user name or bad password</span>
+  <span class="lv-msg">Sub Status: <span class="lv-fail">0xC000006A</span></span>                  <span class="lv-fail">← wrong password (not wrong username)</span>
+
+<span class="lv-ts">2024-01-15 02:34:52</span> <span class="lv-host">WIN-WS01</span> <span class="lv-id">EventID: <span class="lv-ok">4624</span></span> <span class="lv-msg">An account was successfully logged on.</span>
+  <span class="lv-msg">Account Name: Administrator</span>
+  <span class="lv-msg">Source Network Address: <span class="lv-fail">10.10.10.50</span></span>    <span class="lv-fail">← same IP, 35 seconds later — password cracked!</span>
+  <span class="lv-msg">Logon Type: <span class="lv-warn">3</span></span>
+  <span class="lv-msg">Authentication Package: <span class="lv-warn">NTLM</span></span>              <span class="lv-warn">← NTLM not Kerberos = possible PtH</span>
+
+<span class="lv-ts">2024-01-15 02:35:01</span> <span class="lv-host">WIN-WS01</span> <span class="lv-id">EventID: <span class="lv-fail">7045</span></span> <span class="lv-msg">A new service was installed.</span>
+  <span class="lv-msg">Service Name: <span class="lv-fail">BTOBTO</span></span>                    <span class="lv-fail">← random name = PSExec service!</span>
+  <span class="lv-msg">Service File Name: <span class="lv-fail">%SystemRoot%\BTOBTO.exe</span></span>
+  <span class="lv-msg">Service Account: LocalSystem</span>
+
+<span class="lv-ts">2024-01-15 02:35:02</span> <span class="lv-host">WIN-WS01</span> <span class="lv-id">EventID: <span class="lv-fail">4688</span></span> <span class="lv-msg">A new process has been created.</span>
+  <span class="lv-msg">New Process Name: <span class="lv-fail">C:\Windows\BTOBTO.exe</span></span>
+  <span class="lv-msg">Process Command Line: <span class="lv-fail">cmd.exe /Q /c whoami 1> \\127.0.0.1\C$\__output 2>&1</span></span>
+  <span class="lv-msg">Creator Subject: NT AUTHORITY\SYSTEM</span>      <span class="lv-fail">← running as SYSTEM via PSExec</span>
+  </div>
+
+  <div class="note nd">
+    <div class="nico">🚨</div>
+    <p><strong>Reading this chain:</strong> 4625 (failed login from 10.10.10.50) → 4624 (success 35s later from same IP, NTLM auth) → 7045 (random service name = PSExec) → 4688 (SYSTEM running cmd.exe with output redirection = PSExec command). This is a complete lateral movement event chain. Every single step is detectable — but only if you're looking.</p>
+  </div>
+
+  <div class="slbl">// 44.3 — LINUX LOG ANALYSIS</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">LINUX LOG ANALYSIS — KEY FILES AND COMMANDS</div></div>
+    <div class="tbody"><span class="co"># ── KEY LOG FILES ────────────────────────────────────────────</span>
+<span class="ha">/var/log/auth.log</span>         <span class="co"># SSH logins, sudo, su, PAM — PRIMARY security log (Debian/Ubuntu)</span>
+<span class="ha">/var/log/secure</span>           <span class="co"># Same on RHEL/CentOS/Fedora</span>
+<span class="ha">/var/log/syslog</span>           <span class="co"># General system messages</span>
+<span class="ha">/var/log/kern.log</span>         <span class="co"># Kernel messages — useful for detecting rootkits, USB events</span>
+<span class="ha">/var/log/apache2/access.log</span> <span class="co"># Web server — every HTTP request</span>
+<span class="ha">/var/log/apache2/error.log</span>  <span class="co"># Web errors — 500 errors, path traversal attempts</span>
+<span class="ha">~/.bash_history</span>           <span class="co"># Commands run by each user — often deleted by attackers</span>
+<span class="ha">/var/log/wtmp</span>             <span class="co"># All logins (read with: last)</span>
+<span class="ha">/var/log/btmp</span>             <span class="co"># Failed logins (read with: lastb)</span>
+
+<span class="co"># ── FIND FAILED SSH ATTEMPTS AND ATTACKER IPs ────────────────</span>
+<span class="pr">$</span> <span class="cm">grep "Failed password" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -rn | head -20</span>
+<span class="hl2">   4721 203.0.113.50     ← top attacker
+    312 10.0.0.23
+     89 198.51.100.5</span>
+
+<span class="co"># ── FIND SUCCESSFUL LOGINS AFTER FAILURES (compromise indicator) ──</span>
+<span class="pr">$</span> <span class="cm">grep "Accepted" /var/log/auth.log | grep "203.0.113.50"</span>
+<span class="hl2">Jan 15 02:41:33 server sshd[1234]: Accepted password for root from 203.0.113.50</span>
+<span class="hc">← root SSH login from the same IP that was brute-forcing → COMPROMISED</span>
+
+<span class="co"># ── DETECT COMMANDS RUN AS ROOT ─────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">grep "sudo" /var/log/auth.log | grep -v "session closed"</span>
+<span class="pr">$</span> <span class="cm">cat /root/.bash_history</span>
+<span class="co"># Attackers often run: curl | bash, wget | sh, python -c, nc -e</span>
+
+<span class="co"># ── APACHE WEB LOG — DETECT ATTACK PATTERNS ──────────────────</span>
+<span class="pr">$</span> <span class="cm">grep "\"GET.*\.\./\.\." /var/log/apache2/access.log</span>       <span class="co"># Path traversal</span>
+<span class="pr">$</span> <span class="cm">grep "sqlmap\|nikto\|nmap\|masscan" /var/log/apache2/access.log</span>  <span class="co"># Scanner UA strings</span>
+<span class="pr">$</span> <span class="cm">awk '{print $1}' /var/log/apache2/access.log | sort | uniq -c | sort -rn | head -10</span>  <span class="co"># Top source IPs</span></div>
+  </div>
+
+  <div class="slbl">// DAY 44 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You see Windows Event ID 4769 (Kerberos Service Ticket) appearing 500 times in 2 minutes from a single user account (<code>john.smith</code>), with <code>Ticket Encryption Type: 0x17</code> for hundreds of different SPNs. What attack does this indicate and what does 0x17 specifically tell you?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Golden Ticket attacks forge TGT tickets (Event ID 4768), not service tickets (4769), and they don\'t generate high volumes of requests for different SPNs.')"><span class="qk">A</span> Golden Ticket attack — forging domain tickets</div>
+      <div class="qo" onclick="qa(this,'wrong','Normal Kerberos authentication generates occasional 4769 events for the specific services a user accesses. 500 requests in 2 minutes for hundreds of different SPNs is never normal user behavior.')"><span class="qk">B</span> Normal Kerberos authentication — users frequently request service tickets</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Kerberoasting. 4769 events are service ticket requests — when a user requests tickets for many SPNs in rapid succession it means they\'re collecting TGS tickets for offline cracking. Encryption type 0x17 = RC4-HMAC. This is critical: modern environments should use AES (0x12/0x11). RC4 tickets are much faster to crack offline with Hashcat. Best detection: alert on any single account generating more than 10 unique SPN requests in 5 minutes with encryption type 0x17. Remediation: set "This account supports Kerberos AES 256 bit encryption" on service accounts — this forces AES tickets which are computationally impractical to crack.')"><span class="qk">C</span> Kerberoasting — the volume of SPN requests is the attack pattern; 0x17 means RC4-HMAC encryption which is fast to crack offline, unlike AES</div>
+      <div class="qo" onclick="qa(this,'wrong','AS-REP Roasting targets accounts without preauthentication and produces 4768 (AS-REQ/AS-REP) events, not service ticket (4769) events. The SPN-targeting pattern here is Kerberoasting.')"><span class="qk">D</span> AS-REP Roasting — requesting authentication tickets without credentials</div>
+    </div>
+    <div class="qfb" id="q1"></div>
+  </div>
+</div><!-- /p1 -->
+
+
+<!-- ════════ DAY 45 ════════ -->
+<div class="pnl" id="p2">
+  <div class="dh">
+    <div class="dnum">45</div>
+    <div class="dinfo">
+      <h2>THREAT DETECTION</h2>
+      <p><span class="stag stl">TOOL</span><span class="stag slb">LAB</span> SPL Detection Queries · Sigma Rules · MITRE ATT&CK Detection · Alert Tuning</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 7 PROGRESS — DAY 45 OF 49</div><div class="pbt"><div class="pbf" style="width:90%"></div></div></div>
+
+  <div class="note ng">
+    <div class="nico">🎯</div>
+    <p><strong>Detection is the blue team's exploitation.</strong> Just as a pentester uses known attack patterns to compromise systems, a defender writes detection rules that catch those same patterns. Today you write the exact Splunk queries and Sigma rules that would have caught every attack you ran in Phases 2 and 3. This is the most direct form of purple teaming.</p>
+  </div>
+
+  <div class="slbl">// 45.1 — SPL DETECTION QUERIES FOR REAL ATTACKS</div>
+  <div class="splunk-win">
+    <div class="splunk-bar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="splunk-title">DETECTION QUERIES — Built from Week 3 &amp; 4 attack knowledge</span></div>
+    <div class="splunk-body">
+<span class="spl-comment">| ── DETECT: Nmap SYN Port Scan (network logs) ───────────────────────</span>
+<span class="spl-cmd">index=network_logs tcp_flags="S"
+| stats dc(dest_port) as unique_ports count by src_ip, _time span=30s
+| where unique_ports > 50
+| table _time, src_ip, unique_ports, count</span>
+<span class="spl-result">Fires when any IP hits 50+ unique ports in 30 seconds = port scan</span>
+
+<span class="spl-comment">| ── DETECT: Mimikatz LSASS Access (Sysmon EventID 10) ──────────────</span>
+<span class="spl-cmd">index=windows_logs source="WinEventLog:Microsoft-Windows-Sysmon/Operational"
+EventCode=10 TargetImage="*lsass.exe"
+| where NOT (SourceImage IN ("*MsMpEng.exe","*csrss.exe","*wininit.exe"))
+| table _time, ComputerName, SourceImage, TargetImage, GrantedAccess</span>
+<span class="spl-result">Any process reading lsass.exe memory that isn't AV or OS = Mimikatz-like</span>
+
+<span class="spl-comment">| ── DETECT: Pass-the-Hash (4624 Logon Type 3 + NTLM) ───────────────</span>
+<span class="spl-cmd">index=windows_logs EventCode=4624
+  Logon_Type=3 Authentication_Package=NTLM
+| where Account_Name!="ANONYMOUS LOGON" AND src_ip!="127.0.0.1"
+| stats count by src_ip, Account_Name, Workstation_Name
+| where count > 3
+| sort -count</span>
+<span class="spl-result">NTLM network logons from same IP to multiple hosts = PtH lateral movement</span>
+
+<span class="spl-comment">| ── DETECT: Kerberoasting (4769 RC4 tickets) ───────────────────────</span>
+<span class="spl-cmd">index=windows_logs EventCode=4769
+  Ticket_Encryption_Type=0x17
+  Service_Name!="krbtgt"
+| stats dc(Service_Name) as spn_count count by Account_Name, Client_Address
+| where spn_count > 5
+| sort -spn_count</span>
+<span class="spl-result">User requesting RC4 tickets for 5+ SPNs = Kerberoasting in progress</span>
+
+<span class="spl-comment">| ── DETECT: New Admin Account Created (backdoor) ───────────────────</span>
+<span class="spl-cmd">index=windows_logs (EventCode=4720 OR EventCode=4732)
+| eval action=case(EventCode=="4720","Account Created",EventCode=="4732","Added to Group",true(),"Unknown")
+| where match(Group_Name,"Admin") OR match(Group_Name,"Domain Admin")
+| table _time, ComputerName, Subject_Account, Target_Account, action, Group_Name</span>
+<span class="spl-result">New accounts or group additions in admin groups outside change windows</span>
+
+<span class="spl-comment">| ── DETECT: Suspicious PowerShell (encoded commands) ──────────────</span>
+<span class="spl-cmd">index=windows_logs EventCode=4688
+  New_Process_Name="*powershell*"
+  Process_Command_Line IN ("*-enc*","*-EncodedCommand*","*IEX*","*Invoke-Expression*","*DownloadString*")
+| table _time, ComputerName, Account_Name, Process_Command_Line</span>
+<span class="spl-result">PowerShell with encoded commands or download cradles = likely malicious</span>
+
+<span class="spl-comment">| ── DETECT: Scheduled Task Persistence ─────────────────────────────</span>
+<span class="spl-cmd">index=windows_logs EventCode=4698
+| rex field=Task_Content "Command&gt;(?P&lt;task_cmd&gt;[^&lt;]+)"
+| where match(task_cmd,"powershell|cmd|wscript|cscript|mshta|regsvr32")
+| table _time, ComputerName, Subject_Account, Task_Name, task_cmd</span>
+    </div>
+  </div>
+
+  <div class="slbl">// 45.2 — SIGMA RULES: VENDOR-AGNOSTIC DETECTION</div>
+  <div class="card">
+    <div class="clbl">WHAT IS SIGMA?</div>
+    <p>Sigma is a generic signature format for SIEM systems — write a rule once, convert to SPL, KQL, Lucene, QRadar, or any SIEM's query language. It's the YARA for log detection. The community Sigma repository (github.com/SigmaHQ/sigma) has 3,000+ pre-built rules you can deploy immediately.</p>
+  </div>
+
+  <div class="sigma">
+<span class="sg-comment"># Sigma rule: Detecting Mimikatz via LSASS memory access</span>
+<span class="sg-key">title:</span> <span class="sg-str">Mimikatz LSASS Process Access</span>
+<span class="sg-key">id:</span> <span class="sg-val">a7ae4f4c-f8b2-4d3e-9c8a-1e2f4d6b8c0a</span>
+<span class="sg-key">status:</span> <span class="sg-str">stable</span>
+<span class="sg-key">description:</span> <span class="sg-str">Detects process access to LSASS memory — indicative of credential dumping tools like Mimikatz</span>
+<span class="sg-key">references:</span>
+  <span class="sg-val">- https://attack.mitre.org/techniques/T1003/001/</span>
+<span class="sg-key">author:</span> <span class="sg-str">SOC Team</span>
+<span class="sg-key">tags:</span>
+  <span class="sg-val">- attack.credential_access</span>
+  <span class="sg-val">- attack.t1003.001</span>
+<span class="sg-key">logsource:</span>
+  <span class="sg-key">category:</span> <span class="sg-str">process_access</span>
+  <span class="sg-key">product:</span> <span class="sg-str">windows</span>
+<span class="sg-key">detection:</span>
+  <span class="sg-key">selection:</span>
+    <span class="sg-key">TargetImage|endswith:</span> <span class="sg-str">'\lsass.exe'</span>
+    <span class="sg-key">GrantedAccess|contains:</span>
+      <span class="sg-val">- '0x1010'</span>
+      <span class="sg-val">- '0x1038'</span>
+      <span class="sg-val">- '0x40'</span>
+      <span class="sg-val">- '0x1fffff'</span>
+  <span class="sg-key">filter_legit:</span>
+    <span class="sg-key">SourceImage|contains:</span>
+      <span class="sg-val">- 'MsMpEng.exe'</span>
+      <span class="sg-val">- 'csrss.exe'</span>
+      <span class="sg-val">- 'wininit.exe'</span>
+      <span class="sg-val">- 'lsm.exe'</span>
+  <span class="sg-key">condition:</span> <span class="sg-val">selection and not filter_legit</span>
+<span class="sg-key">falsepositives:</span>
+  <span class="sg-val">- Some EDR products (tune filter_legit accordingly)</span>
+<span class="sg-key">level:</span> <span class="sg-str">high</span>
+  </div>
+
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">SIGMA CONVERSION — ONE RULE, MANY SIEMs</div></div>
+    <div class="tbody"><span class="co"># Install sigma tools:</span>
+<span class="pr">$</span> <span class="cm">pip install sigma-cli --break-system-packages</span>
+<span class="pr">$</span> <span class="cm">sigma plugin install splunk</span>
+<span class="pr">$</span> <span class="cm">sigma plugin install elasticsearch</span>
+
+<span class="co"># Convert Mimikatz Sigma rule to Splunk SPL:</span>
+<span class="pr">$</span> <span class="cm">sigma convert -t splunk -p sysmon mimikatz_lsass.yml</span>
+<span class="hl2">EventCode=10 TargetImage="*\\lsass.exe" (GrantedAccess="0x1010" OR GrantedAccess="0x1038") NOT (SourceImage="*\\MsMpEng.exe" OR SourceImage="*\\csrss.exe")</span>
+
+<span class="co"># Convert same rule to Elasticsearch KQL:</span>
+<span class="pr">$</span> <span class="cm">sigma convert -t elasticsearch mimikatz_lsass.yml</span>
+<span class="hl2">winlog.event_data.TargetImage:(*\\lsass.exe) AND (winlog.event_data.GrantedAccess:0x1010 OR winlog.event_data.GrantedAccess:0x1038)</span>
+
+<span class="co"># Download the full Sigma community rule pack:</span>
+<span class="pr">$</span> <span class="cm">git clone https://github.com/SigmaHQ/sigma.git</span>
+<span class="co"># 3,000+ rules covering every MITRE ATT&CK technique
+# Convert entire directory to your SIEM in one command</span>
+<span class="pr">$</span> <span class="cm">sigma convert -t splunk -p sysmon -r sigma/rules/windows/</span></div>
+  </div>
+
+  <div class="slbl">// DAY 45 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">Your Splunk detection rule for PowerShell encoded commands fires 2,000 times per day, mostly from legitimate IT admin scripts. Your SOC team is overwhelmed with false positives and starts ignoring the alert. What is the correct approach to fix this without losing detection capability?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Deleting the rule eliminates all detection for encoded PowerShell — a very commonly abused technique. The problem is specificity, not the rule concept.')"><span class="qk">A</span> Delete the rule — too many false positives means the detection is wrong</div>
+      <div class="qo" onclick="qa(this,'wrong','Raising the threshold means you need even more PowerShell encoded commands before alerting — legitimate scripts would still trigger it, just with a higher volume. The root issue is unfiltered known-good traffic.')"><span class="qk">B</span> Raise the threshold to 50 occurrences before alerting</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Alert tuning. The rule logic is right, the filtering is wrong. Approach: (1) Whitelist — identify the specific admin accounts, machines, and time windows generating legitimate encoded commands. Add NOT conditions: <code>NOT (Account_Name IN ("svc-deploy","automation") AND ComputerName IN ("DEPLOY-SRV"))</code>. (2) Context enrichment — add the parent process. Legitimate scripts run from schtasks or specific deployment tools. Mimikatz-delivered commands typically run from cmd.exe or user-interactive PowerShell. (3) Aggregate differently — group by parent process + user, alert only on unusual combinations. (4) Build a lookup table of approved encoded command hashes. The goal: zero false positives for known-good, 100% detection of novel encoded commands. "Alert fatigue" — where analysts ignore noisy alerts — is one of the biggest causes of missed real incidents.')"><span class="qk">C</span> Whitelist known-good accounts and machines, add parent process context, and group alerts by unusual combinations rather than individual events — eliminate false positives without losing coverage</div>
+      <div class="qo" onclick="qa(this,'wrong','Emailing IT every time still produces 2,000 emails per day and IT will stop reading them — same alert fatigue problem, different recipient. The tuning must happen at the detection layer.')"><span class="qk">D</span> Keep the rule but route alerts to the IT team instead of SOC</div>
+    </div>
+    <div class="qfb" id="q2"></div>
+  </div>
+</div><!-- /p2 -->
+
+
+<!-- ════════ DAY 46 ════════ -->
+<div class="pnl" id="p3">
+  <div class="dh">
+    <div class="dnum">46</div>
+    <div class="dinfo">
+      <h2>IDS/IPS — SNORT & SURICATA</h2>
+      <p><span class="stag stl">TOOL</span><span class="stag slb">LAB</span> Snort Rules · Suricata · Alert Tuning · Network Detection</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 7 PROGRESS — DAY 46 OF 49</div><div class="pbt"><div class="pbf" style="width:92%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">🔍</div>
+    <p><strong>Network-based detection catches what host logs miss.</strong> An attacker who clears Windows Event Logs leaves network evidence. Snort and Suricata sit on the wire and inspect every packet — they see the port scan, the SQL injection payload, and the reverse shell connection whether or not the target machine keeps any logs.</p>
+  </div>
+
+  <div class="slbl">// 46.1 — SNORT RULE ANATOMY</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">SNORT RULE STRUCTURE AND REAL EXAMPLES</div></div>
+    <div class="tbody"><span class="co"># RULE FORMAT:
+# action proto src_ip src_port direction dst_ip dst_port (options)</span>
+
+<span class="ha">alert tcp any any -&gt; any any (msg:"Nmap SYN Scan Detected"; flags:S; threshold: type both, track by_src, count 20, seconds 5; classtype:network-scan; sid:1000001; rev:1;)</span>
+
+<span class="co"># Breaking down the options:
+# msg:        Human-readable alert description
+# flags:S     Only SYN flag set (nmap -sS pattern)
+# threshold:  Alert only after 20 SYN packets in 5 seconds (reduce noise)
+# classtype:  Category for prioritisation
+# sid:        Unique rule identifier (yours start at 1000000+)
+# rev:        Rule version number</span>
+
+<span class="co"># ── SQL INJECTION DETECTION ───────────────────────────────────</span>
+<span class="ha">alert tcp any any -&gt; any 80 (msg:"SQL Injection Attempt - UNION SELECT"; content:"UNION"; nocase; content:"SELECT"; nocase; distance:0; within:20; http_uri; classtype:web-application-attack; sid:1000002; rev:1;)</span>
+
+<span class="co"># ── REVERSE SHELL DETECTION ───────────────────────────────────</span>
+<span class="ha">alert tcp any any -&gt; $HOME_NET any (msg:"Possible Reverse Shell - /bin/bash"; content:"/bin/bash"; content:"-i"; within:20; flow:established,to_server; sid:1000003; rev:1;)</span>
+
+<span class="co"># ── C2 BEACONING DETECTION (regular interval) ────────────────</span>
+<span class="ha">alert tcp $HOME_NET any -&gt; $EXTERNAL_NET 443 (msg:"Possible C2 Beaconing - Regular HTTPS"; flow:established,to_server; detection_filter: track by_src, count 30, seconds 1800; classtype:trojan-activity; sid:1000004; rev:1;)</span>
+
+<span class="co"># ── MIMIKATZ NETWORK INDICATOR ────────────────────────────────</span>
+<span class="ha">alert smb $HOME_NET any -&gt; $HOME_NET any (msg:"Mimikatz DCSync Activity"; content:"|05 00 0b|"; content:"DrsuApi"; nocase; within:100; sid:1000005; rev:1;)</span>
+
+<span class="co"># ── RUNNING SNORT ─────────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">snort -A console -i eth0 -c /etc/snort/snort.conf</span>
+<span class="pr">$</span> <span class="cm">snort -r capture.pcap -c /etc/snort/snort.conf -A console</span>   <span class="co"># test against PCAP</span></div>
+  </div>
+
+  <div class="slbl">// 46.2 — SURICATA: THE MODERN CHOICE</div>
+  <table class="tbl">
+    <tr><th>FEATURE</th><th>SNORT 3</th><th>SURICATA</th></tr>
+    <tr><td>Threading</td><td>Single-threaded</td><td><span class="hl">Multi-threaded</span> — handles 10Gbps+</td></tr>
+    <tr><td>Protocol detection</td><td>Basic</td><td><span class="hl">Deep protocol awareness</span> — HTTP/2, TLS, DNS, SSH</td></tr>
+    <tr><td>Output format</td><td>Alert log</td><td><span class="hl">EVE JSON</span> — structured, SIEM-ready</td></tr>
+    <tr><td>Lua scripting</td><td>Limited</td><td>Full Lua for complex detection logic</td></tr>
+    <tr><td>File extraction</td><td>No</td><td><span class="hl">Yes</span> — extract files from network streams</td></tr>
+    <tr><td>Rule compatibility</td><td>Snort rules</td><td>Compatible with Snort rules + own extensions</td></tr>
+    <tr><td>Industry trend</td><td>Established</td><td><span class="hl">Preferred for new deployments</span></td></tr>
+  </table>
+
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">SURICATA — SETUP AND EVE JSON ANALYSIS</div></div>
+    <div class="tbody"><span class="co"># Install Suricata on Kali:</span>
+<span class="pr">$</span> <span class="cm">sudo apt install suricata -y</span>
+<span class="pr">$</span> <span class="cm">sudo suricata-update</span>   <span class="co"># Download latest community ruleset (Emerging Threats)</span>
+
+<span class="co"># Run against a network interface:</span>
+<span class="pr">$</span> <span class="cm">sudo suricata -c /etc/suricata/suricata.yaml -i eth0</span>
+
+<span class="co"># Run against a capture file for testing:</span>
+<span class="pr">$</span> <span class="cm">sudo suricata -r metasploitable_attack.pcap -l /tmp/suricata_output/</span>
+
+<span class="co"># Read EVE JSON output (structured, one event per line):</span>
+<span class="pr">$</span> <span class="cm">cat /tmp/suricata_output/eve.json | python3 -m json.tool | head -50</span>
+<span class="hl2">{
+  "timestamp": "2024-01-15T02:34:55.123456+0000",
+  "flow_id": 1234567890,
+  "event_type": "alert",
+  "src_ip": "10.10.10.50",
+  "src_port": 51234,
+  "dest_ip": "10.10.10.5",
+  "dest_port": 445,
+  "proto": "TCP",
+  "alert": {
+    "action": "allowed",
+    "signature_id": 2027865,
+    "signature": "ET EXPLOIT EternalBlue Attempt",
+    "category": "Attempted Administrator Privilege Gain",
+    "severity": 1
+  }
+}</span>
+
+<span class="co"># Filter EVE JSON for alerts only:</span>
+<span class="pr">$</span> <span class="cm">jq 'select(.event_type=="alert") | {ts:.timestamp,src:.src_ip,sig:.alert.signature}' eve.json</span>
+
+<span class="co"># Ship EVE JSON to Splunk or ELK for centralised analysis:</span>
+<span class="co"># Configure /etc/suricata/suricata.yaml outputs.eve-log to Filebeat input</span></div>
+  </div>
+
+  <div class="slbl">// DAY 46 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">Your Suricata rule detects SQL injection in HTTP traffic by matching <code>UNION SELECT</code> strings. An attacker switches to sending <code>UN/**/ION SEL/**/ECT</code> (SQL comment injection). Your rule stops firing. What is the correct approach to make the rule robust against this evasion?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Adding more exact strings just adds more patterns for the attacker to vary. The core problem is matching exact strings against content that can be trivially obfuscated.')"><span class="qk">A</span> Add more content matches — also detect "UN" followed by "ION" within 10 bytes</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Two-part solution: (1) Normalise first — use Suricata\'s <code>http.uri.raw</code> and the <code>urilen</code> keyword combined with the <code>pcre</code> keyword which can handle comment stripping patterns, or use the Lua scripting capability to pre-process and normalise content before matching. Better: configure a WAF or NIDS that normalises SQL syntax before pattern matching. (2) Move up the stack — instead of matching exact payloads, detect behavioural anomalies: responses containing "sql syntax" error strings (database error disclosure), abnormally large responses to simple GET requests (data exfiltration), or repeated 500 errors from the same source. Real attackers know every content-match rule and craft payloads specifically to evade them. Behavioural detection is far harder to bypass than string matching.')"><span class="qk">B</span> Use PCRE (regex) with comment-stripping patterns and add behavioural detection (error response rates, abnormal response sizes) rather than relying purely on payload string matching</div>
+      <div class="qo" onclick="qa(this,'wrong','Blocking all SQL keywords would cause massive false positives — legitimate applications reference these terms in their content constantly.')"><span class="qk">C</span> Block all traffic containing SQL keywords at the firewall level</div>
+      <div class="qo" onclick="qa(this,'wrong','Suricata EVE JSON logs help you analyse what happened — they don\'t make the detection rule more robust against evasion. You still need to fix the rule itself.')"><span class="qk">D</span> Switch to Suricata EVE JSON logging — it captures the full payload making evasion impossible</div>
+    </div>
+    <div class="qfb" id="q3"></div>
+  </div>
+</div><!-- /p3 -->
+
+
+<!-- ════════ DAY 47 ════════ -->
+<div class="pnl" id="p4">
+  <div class="dh">
+    <div class="dnum">47</div>
+    <div class="dinfo">
+      <h2>INCIDENT RESPONSE</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> IR Lifecycle · Playbooks · Triage · Containment · Communication</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 7 PROGRESS — DAY 47 OF 49</div><div class="pbt"><div class="pbf" style="width:93%"></div></div></div>
+
+  <div class="note nw">
+    <div class="nico">⚡</div>
+    <p><strong>Incident Response is what happens when detection finds something real.</strong> The average dwell time for a threat actor in a network before detection is 16 days. Every hour of slow IR means more data exfiltrated, more systems compromised, more damage done. A practised IR process turns a potential catastrophe into a controlled recovery.</p>
+  </div>
+
+  <div class="slbl">// 47.1 — THE 6-PHASE IR LIFECYCLE (NIST SP 800-61)</div>
+  <div class="ir-phases">
+    <div class="ir-phase">
+      <div class="irp-n">1</div>
+      <div class="irp-name">Preparation</div>
+      <div class="irp-desc">Build IR capability BEFORE an incident. IR playbooks, contact lists, forensic toolkits, network diagrams, asset inventories, logging infrastructure, and tabletop exercises. Most organisations fail here — the first incident shouldn't be when you discover you have no playbook.</div>
+    </div>
+    <div class="ir-phase">
+      <div class="irp-n">2</div>
+      <div class="irp-name">Identification</div>
+      <div class="irp-desc">Detect and confirm the incident. SIEM alert fires → is this a true positive? Triage the alert: check correlated events, timeline the activity, determine scope (one machine or many?). Declare an incident and assign severity. Time is critical — every minute of uncertainty is attacker dwell time.</div>
+    </div>
+    <div class="ir-phase">
+      <div class="irp-n">3</div>
+      <div class="irp-name">Containment</div>
+      <div class="irp-desc">Stop the bleeding without destroying evidence. Short-term: isolate affected systems from the network (VLAN, firewall rule, pull cable — not shutdown). Long-term: change credentials, block C2 IPs, revoke tokens. Forensic image BEFORE containment actions alter the system.</div>
+    </div>
+    <div class="ir-phase">
+      <div class="irp-n">4</div>
+      <div class="irp-name">Eradication</div>
+      <div class="irp-desc">Remove the attacker and their artifacts. Delete malware, close backdoors, revoke persistence mechanisms (scheduled tasks, registry keys, SSH keys). Patch the exploited vulnerability. Reset ALL compromised credentials — not just the ones you found, assume all were harvested.</div>
+    </div>
+    <div class="ir-phase">
+      <div class="irp-n">5</div>
+      <div class="irp-name">Recovery</div>
+      <div class="irp-desc">Restore systems to normal operation safely. Rebuild from known-good backups rather than cleaning infected systems (you can't guarantee all malware is removed). Validate systems are clean before reconnecting. Monitor intensively for 30 days — attackers frequently re-enter through overlooked persistence.</div>
+    </div>
+    <div class="ir-phase">
+      <div class="irp-n">6</div>
+      <div class="irp-name">Lessons Learned</div>
+      <div class="irp-desc">Write the post-incident report within 2 weeks while details are fresh. What happened, how it was detected, timeline, impact, what worked, what failed, and specific improvements to prevent recurrence. Brief leadership. Update playbooks. This phase is where organisations actually improve — most skip it.</div>
+    </div>
+  </div>
+
+  <div class="slbl">// 47.2 — FIRST 15 MINUTES: RANSOMWARE IR TRIAGE</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">RANSOMWARE IR — IMMEDIATE RESPONSE CHECKLIST</div></div>
+    <div class="tbody"><span class="co"># ── MINUTE 0–2: CONFIRM AND SCOPE ────────────────────────────</span>
+<span class="ham">[!] Alert: Files being renamed to .locked extension on FILE-SRV01</span>
+<span class="ha">ACTION: Don't shut down anything yet — confirm first</span>
+<span class="pr">IR></span> <span class="cm">Check Splunk: index=* FILE-SRV01 | head 50   </span><span class="co"># What else is happening?</span>
+<span class="pr">IR></span> <span class="cm">netstat -an | grep ESTABLISHED</span>              <span class="co"># Active C2 connections?</span>
+<span class="pr">IR></span> <span class="cm">tasklist /v</span>                                 <span class="co"># Suspicious processes?</span>
+
+<span class="co"># ── MINUTE 2–5: FORENSIC PRESERVATION ───────────────────────</span>
+<span class="ha">BEFORE touching anything — capture volatile evidence:</span>
+<span class="pr">IR></span> <span class="cm">netstat -an > C:\IR\network_connections.txt</span>
+<span class="pr">IR></span> <span class="cm">tasklist /v > C:\IR\processes.txt</span>
+<span class="pr">IR></span> <span class="cm">ipconfig /all > C:\IR\network_config.txt</span>
+<span class="pr">IR></span> <span class="cm">wevtutil epl Security C:\IR\security_log.evtx</span>  <span class="co"># Export logs NOW before overwritten</span>
+<span class="co"># Take memory dump if possible (RAMMap, WinPmem)</span>
+
+<span class="co"># ── MINUTE 5–10: CONTAINMENT ─────────────────────────────────</span>
+<span class="hc">DO: Isolate via VLAN reassignment (preserves machine, cuts network access)
+DO: Block the C2 IP at perimeter firewall
+DON'T: Power off (destroys memory evidence, may worsen encryption)
+DON'T: Delete suspicious files (need for forensic analysis)</span>
+
+<span class="co"># ── MINUTE 10–15: SCOPE ASSESSMENT ──────────────────────────</span>
+<span class="pr">IR></span> <span class="cm">crackmapexec smb 10.10.10.0/24 --gen-relay-list</span>  <span class="co"># What else is reachable?</span>
+<span class="co"># Check Splunk for same C2 IOCs across ALL machines:</span>
+<span class="pr">IR></span> <span class="cm">index=* [known_c2_ip OR file_hash OR mutex_name]  </span>
+<span class="co"># How many machines? Define blast radius before recovery planning</span>
+
+<span class="co"># ── COMMUNICATION ────────────────────────────────────────────</span>
+<span class="ha">Notify (in this order, immediately):
+  1. IR team lead / CISO
+  2. Legal counsel (ransomware may require breach notification)
+  3. Executive team (brief, not technical)
+  4. Law enforcement (FBI/CISA for ransomware — optional but recommended)
+  
+DO NOT: Notify publicly before legal review
+DO NOT: Contact ransomware group without legal counsel
+DO NOT: Pay ransom without legal/insurance guidance</span></div>
+  </div>
+
+  <div class="slbl">// DAY 47 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You discover an attacker has had access to your network for 14 days (detected via SIEM). They've compromised 3 servers. You've identified all their persistence mechanisms and the initial access vector. A manager says "just patch the servers and change the passwords — done." What's wrong with this approach and what must you do instead?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Rebuilding every machine in the organization would cause massive unnecessary downtime if the scope is confirmed to be only 3 servers.')"><span class="qk">A</span> Nothing is wrong — patching and password resets is sufficient for 3 servers</div>
+      <div class="qo" onclick="qa(this,'wrong','Paying the ransom isn\'t relevant here — this isn\'t described as a ransomware incident, and paying is a last resort even then.')"><span class="qk">B</span> You should also pay the ransom to ensure all data is recovered</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! This approach is dangerously incomplete. Problems: (1) 14-day dwell time means the attacker had time to establish persistence you haven\'t found — a professional attacker places 3–5 backdoors, not one. "Cleaning" a compromised system is unreliable. Rebuild from known-good backups. (2) Assume credential compromise is total — 14 days of access to 3 servers means Mimikatz was likely run, meaning ALL domain credentials must be reset, not just the 3 servers\'. Including krbtgt (twice). (3) Scope may be wrong — 14 days is enough for full lateral movement; your 3-server count may be incomplete. Image all machines for forensic analysis, not just the identified ones. (4) Root cause — what was the initial vector? If it\'s not patched and confirmed closed, they\'re back in 24 hours. (5) Legal/compliance — 14-day unauthorized access likely triggers breach notification requirements depending on what data the servers held.')"><span class="qk">C</span> 14-day dwell time means credential harvesting is near-certain — ALL domain passwords and krbtgt must be reset. Systems should be rebuilt not cleaned. Scope validation and breach notification assessment are also required.</div>
+      <div class="qo" onclick="qa(this,'wrong','Shutting down all systems causes massive business disruption and isn\'t required. Targeted containment and methodical eradication is the correct approach.')"><span class="qk">D</span> Shut down all systems immediately until forensics complete</div>
+    </div>
+    <div class="qfb" id="q4"></div>
+  </div>
+</div><!-- /p4 -->
+
+
+<!-- ════════ DAY 48 ════════ -->
+<div class="pnl" id="p5">
+  <div class="dh">
+    <div class="dnum">48</div>
+    <div class="dinfo">
+      <h2>DIGITAL FORENSICS I</h2>
+      <p><span class="stag sth">THEORY</span><span class="stag slb">LAB</span> Disk Imaging · File Carving · Autopsy · Timeline · MFT Analysis</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 7 PROGRESS — DAY 48 OF 49</div><div class="pbt"><div class="pbf" style="width:97%"></div></div></div>
+
+  <div class="note ni">
+    <div class="nico">🔬</div>
+    <p><strong>Digital forensics answers the question: what exactly happened?</strong> After containment, forensics builds the complete picture — what files were accessed, what commands were run, what data was exfiltrated, and exactly when every action occurred. This evidence supports legal proceedings, insurance claims, and regulatory breach notifications.</p>
+  </div>
+
+  <div class="slbl">// 48.1 — ORDER OF VOLATILITY</div>
+  <div class="card">
+    <div class="clbl">COLLECT THE MOST VOLATILE EVIDENCE FIRST</div>
+    <p>Volatile data disappears when the system is powered off. Non-volatile data persists. Always collect in this order — never power off a live system before capturing volatile evidence.</p>
+  </div>
+  <table class="tbl">
+    <tr><th>ORDER</th><th>DATA TYPE</th><th>PERSISTENCE</th><th>HOW TO CAPTURE</th></tr>
+    <tr><td><span class="hl">1</span></td><td>CPU registers / cache</td><td>Lost instantly on shutdown</td><td>Memory dump tools (WinPmem, LiME) — rarely needed</td></tr>
+    <tr><td><span class="hl">2</span></td><td>RAM / Physical Memory</td><td>Lost on shutdown</td><td>WinPmem (Windows), LiME kernel module (Linux), RAM dump via hypervisor</td></tr>
+    <tr><td><span class="hl">3</span></td><td>Network connections</td><td>Changes constantly</td><td>netstat -an, ss -tulpn, captured immediately</td></tr>
+    <tr><td><span class="hl">4</span></td><td>Running processes</td><td>Changes constantly</td><td>tasklist /v, ps aux, process dump with procdump</td></tr>
+    <tr><td><span class="hl">5</span></td><td>Open files / handles</td><td>Changes with processes</td><td>handle.exe (Sysinternals), lsof</td></tr>
+    <tr><td><span class="hl">6</span></td><td>Disk / File system</td><td>Persists after shutdown</td><td>FTK Imager, dd, dcfldd — bit-for-bit forensic image</td></tr>
+    <tr><td><span class="hl">7</span></td><td>Logs and event data</td><td>Persists (can be deleted)</td><td>Export before any remediation activity</td></tr>
+    <tr><td><span class="hl">8</span></td><td>Backup / archive</td><td>Most persistent</td><td>Check backup integrity — attackers corrupt backups</td></tr>
+  </table>
+
+  <div class="slbl">// 48.2 — DISK IMAGING</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">FORENSIC DISK IMAGING — dd, dcfldd, FTK IMAGER</div></div>
+    <div class="tbody"><span class="co"># ── dd: create bit-for-bit forensic image ────────────────────</span>
+<span class="pr">$</span> <span class="cm">dd if=/dev/sdb of=/mnt/evidence/disk_image.dd bs=4M status=progress</span>
+<span class="co"># if = input file (source disk), of = output file (image)
+# bs = block size (4MB is fast), status = show progress
+# This creates an EXACT copy including deleted files, slack space, unallocated areas</span>
+
+<span class="co"># Generate MD5 hash BEFORE and AFTER to prove integrity:</span>
+<span class="pr">$</span> <span class="cm">md5sum /dev/sdb > evidence_hash_original.txt</span>
+<span class="pr">$</span> <span class="cm">md5sum disk_image.dd > evidence_hash_image.txt</span>
+<span class="pr">$</span> <span class="cm">diff evidence_hash_original.txt evidence_hash_image.txt</span>
+<span class="co"># If hashes match → image is forensically sound (court admissible)</span>
+
+<span class="co"># ── dcfldd: dd with hashing built-in ─────────────────────────</span>
+<span class="pr">$</span> <span class="cm">dcfldd if=/dev/sdb of=/mnt/evidence/disk.dd hash=md5 hashlog=/mnt/evidence/hash.log</span>
+
+<span class="co"># ── Mount image READ-ONLY for analysis ──────────────────────</span>
+<span class="pr">$</span> <span class="cm">mkdir /mnt/forensic_mount</span>
+<span class="pr">$</span> <span class="cm">mount -o ro,loop disk_image.dd /mnt/forensic_mount</span>
+<span class="co"># -o ro = read-only (NEVER mount evidence read-write — it alters timestamps)</span>
+
+<span class="co"># ── FTK Imager (Windows GUI) ─────────────────────────────────
+# File → Create Disk Image → Select source → Choose E01 format
+# E01 (EnCase) format: includes metadata, case info, automatic hash verification
+# More court-accepted than raw dd images for legal proceedings</span>
+
+<span class="co"># ── Key locations to examine in mounted image ─────────────────</span>
+<span class="ha">/mnt/forensic_mount/Windows/System32/winevt/Logs/Security.evtx  ← Event logs
+/mnt/forensic_mount/Users/*/NTUSER.DAT                           ← User registry hives
+/mnt/forensic_mount/Windows/Prefetch/*.pf                        ← Program execution evidence
+/mnt/forensic_mount/$MFT                                         ← Master File Table (all file metadata)
+/mnt/forensic_mount/Windows/System32/config/SAM                  ← Local password hashes</span></div>
+  </div>
+
+  <div class="slbl">// 48.3 — AUTOPSY: GRAPHICAL FORENSICS</div>
+  <div class="card">
+    <div class="clbl">AUTOPSY WORKFLOW</div>
+    <p>Autopsy (sleuthkit.org) is a free, open-source forensic analysis platform — the same underlying technology used by law enforcement worldwide. It parses disk images and presents an organised view of the file system, deleted files, browser history, email, and timeline.</p>
+  </div>
+  <div class="card">
+    <div class="clbl">KEY AUTOPSY MODULES</div>
+    <ul class="ck">
+      <li><strong>Timeline Analysis</strong> — Visualises file system activity over time. Spikes of activity at 2AM on a server that's normally idle = attacker activity window.</li>
+      <li><strong>Keyword Search</strong> — Search entire disk image for strings: "password", "mimikatz", attacker IP addresses, exfiltrated data samples.</li>
+      <li><strong>Web Artifacts</strong> — Browser history, downloads, cookies, cached pages. Did the attacker research your environment from a compromised workstation?</li>
+      <li><strong>Recent Activity</strong> — Recently accessed files, installed programs, USB device history. Attackers often plug in USB drives for data exfiltration.</li>
+      <li><strong>Hash Lookup</strong> — Compare file hashes against NSRL (National Software Reference Library) to identify known-good files and highlight unknown/malicious ones.</li>
+      <li><strong>File Carving</strong> — Recover deleted files from unallocated disk space. Even after deletion and emptying recycle bin, files often recoverable until overwritten.</li>
+    </ul>
+  </div>
+
+  <div class="slbl">// DAY 48 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You're imaging a live Windows server suspected of compromise. The server hosts a critical database that must stay online. You cannot shut it down. Which approach preserves the most evidence while meeting the operational constraint?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Shutting down violates the operational constraint (database must stay online) and destroys volatile evidence (RAM, network connections, running processes) before capture.')"><span class="qk">A</span> Shut it down to take a clean disk image — live imaging is unreliable</div>
+      <div class="qo" onclick="qa(this,'wrong','Copying only suspicious files misses crucial evidence: deleted files, unallocated space, slack space, MFT metadata, and files that look normal but have been modified by the attacker.')"><span class="qk">B</span> Copy only the suspicious files you've already identified to save time</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Live forensic acquisition: (1) First, capture volatile data immediately — netstat, tasklist, running processes, open files (handle.exe). (2) Take a live RAM dump with WinPmem: winpmem_mini_x64.exe memory.aff4 — this captures network connections, encryption keys, process memory, and injected code that disappears on shutdown. (3) Live disk image with FTK Imager Lite while the system runs — it correctly handles files locked by the OS and marks them. (4) Export event logs immediately: wevtutil epl Security security.evtx. The RAM dump is especially critical — in ransomware cases the encryption key may still be in memory. Forensics on a live system is less clean than a shutdown image but far better than losing all volatile evidence, and operational constraints are real.')"><span class="qk">C</span> Capture volatile data first (netstat, tasklist), take a live RAM dump with WinPmem, then take a live disk image with FTK Imager Lite — prioritise what will be lost at shutdown</div>
+      <div class="qo" onclick="qa(this,'wrong','Waiting until maintenance window could be days away — attacker dwell time continues, log files rotate and overwrite, volatile evidence is lost anyway when processes change, and the maintenance window itself may trigger shutdown.')"><span class="qk">D</span> Wait for the next scheduled maintenance window to take a proper offline image</div>
+    </div>
+    <div class="qfb" id="q5"></div>
+  </div>
+</div><!-- /p5 -->
+
+
+<!-- ════════ DAY 49 ════════ -->
+<div class="pnl" id="p6">
+  <div class="dh">
+    <div class="dnum">49</div>
+    <div class="dinfo">
+      <h2>DIGITAL FORENSICS II + WEEK 7 REVIEW</h2>
+      <p><span class="stag stl">TOOL</span><span class="stag slb">LAB</span> Volatility 3 · Memory Analysis · Malware Artifacts · YARA · Capstone</p>
+    </div>
+  </div>
+  <div class="pb"><div class="pbl">WEEK 7 — COMPLETE ✓</div><div class="pbt"><div class="pbf" style="width:100%"></div></div></div>
+
+  <div class="note ng">
+    <div class="nico">🧠</div>
+    <p><strong>Memory forensics finds what disk forensics misses.</strong> Fileless malware never touches disk. Process injection leaves no file. Encryption keys exist only in RAM. Volatility extracts this from a memory dump — revealing running malicious processes, injected shellcode, network connections, and cryptographic material that disk analysis can never surface.</p>
+  </div>
+
+  <div class="slbl">// 49.1 — VOLATILITY 3 CORE WORKFLOW</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">VOLATILITY 3 — MEMORY FORENSICS INVESTIGATION</div></div>
+    <div class="tbody"><span class="co"># Install Volatility 3:</span>
+<span class="pr">$</span> <span class="cm">git clone https://github.com/volatilityfoundation/volatility3.git</span>
+<span class="pr">$</span> <span class="cm">pip3 install -r requirements.txt --break-system-packages</span>
+
+<span class="co"># Memory dump file: memory.dmp (captured with WinPmem or from VM snapshot)</span>
+
+<span class="co"># ── STEP 1: Identify OS (auto-detected in Vol3) ──────────────</span>
+<span class="pr">$</span> <span class="cm">python3 vol.py -f memory.dmp windows.info</span>
+<span class="hl2">Kernel Base: 0xf80000000000
+Image Type: Service Pack 1
+NtSystemRoot: C:\Windows
+NtProductType: NtProductWinNt</span>
+
+<span class="co"># ── STEP 2: List running processes ───────────────────────────</span>
+<span class="pr">$</span> <span class="cm">python3 vol.py -f memory.dmp windows.pslist</span>
+<span class="hl2">PID   PPID  ImageFileName        Offset       Threads  Handles
+4     0     System               0xe00000...  147      2303
+624   4     smss.exe             0xe1234...   2        29
+888   844   svchost.exe          0xe5678...   12       502</span>
+<span class="hc">1337  888   powershell.exe       0xf1234...   4        211</span>   <span class="hc">← suspicious parent!</span>
+<span class="hc">1492  1337  cmd.exe              0xf5678...   1        42</span>    <span class="hc">← svchost spawning powershell spawning cmd</span>
+
+<span class="co"># ── STEP 3: Check for hidden processes (rootkit detection) ────</span>
+<span class="pr">$</span> <span class="cm">python3 vol.py -f memory.dmp windows.psscan</span>
+<span class="co"># psscan scans raw memory for EPROCESS structures — finds processes
+# hidden from pslist (rootkit technique: DKOM — Direct Kernel Object Manipulation)</span>
+
+<span class="co"># ── STEP 4: Detect process injection (malfind) ───────────────</span>
+<span class="pr">$</span> <span class="cm">python3 vol.py -f memory.dmp windows.malfind</span>
+<span class="hc">PID: 4892  Name: explorer.exe  Address: 0x1e0000
+Vad Tag: VadS  Protection: PAGE_EXECUTE_READWRITE
+0x00 4d 5a 90 00 03 00 00 00  MZ...... ← MZ header = PE executable injected into explorer!</span>
+<span class="co"># MZ header in non-executable memory region = process injection = Meterpreter/shellcode</span>
+
+<span class="co"># ── STEP 5: Network connections ──────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">python3 vol.py -f memory.dmp windows.netstat</span>
+<span class="hc">Offset     Proto  LocalAddr        LocalPort  ForeignAddr      ForeignPort  State    PID
+0xe1234    TCPv4  10.10.10.5       52341      203.0.113.50     443          ESTAB    4892</span>  <span class="hc">← explorer.exe calling home to external IP!</span>
+
+<span class="co"># ── STEP 6: Extract injected process for analysis ─────────────</span>
+<span class="pr">$</span> <span class="cm">python3 vol.py -f memory.dmp windows.dumpfiles --pid 4892 --output-dir /tmp/dumps/</span>
+<span class="pr">$</span> <span class="cm">file /tmp/dumps/*.exe</span>
+<span class="pr">$</span> <span class="cm">strings /tmp/dumps/*.exe | grep -i "http\|192.168\|beacon\|sleep"</span>   <span class="co"># C2 indicators</span>
+
+<span class="co"># ── DETECT MIMIKATZ ARTIFACTS IN MEMORY ──────────────────────</span>
+<span class="pr">$</span> <span class="cm">python3 vol.py -f memory.dmp windows.strings --pid 1337 | grep -i "sekurlsa\|mimikatz\|wdigest"</span>
+<span class="hc">Found: "sekurlsa::logonpasswords" in PID 1337 memory → Mimikatz was run</span></div>
+  </div>
+
+  <div class="slbl">// 49.2 — YARA: MALWARE SIGNATURE MATCHING</div>
+  <div class="sigma">
+<span class="sg-comment">/* YARA rule to detect Mimikatz strings in memory or files */</span>
+<span class="sg-key">rule</span> <span class="sg-str">Mimikatz_Indicators</span> {
+    <span class="sg-key">meta:</span>
+        <span class="sg-key">author</span> = <span class="sg-str">"SOC Team"</span>
+        <span class="sg-key">description</span> = <span class="sg-str">"Detects Mimikatz credential dumper"</span>
+        <span class="sg-key">reference</span> = <span class="sg-str">"https://attack.mitre.org/software/S0002/"</span>
+    <span class="sg-key">strings:</span>
+        <span class="sg-val">$s1</span> = <span class="sg-str">"sekurlsa::logonpasswords"</span> <span class="sg-key">ascii</span> <span class="sg-key">nocase</span>
+        <span class="sg-val">$s2</span> = <span class="sg-str">"gentilkiwi"</span> <span class="sg-key">ascii</span>
+        <span class="sg-val">$s3</span> = <span class="sg-str">"mimikatz"</span> <span class="sg-key">ascii</span> <span class="sg-key">nocase</span>
+        <span class="sg-val">$s4</span> = <span class="sg-str">"lsadump::dcsync"</span> <span class="sg-key">ascii</span> <span class="sg-key">nocase</span>
+        <span class="sg-val">$hex1</span> = { 4d 69 6d 69 4b 61 74 7a }   <span class="sg-comment">/* MimiKatz hex */</span>
+    <span class="sg-key">condition:</span>
+        <span class="sg-key">any of</span> (<span class="sg-val">$s*</span>) <span class="sg-key">or</span> <span class="sg-val">$hex1</span>
+}
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">YARA — SCAN FILES AND MEMORY</div></div>
+    <div class="tbody"><span class="co"># Install yara:</span>
+<span class="pr">$</span> <span class="cm">apt install yara -y</span>
+
+<span class="co"># Scan a single file:</span>
+<span class="pr">$</span> <span class="cm">yara mimikatz.yar suspicious_file.exe</span>
+<span class="hl2">Mimikatz_Indicators suspicious_file.exe</span>   <span class="hc">← MATCH FOUND</span>
+
+<span class="co"># Scan an entire directory recursively:</span>
+<span class="pr">$</span> <span class="cm">yara -r mimikatz.yar /tmp/dumps/</span>
+
+<span class="co"># Scan a memory dump directly:</span>
+<span class="pr">$</span> <span class="cm">yara -r all_rules.yar memory.dmp</span>
+
+<span class="co"># Download community YARA rules (thousands of malware families):</span>
+<span class="pr">$</span> <span class="cm">git clone https://github.com/Yara-Rules/rules.git</span>
+<span class="pr">$</span> <span class="cm">yara -r rules/malware/ suspicious_file.exe</span></div>
+  </div>
+
+  <div class="slbl">// 49.3 — WEEK 7 COMPLETE REVIEW</div>
+  <table class="tbl">
+    <tr><th>DAY</th><th>SKILL</th><th>KEY CAPABILITY</th><th>TOOL</th></tr>
+    <tr><td class="hl">43</td><td>SIEM Fundamentals</td><td>SPL pipelines, log ingestion, dashboards, KQL</td><td>Splunk, ELK</td></tr>
+    <tr><td class="hl">44</td><td>Log Analysis</td><td>9 critical Windows Event IDs, Linux auth log pipelines, lateral movement event chains</td><td>Event Viewer, grep/awk</td></tr>
+    <tr><td class="hl">45</td><td>Threat Detection</td><td>SPL detection for Mimikatz/PtH/Kerberoasting/PowerShell; Sigma rules and conversion</td><td>Splunk SPL, Sigma, sigmac</td></tr>
+    <tr><td class="hl">46</td><td>IDS/IPS</td><td>Snort rule writing, Suricata EVE JSON, tuning for evasion</td><td>Snort, Suricata</td></tr>
+    <tr><td class="hl">47</td><td>Incident Response</td><td>6-phase IR lifecycle, ransomware 15-minute triage, communication chain</td><td>IR playbooks, TheHive</td></tr>
+    <tr><td class="hl">48</td><td>Digital Forensics I</td><td>Order of volatility, dd/FTK Imager, Autopsy, timeline analysis, file carving</td><td>FTK Imager, Autopsy, dd</td></tr>
+    <tr><td class="hl">49</td><td>Digital Forensics II</td><td>Volatility 3 plugins, malfind process injection, YARA rule writing, memory-based IOCs</td><td>Volatility 3, YARA</td></tr>
+  </table>
+
+  <div class="slbl">// WEEK 7 — CAPSTONE LABS</div>
+  <div class="card">
+    <div class="clbl">LAB 1 — BLUE TEAM LABS ONLINE</div>
+    <ul class="ck">
+      <li><strong>blueteamlabs.online</strong> — Free platform with scenario-based defensive challenges. Complete "The Report", "Phishing Analysis", and "Malware Analysis" challenges.</li>
+      <li>TryHackMe: <strong>"Splunk: Investigating with Splunk"</strong> — investigate a real attack scenario using SPL</li>
+      <li>TryHackMe: <strong>"Windows Event Logs"</strong> — identify attacks purely from Windows Event Viewer</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="clbl">LAB 2 — MEMORY FORENSICS CHALLENGE</div>
+    <ul class="ck">
+      <li>Download the MemLabs challenges (github.com/stuxnet999/MemLabs) — 6 progressively harder Volatility challenges.</li>
+      <li>Start with Lab 1: identify the OS, list processes, find the hidden flag in a process's command line arguments.</li>
+      <li>Write a one-page forensic report for any one challenge: timeline of events, what you found, how you found it.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="clbl">LAB 3 — PURPLE TEAM: ATTACK THEN DETECT</div>
+    <ul class="ck">
+      <li>In your lab: run an nmap scan against Metasploitable. In Splunk/Suricata, write a rule that catches it. Verify your rule fires.</li>
+      <li>Run Mimikatz sekurlsa::logonpasswords on your Windows lab VM. Check Splunk for the Sysmon Event 10 LSASS access. Does your detection rule catch it?</li>
+      <li>Create a scheduled task for persistence. Write the 4698 detection query. Verify. Then delete the task and confirm the query no longer fires.</li>
+      <li>This purple team loop — attack → detect → verify → improve — is the most valuable skill for any security role.</li>
+    </ul>
+  </div>
+
+  <div class="note ng">
+    <div class="nico">✅</div>
+    <p><strong>Week 7 Readiness Check:</strong> Before Week 8, verify you can: (1) Write an SPL query to detect brute-force and pivot to check if any succeeded. (2) Explain what Windows Event IDs 4625, 4688, 4698, and 4769 indicate and write a detection query for each. (3) Write a Sigma rule for a specific attack technique and convert it to SPL. (4) Walk through the 6-phase IR lifecycle from memory for a ransomware scenario. (5) Take a disk image with dd, verify the hash, and open it in Autopsy. (6) Run at least 3 Volatility plugins against a memory dump and interpret the output.</p>
+  </div>
+</div><!-- /p6 -->
+
+</div><!-- .wrap -->
+
+<footer>PHASE 4 · WEEK 7 COMPLETE · DETECTION, MONITORING & INCIDENT RESPONSE · NEXT: WEEK 8 — HARDENING, THREAT INTEL & PURPLE TEAM</footer>
+
+<script>
+function show(i){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('p'+i).classList.add('on');
+  document.querySelectorAll('.dtab')[i].classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function qa(el,type,exp){
+  const q=el.closest('.qb');
+  if(q.dataset.done)return;
+  q.dataset.done='1';
+  q.querySelectorAll('.qo').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='0.4';});
+  el.style.opacity='1';el.classList.add(type);
+  const fb=q.querySelector('.qfb');
+  if(fb){fb.classList.add('show',type);fb.textContent=exp;}
+}
+</script>
+
+<div class="week-nav" style="border-top-color:var(--border,#141b26);max-width:1160px;margin:2rem auto 0;padding:2rem;display:flex;justify-content:space-between;align-items:center;">
+  <a href="week6.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">← Previous Week</a>
+  <a href="../index.html" style="color:var(--teal,#2dd4bf);border-color:rgba(45,212,191,0.3);">⌂ Lesson Hub</a>
+  <a href="week8.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">Next Week →</a>
+</div>
+
+<a href="#" id="back-to-top" title="Back to top">↑</a>
+
+<script src="../js/shared.js"></script>
+</body>
+</html>

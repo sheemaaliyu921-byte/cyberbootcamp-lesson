@@ -1,0 +1,30 @@
+# CyberBootcamp Lessons — Cloudflare Pages Redirects
+# Short URLs for sharing individual weeks
+
+/w1     /weeks/week1.html    301
+/w2     /weeks/week2.html    301
+/w3     /weeks/week3.html    301
+/w4     /weeks/week4.html    301
+/w5     /weeks/week5.html    301
+/w6     /weeks/week6.html    301
+/w7     /weeks/week7.html    301
+/w8     /weeks/week8.html    301
+
+# Friendly aliases
+/week1  /weeks/week1.html    301
+/week2  /weeks/week2.html    301
+/week3  /weeks/week3.html    301
+/week4  /weeks/week4.html    301
+/week5  /weeks/week5.html    301
+/week6  /weeks/week6.html    301
+/week7  /weeks/week7.html    301
+/week8  /weeks/week8.html    301
+
+# Phase shortcuts
+/phase1 /weeks/week1.html    301
+/phase2 /weeks/week3.html    301
+/phase3 /weeks/week5.html    301
+/phase4 /weeks/week7.html    301
+
+# Fallback — 404 to index
+/*      /index.html          200
