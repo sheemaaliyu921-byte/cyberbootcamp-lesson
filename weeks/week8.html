@@ -250,16 +250,28 @@ header{background:rgba(6,8,12,0.97);border-bottom:1px solid var(--border);paddin
 
 footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-family:var(--mono);font-size:0.63rem;color:var(--muted);letter-spacing:0.1em;max-width:1160px;margin:2rem auto 0;position:relative;z-index:1;}
 </style>
-<link rel="stylesheet" href="../css/shared.css"/>
+
+<style>
+/* ── Back-to-top floating button ── */
+#btt{
+  position:fixed;bottom:1.5rem;right:1.5rem;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.18);
+  color:#fff;font-size:1.2rem;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;text-decoration:none;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.3s,transform 0.2s;
+  z-index:9999;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);
+}
+#btt.show{opacity:1;pointer-events:auto;}
+#btt:hover{transform:translateY(-3px);}
+</style>
 </head>
 <body>
-<nav class="breadcrumb" style="background:var(--surface,#090c12);border-bottom-color:var(--border,#141b26);color:var(--muted,#253040);">
-  <a href="../index.html" style="color:var(--accent,#3b82f6);">LESSON HUB</a>
-  <span>/</span>
-  <span style="color:var(--text,#b0c0d8);">Phase 4</span>
-  <span>/</span>
-  <span style="color:#fff;">Week 8</span>
-</nav>
 
 <header>
   <div class="hi">
@@ -1128,14 +1140,21 @@ function matab(el,id){
 }
 </script>
 
-<div class="week-nav" style="border-top-color:var(--border,#141b26);max-width:1160px;margin:2rem auto 0;padding:2rem;display:flex;justify-content:space-between;align-items:center;">
-  <a href="week7.html" style="color:var(--accent,#3b82f6);border-color:var(--border,#141b26);">← Previous Week</a>
-  <a href="../index.html" style="color:var(--teal,#2dd4bf);border-color:rgba(45,212,191,0.3);">⌂ Lesson Hub</a>
-  <span class="disabled" style="opacity:0.25;font-family:monospace;font-size:0.72rem;">Next Week →</span>
-</div>
+<a href="#" id="btt" title="Back to top" aria-label="Scroll to top">↑</a>
 
-<a href="#" id="back-to-top" title="Back to top">↑</a>
-
-<script src="../js/shared.js"></script>
+<script>
+(function(){
+  var btn = document.getElementById('btt');
+  if(!btn) return;
+  window.addEventListener('scroll', function(){
+    if(window.scrollY > 350){ btn.classList.add('show'); }
+    else { btn.classList.remove('show'); }
+  }, {passive: true});
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  });
+})();
+</script>
 </body>
 </html>
