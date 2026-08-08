@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="CyberBootcamp — Nmap Deep Dive: Hands-On Labs, Offensive Scanning, Bypass & Defence"/>
+<title>CyberBootcamp — Nmap Deep Dive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600;700;800&family=Exo+2:ital@1&display=swap" rel="stylesheet"/>
+<style>
+/* ── Nmap signature palette: terminal green on near-black, scan-pulse orange ── */
+:root{
+  --bg:       #020503;
+  --surface:  #050a06;
+  --card:     #080f09;
+  --border:   #0c1a0e;
+  --accent:   #00e676;   /* nmap terminal green */
+  --dim:      #00b85a;
+  --orange:   #ff6d00;   /* scan pulse / warning */
+  --blue:     #40c4ff;   /* open port */
+  --red:      #ff3d57;   /* alert / firewall */
+  --purple:   #ce93d8;   /* filtered / unknown */
+  --amber:    #ffd740;   /* OS detection */
+  --text:     #a5c8aa;
+  --muted:    #1a3320;
+  --mono:     'Share Tech Mono', monospace;
+  --sans:     'Exo 2', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.7;min-height:100vh;}
+
+/* Signature: scan-line sweep animation */
+body::after{
+  content:'';position:fixed;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  opacity:0.2;animation:scan 6s linear infinite;pointer-events:none;z-index:0;
+}
+@keyframes scan{0%{top:0;}100%{top:100vh;}}
+
+/* ── HEADER ── */
+header{background:rgba(2,5,3,0.98);border-bottom:1px solid var(--border);padding:0 2rem;position:sticky;top:0;z-index:200;backdrop-filter:blur(12px);}
+.hi{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:58px;}
+.logo{font-family:var(--mono);font-size:0.8rem;color:var(--accent);letter-spacing:0.08em;}
+.logo span{color:var(--muted);}
+.scan-badge{font-family:var(--mono);font-size:0.6rem;color:var(--orange);border:1px solid rgba(255,109,0,0.35);padding:4px 12px;letter-spacing:0.12em;background:rgba(255,109,0,0.06);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.5;}}
+
+/* ── HERO ── */
+.hero{max-width:1200px;margin:0 auto;padding:4rem 2rem 2.5rem;position:relative;z-index:1;}
+.hero-eyebrow{font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.28em;margin-bottom:0.8rem;}
+.hero h1{font-family:var(--sans);font-size:clamp(2.5rem,6vw,5rem);color:#fff;font-weight:800;line-height:0.95;letter-spacing:0.01em;margin-bottom:1rem;}
+.hero h1 .nm{color:var(--accent);}
+.hero h1 .ap{color:var(--orange);}
+.hero-sub{max-width:580px;color:var(--muted);font-size:0.9rem;line-height:1.75;margin-bottom:1.8rem;}
+.ratio-bar{display:flex;gap:0;border-radius:3px;overflow:hidden;margin-bottom:1.5rem;height:8px;max-width:400px;}
+.r-practical{background:var(--accent);flex:7;}
+.r-theory{background:var(--muted);flex:3;}
+.ratio-label{font-family:var(--mono);font-size:0.62rem;color:var(--muted);margin-bottom:0.5rem;}
+.hero-tags{display:flex;gap:0.4rem;flex-wrap:wrap;}
+.tag{font-family:var(--mono);font-size:0.6rem;padding:4px 10px;border-radius:2px;letter-spacing:0.06em;border-width:1px;border-style:solid;}
+.t-green {background:rgba(0,230,118,0.08);color:var(--accent); border-color:rgba(0,230,118,0.25);}
+.t-orange{background:rgba(255,109,0,0.08);color:var(--orange); border-color:rgba(255,109,0,0.25);}
+.t-blue  {background:rgba(64,196,255,0.07);color:var(--blue);  border-color:rgba(64,196,255,0.2);}
+.t-red   {background:rgba(255,61,87,0.07); color:var(--red);   border-color:rgba(255,61,87,0.2);}
+.t-purple{background:rgba(206,147,216,0.08);color:var(--purple);border-color:rgba(206,147,216,0.22);}
+.t-amber {background:rgba(255,215,64,0.07);color:var(--amber); border-color:rgba(255,215,64,0.2);}
+
+/* ── OUTLINE TABLE ── */
+.outline-wrap{max-width:1200px;margin:0 auto;padding:0 2rem 2rem;position:relative;z-index:1;}
+.outline-box{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.outline-hdr{background:var(--surface);padding:0.85rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.outline-hdr-l{font-family:var(--mono);font-size:0.61rem;color:var(--accent);letter-spacing:0.2em;}
+.outline-hdr-r{font-family:var(--mono);font-size:0.59rem;color:var(--muted);}
+.otbl{width:100%;border-collapse:collapse;font-size:0.81rem;}
+.otbl th{background:var(--surface);color:var(--dim);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.13em;text-align:left;padding:9px 13px;border:1px solid var(--border);}
+.otbl td{padding:10px 13px;border:1px solid var(--border);color:var(--text);vertical-align:top;}
+.otbl tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
+.otbl tr:hover td{background:rgba(0,230,118,0.025);}
+.os{font-family:var(--mono);font-size:0.73rem;font-weight:700;color:var(--accent);}
+.ot{font-weight:700;color:#ccf0d4;}
+.ok{font-family:var(--mono);font-size:0.72rem;color:var(--dim);}
+.pb{font-family:var(--mono);font-size:0.58rem;padding:2px 7px;border-radius:2px;border-width:1px;border-style:solid;white-space:nowrap;}
+.pb-lab{background:rgba(0,230,118,0.08);color:var(--accent);border-color:rgba(0,230,118,0.2);}
+.pb-off{background:rgba(255,109,0,0.08);color:var(--orange);border-color:rgba(255,109,0,0.2);}
+.pb-byp{background:rgba(206,147,216,0.08);color:var(--purple);border-color:rgba(206,147,216,0.2);}
+.pb-def{background:rgba(64,196,255,0.07);color:var(--blue);border-color:rgba(64,196,255,0.2);}
+
+/* ── SECTION NAV ── */
+.snav{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;border-bottom:1px solid var(--border);position:relative;z-index:1;overflow-x:auto;}
+.stab{font-family:var(--mono);font-size:0.62rem;padding:11px 14px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;letter-spacing:0.04em;}
+.stab:hover{color:var(--text);}
+.stab.on{border-bottom-color:var(--accent);color:var(--accent);}
+.stab.on.off{border-bottom-color:var(--orange);color:var(--orange);}
+.stab.on.byp{border-bottom-color:var(--purple);color:var(--purple);}
+.stab.on.def{border-bottom-color:var(--blue);color:var(--blue);}
+
+/* ── CONTENT ── */
+.wrap{max-width:1200px;margin:0 auto;padding:2.5rem 2rem;position:relative;z-index:1;}
+.pnl{display:none;}.pnl.on{display:block;}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;gap:1.5rem;align-items:flex-start;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.sh-num{font-family:var(--mono);font-size:4rem;line-height:0.85;opacity:0.08;min-width:100px;font-weight:700;}
+.c-green{color:var(--accent);}
+.c-orange{color:var(--orange);}
+.c-purple{color:var(--purple);}
+.c-blue{color:var(--blue);}
+.sh-info h2{font-family:var(--sans);font-size:1.5rem;color:#fff;font-weight:800;margin-bottom:0.35rem;}
+.sh-info p{color:var(--muted);font-size:0.84rem;}
+.stag{font-family:var(--mono);font-size:0.58rem;padding:2px 8px;margin-right:4px;border-radius:2px;letter-spacing:0.08em;border-width:1px;border-style:solid;}
+
+/* ── NMAP COMMAND BUILDER ── */
+.builder{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin:1rem 0;}
+.builder-hdr{background:var(--surface);padding:0.8rem 1.4rem;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:0.62rem;color:var(--accent);letter-spacing:0.15em;}
+.builder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.5rem;padding:1rem;}
+.opt-group{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:3px;padding:0.8rem;}
+.opt-group-title{font-family:var(--mono);font-size:0.6rem;color:var(--muted);letter-spacing:0.15em;margin-bottom:0.5rem;}
+.opt-btn{display:block;width:100%;text-align:left;font-family:var(--mono);font-size:0.7rem;padding:5px 8px;border:1px solid var(--border);border-radius:2px;background:transparent;color:var(--text);cursor:pointer;margin-bottom:3px;transition:all 0.13s;}
+.opt-btn:hover{border-color:var(--accent);color:var(--accent);}
+.opt-btn.active{border-color:var(--accent);background:rgba(0,230,118,0.1);color:var(--accent);}
+.opt-btn.active.off-opt{border-color:var(--orange);background:rgba(255,109,0,0.1);color:var(--orange);}
+.builder-output{background:#010a03;border-top:1px solid var(--border);padding:1rem 1.4rem;}
+.builder-cmd{font-family:var(--mono);font-size:0.82rem;color:var(--accent);word-break:break-all;min-height:1.5rem;}
+.builder-actions{display:flex;gap:0.5rem;margin-top:0.6rem;}
+.b-btn{font-family:var(--mono);font-size:0.63rem;padding:5px 12px;border-radius:2px;cursor:pointer;border-width:1px;border-style:solid;transition:all 0.15s;}
+.b-run{background:rgba(0,230,118,0.1);color:var(--accent);border-color:rgba(0,230,118,0.3);}
+.b-run:hover{background:rgba(0,230,118,0.18);}
+.b-copy{background:transparent;color:var(--muted);border-color:var(--border);}
+.b-copy:hover{color:var(--text);border-color:var(--text);}
+.b-clear{background:transparent;color:var(--red);border-color:rgba(255,61,87,0.3);}
+
+/* ── NMAP OUTPUT SIM ── */
+.nmap-out{background:#010a03;border:1px solid var(--border);border-radius:3px;padding:1.2rem 1.4rem;font-family:var(--mono);font-size:0.74rem;line-height:2;margin:1rem 0;overflow-x:auto;}
+.no-comment{color:#0a2010;}
+.no-header{color:var(--dim);}
+.no-host{color:var(--accent);}
+.no-open{color:var(--blue);}
+.no-closed{color:#1a3320;}
+.no-filtered{color:var(--purple);}
+.no-os{color:var(--amber);}
+.no-script{color:var(--orange);}
+.no-warn{color:var(--red);}
+.no-timing{color:var(--muted);}
+
+/* ── SCAN RESULT TABLE ── */
+.port-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.76rem;margin:0.5rem 0;}
+.port-table th{background:var(--surface);color:var(--dim);font-size:0.6rem;letter-spacing:0.12em;text-align:left;padding:7px 12px;border:1px solid var(--border);}
+.port-table td{padding:7px 12px;border:1px solid var(--border);}
+.port-table tr:nth-child(even) td{background:rgba(255,255,255,0.012);}
+.status-open{color:var(--blue);font-weight:700;}
+.status-closed{color:var(--muted);}
+.status-filtered{color:var(--purple);}
+.port-num{color:var(--accent);}
+.service-name{color:var(--amber);}
+
+/* ── TERMINAL ── */
+.trm{background:#010a03;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin:1rem 0;}
+.tbar{background:#040c05;padding:7px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);}
+.d{width:9px;height:9px;border-radius:50%;}
+.dr{background:#ff5f56;}.dy{background:#ffbd2e;}.dg{background:#27c93f;}
+.ttl{font-family:var(--mono);font-size:0.61rem;color:var(--muted);margin-left:6px;letter-spacing:0.1em;}
+.tbody{padding:1.2rem 1.4rem;font-family:var(--mono);font-size:0.76rem;line-height:2.1;color:#0d2510;position:relative;}
+.pr{color:var(--accent);}.cm{color:#8ec89a;}.co{color:#0a2010;}
+.ha{color:var(--accent);}.hc{color:var(--red);}.ham{color:var(--amber);}
+.hl2{color:var(--dim);}.hb{color:var(--blue);}.hp{color:var(--purple);}
+.hor{color:var(--orange);}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.5rem;margin-bottom:1.2rem;}
+.clbl{font-family:var(--mono);font-size:0.61rem;color:var(--dim);letter-spacing:0.2em;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.5rem;}
+.clbl::before{content:'$';color:var(--muted);}
+.card h3{font-size:1rem;font-weight:700;color:#ccf0d4;margin-bottom:0.5rem;}
+.card p{color:var(--text);font-size:0.87rem;margin-bottom:0.5rem;}
+.card p:last-child{margin-bottom:0;}
+
+/* ── CALLOUT ── */
+.note{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.2rem;border-radius:3px;margin:1rem 0;font-size:0.85rem;border-width:1px;border-style:solid;}
+.ni{background:rgba(64,196,255,0.05);border-color:rgba(64,196,255,0.18);}
+.nw{background:rgba(255,109,0,0.05);border-color:rgba(255,109,0,0.2);}
+.nd{background:rgba(255,61,87,0.05);border-color:rgba(255,61,87,0.2);}
+.ng{background:rgba(0,230,118,0.04);border-color:rgba(0,230,118,0.15);}
+.np{background:rgba(206,147,216,0.06);border-color:rgba(206,147,216,0.2);}
+.nico{font-size:1rem;line-height:1.6;flex-shrink:0;}
+.note p{color:var(--text);margin:0;}.note strong{color:#fff;}
+
+/* ── CHECKLIST ── */
+.ck{list-style:none;margin:0.8rem 0;}
+.ck li{display:flex;align-items:flex-start;gap:0.7rem;padding:0.42rem 0;font-size:0.85rem;color:var(--text);border-bottom:1px solid rgba(255,255,255,0.04);}
+.ck li:last-child{border-bottom:none;}
+.ck li::before{content:'[+]';color:var(--accent);flex-shrink:0;font-family:var(--mono);font-size:0.72rem;}
+
+/* ── LAB EXERCISE BOX ── */
+.lab-box{background:rgba(0,230,118,0.03);border:1px solid rgba(0,230,118,0.2);border-left:3px solid var(--accent);border-radius:3px;padding:1.2rem 1.4rem;margin:1rem 0;}
+.lab-title{font-family:var(--mono);font-size:0.65rem;color:var(--accent);letter-spacing:0.15em;margin-bottom:0.8rem;}
+.lab-steps{list-style:none;}
+.lab-steps li{display:flex;gap:0.8rem;padding:0.4rem 0;font-size:0.84rem;color:var(--text);}
+.lab-steps li::before{content:attr(data-n);font-family:var(--mono);font-size:0.68rem;color:var(--dim);min-width:20px;flex-shrink:0;padding-top:2px;}
+
+/* ── QUIZ ── */
+.qb{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.4rem;margin-bottom:1rem;}
+.qt{font-size:0.88rem;font-weight:600;color:#ccf0d4;margin-bottom:1rem;}
+.qopts{display:flex;flex-direction:column;gap:0.44rem;}
+.qo{display:flex;align-items:flex-start;gap:0.65rem;padding:0.6rem 1rem;border:1px solid var(--border);border-radius:2px;cursor:pointer;font-size:0.81rem;color:var(--text);transition:all 0.14s;user-select:none;}
+.qo:hover{border-color:var(--accent);color:#fff;background:rgba(0,230,118,0.04);}
+.qo.correct{border-color:var(--accent);background:rgba(0,230,118,0.07);color:var(--accent);}
+.qo.wrong{border-color:var(--red);background:rgba(255,61,87,0.07);color:var(--red);}
+.qk{font-family:var(--mono);font-size:0.67rem;color:var(--muted);min-width:16px;flex-shrink:0;padding-top:1px;}
+.qfb{margin-top:0.8rem;font-size:0.79rem;padding:0.6rem 1rem;border-radius:2px;display:none;border-width:1px;border-style:solid;}
+.qfb.show{display:block;}
+.qfb.correct{background:rgba(0,230,118,0.07);color:var(--accent);border-color:rgba(0,230,118,0.2);}
+.qfb.wrong{background:rgba(255,61,87,0.08);color:var(--red);border-color:rgba(255,61,87,0.22);}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:0.81rem;margin:1rem 0;}
+.tbl th{background:var(--surface);color:var(--dim);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.13em;text-align:left;padding:9px 13px;border:1px solid var(--border);}
+.tbl td{padding:9px 13px;border:1px solid var(--border);color:var(--text);vertical-align:top;}
+.tbl tr:nth-child(even) td{background:rgba(255,255,255,0.013);}
+.tbl tr:hover td{background:rgba(0,230,118,0.02);}
+
+/* ── SECTION LABEL ── */
+.slbl{font-family:var(--mono);font-size:0.61rem;color:var(--muted);letter-spacing:0.25em;margin:2rem 0 0.8rem;}
+
+/* ── TWO COL ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+@media(max-width:720px){.two,.three{grid-template-columns:1fr;}.sh-num{font-size:2.8rem;min-width:70px;}.builder-grid{grid-template-columns:1fr 1fr;}}
+
+code{font-family:var(--mono);font-size:0.82em;color:var(--dim);background:rgba(0,230,118,0.07);padding:1px 5px;border-radius:2px;}
+.hl{color:var(--accent);font-weight:600;}
+.hcr{color:var(--red);font-weight:600;}
+.hor2{color:var(--orange);font-weight:600;}
+.hbl{color:var(--blue);font-weight:600;}
+.hpp{color:var(--purple);font-weight:600;}
+.ham2{color:var(--amber);font-weight:600;}
+
+/* ── BACK TO TOP ── */
+#btt{position:fixed;bottom:1.5rem;right:1.5rem;width:44px;height:44px;border-radius:50%;background:rgba(2,5,3,0.85);backdrop-filter:blur(10px);border:1px solid rgba(0,230,118,0.3);color:var(--accent);font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;opacity:0;pointer-events:none;transition:opacity 0.3s,transform 0.2s;z-index:999;}
+#btt.show{opacity:1;pointer-events:auto;}
+#btt:hover{transform:translateY(-3px);}
+
+footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;max-width:1200px;margin:3rem auto 0;position:relative;z-index:1;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hi">
+    <div class="logo">CYBER<span>BOOT</span>CAMP // <span>NMAP</span></div>
+    <div class="scan-badge">SCANNING...</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">// NETWORK SCANNING · HOST DISCOVERY · SERVICE ENUMERATION · NSE SCRIPTING</div>
+  <h1><span class="nm">Nmap</span> <span class="ap">Deep</span><br/>Dive</h1>
+  <p class="hero-sub">The most used tool in offensive security — from your first ping sweep to evading firewalls, fingerprinting services, running exploit scripts, and building a detection layer against incoming scans.</p>
+  <div class="ratio-label">LESSON SPLIT — 70% PRACTICAL / 30% THEORY</div>
+  <div class="ratio-bar"><div class="r-practical"></div><div class="r-theory"></div></div>
+  <div class="hero-tags">
+    <span class="tag t-green">§1 Setup & Basics</span>
+    <span class="tag t-orange">§2 Host Discovery</span>
+    <span class="tag t-orange">§3 Port Scanning</span>
+    <span class="tag t-orange">§4 Service & OS Detection</span>
+    <span class="tag t-amber">§5 NSE Scripts</span>
+    <span class="tag t-purple">§6 Firewall Bypass</span>
+    <span class="tag t-blue">§7 Defensive Detection</span>
+    <span class="tag t-green">§8 Full Recon Lab</span>
+  </div>
+</div>
+
+<!-- OUTLINE TABLE -->
+<div class="outline-wrap">
+  <div class="outline-box">
+    <div class="outline-hdr">
+      <span class="outline-hdr-l">NMAP — SECTION OUTLINE</span>
+      <span class="outline-hdr-r">8 SECTIONS · 70% PRACTICAL · OFFENSIVE + BYPASS + DEFENSIVE</span>
+    </div>
+    <table class="otbl">
+      <thead><tr><th style="width:55px">SEC</th><th style="width:60px">TYPE</th><th style="width:210px">TOPIC</th><th>WHAT YOU PRACTICE</th><th style="width:170px">KEY COMMANDS</th></tr></thead>
+      <tbody>
+        <tr><td class="os">§1</td><td><span class="pb pb-lab">LAB</span></td><td class="ot">Setup & First Scans</td><td>Install Nmap, understand the scan workflow, run your first three scans, read output correctly. Understand what each output line means. Set up a safe lab target (Metasploitable/TryHackMe).</td><td class="ok">nmap -v, --open, -oN, -oX</td></tr>
+        <tr><td class="os">§2</td><td><span class="pb pb-off">OFFENSIVE</span></td><td class="ot">Host Discovery</td><td>Map an entire subnet without touching ports. ARP scan, ICMP sweep, TCP ping, UDP ping. Discover live hosts silently. Handle networks that block ICMP. Practical: map a /24 network.</td><td class="ok">-sn, -PE, -PS, -PA, -PU, --send-ip</td></tr>
+        <tr><td class="os">§3</td><td><span class="pb pb-off">OFFENSIVE</span></td><td class="ot">Port Scanning Techniques</td><td>SYN stealth scan, TCP connect, UDP scan, FIN/NULL/XMAS scans. Understand what each returns for open/closed/filtered. Scan all 65535 ports. Control timing from T0 to T5. Practical: full port discovery on target.</td><td class="ok">-sS, -sT, -sU, -sF, -sN, -sX, -p-</td></tr>
+        <tr><td class="os">§4</td><td><span class="pb pb-off">OFFENSIVE</span></td><td class="ot">Service & OS Detection</td><td>Banner grabbing, version detection, OS fingerprinting. Identify exact software versions and patch levels. Build a vulnerability surface from scan results. Practical: fingerprint a target and map to CVEs.</td><td class="ok">-sV, -O, -A, --version-intensity</td></tr>
+        <tr><td class="os">§5</td><td><span class="pb pb-off">OFFENSIVE</span></td><td class="ot">NSE Scripts</td><td>The Nmap Scripting Engine — run 600+ built-in scripts. Vulnerability detection, authentication bypass, brute-force, exploit checks. Write your own basic NSE script. Practical: run vuln category against target.</td><td class="ok">--script, -sC, vuln, auth, exploit</td></tr>
+        <tr><td class="os">§6</td><td><span class="pb pb-byp">BYPASS</span></td><td class="ot">Firewall & IDS Evasion</td><td>Fragment packets, spoof source IPs, use decoys, slow scans to avoid rate-limit detection, randomise target order, use zombie idle scanning. Practical: scan a firewalled target without triggering IDS.</td><td class="ok">-f, -D, -S, --source-port, -T0, -sI</td></tr>
+        <tr><td class="os">§7</td><td><span class="pb pb-def">DEFENSIVE</span></td><td class="ot">Detecting Nmap Scans</td><td>What Nmap scans look like in Wireshark, Snort, and system logs. Write Snort rules for SYN scan, version scan, and NSE detection. Harden services against fingerprinting. Firewall rule design against scanning.</td><td class="ok">Snort rules, iptables, Wireshark filters</td></tr>
+        <tr><td class="os">§8</td><td><span class="pb pb-lab">LAB</span></td><td class="ot">Full Recon Lab</td><td>Complete offensive recon workflow from zero: host discovery → port scan → service detection → NSE → output parsing → map findings to CVEs → generate professional recon report. TryHackMe/HackTheBox integration.</td><td class="ok">All flags + output formats + grep parsing</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION NAV -->
+<div class="snav">
+  <button class="stab on"     onclick="show(0)">§1 Setup</button>
+  <button class="stab off"    onclick="show(1)">§2 Host Discovery</button>
+  <button class="stab off"    onclick="show(2)">§3 Port Scanning</button>
+  <button class="stab off"    onclick="show(3)">§4 Service & OS</button>
+  <button class="stab off"    onclick="show(4)">§5 NSE Scripts</button>
+  <button class="stab byp"    onclick="show(5)">§6 Firewall Bypass</button>
+  <button class="stab def"    onclick="show(6)">§7 Detection</button>
+  <button class="stab"        onclick="show(7)">§8 Full Lab</button>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════ §1 SETUP ══════════ -->
+<div class="pnl on" id="p0">
+  <div class="sh">
+    <div class="sh-num c-green">01</div>
+    <div class="sh-info">
+      <h2>Setup & First Scans</h2>
+      <p><span class="stag t-green">LAB</span> Install · First Scan · Output Formats · Reading Results · Lab Environment</p>
+    </div>
+  </div>
+
+  <div class="note ng">
+    <div class="nico">🎯</div>
+    <p><strong>Nmap is the first tool every pentester runs on a new target.</strong> Before exploiting anything you need to know what's there. Nmap tells you which hosts are alive, which ports are open, what software is running, and what version it is. Everything else in offensive security builds on this foundation.</p>
+  </div>
+
+  <div class="slbl">// §1.1 — INSTALLATION</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">INSTALL NMAP</div></div>
+    <div class="tbody"><span class="co"># ── KALI LINUX (pre-installed) ──────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">nmap --version</span>
+<span class="hl2">Nmap version 7.94 ( https://nmap.org )</span>
+<span class="pr">$</span> <span class="cm">sudo apt update && sudo apt install nmap -y</span>   <span class="co"># update to latest</span>
+
+<span class="co"># ── UBUNTU / DEBIAN ─────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo apt install nmap -y</span>
+
+<span class="co"># ── TERMUX (Android) ────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">pkg install nmap -y</span>
+
+<span class="co"># ── WINDOWS ──────────────────────────────────────────────────</span>
+<span class="co"># Download: nmap.org/download.html → nmap-x.xx-setup.exe
+# Installs WinPcap/Npcap for raw packet access
+# Use Nmap Zenmap GUI or Command Prompt</span>
+
+<span class="co"># ── SET UP A SAFE LAB TARGET ─────────────────────────────────</span>
+<span class="co"># Option 1: Metasploitable 2 (download from SourceForge, run in VirtualBox)</span>
+<span class="co"># Option 2: TryHackMe — free rooms with legal scan targets</span>
+<span class="co"># Option 3: HackTheBox Starting Point machines</span>
+<span class="co"># Option 4: Use scanme.nmap.org — Nmap's official test server</span>
+<span class="pr">$</span> <span class="cm">nmap scanme.nmap.org</span>   <span class="co"># legal scan target provided by Nmap team</span>
+
+<span class="co"># ⚠ NEVER scan targets you don't own or have written permission to scan</span></div>
+  </div>
+
+  <div class="slbl">// §1.2 — YOUR FIRST THREE SCANS</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">FIRST SCANS — RUN THESE IN ORDER</div></div>
+    <div class="tbody"><span class="co"># SCAN 1: Quick scan — top 1000 ports, no OS or version detection</span>
+<span class="pr">$</span> <span class="cm">nmap 192.168.1.10</span>
+<span class="hl2">Starting Nmap 7.94 ( https://nmap.org )
+Nmap scan report for 192.168.1.10
+Host is up (0.0023s latency).
+Not shown: 977 closed tcp ports (reset)
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+80/tcp   open   http
+443/tcp  open   https
+3306/tcp open   mysql</span>
+
+<span class="co"># SCAN 2: Verbose — see what Nmap is doing in real time</span>
+<span class="pr">$</span> <span class="cm">nmap -v 192.168.1.10</span>
+<span class="co"># Shows: discovered ports as they are found, timing, phases</span>
+
+<span class="co"># SCAN 3: Aggressive — version + OS + scripts + traceroute</span>
+<span class="pr">$</span> <span class="cm">nmap -A 192.168.1.10</span>
+<span class="co"># Shows: service versions, OS guess, default NSE scripts, route to host</span>
+<span class="co"># Use this for deep recon after initial port discovery</span></div>
+  </div>
+
+  <div class="slbl">// §1.3 — READING NMAP OUTPUT</div>
+  <div class="card">
+    <div class="clbl">UNDERSTANDING EVERY LINE</div>
+    <table class="tbl" style="margin:0;">
+      <tr><th>OUTPUT LINE</th><th>WHAT IT MEANS</th><th>ACTION</th></tr>
+      <tr><td><code>Host is up (0.002s latency)</code></td><td>Target responded to ping/probe — it's alive</td><td>Proceed with port scan</td></tr>
+      <tr><td><code>22/tcp open ssh</code></td><td>Port 22 is open, running SSH</td><td>Try banner grab, credential attack, version lookup</td></tr>
+      <tr><td><code>80/tcp closed http</code></td><td>Port actively refused — service not running</td><td>Skip, note for later</td></tr>
+      <tr><td><code>443/tcp filtered https</code></td><td>Firewall blocking — can't determine state</td><td>Try bypass techniques (§6)</td></tr>
+      <tr><td><code>Not shown: 977 closed ports</code></td><td>977 ports were scanned and closed — not shown to save space</td><td>Use --reason to see why each is closed</td></tr>
+      <tr><td><code>OS: Linux 3.x–5.x</code></td><td>OS fingerprint match from TCP/IP stack behaviour</td><td>Look for kernel-specific CVEs</td></tr>
+    </table>
+  </div>
+
+  <div class="slbl">// §1.4 — OUTPUT FORMATS (ALWAYS SAVE YOUR SCANS)</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">SAVING NMAP OUTPUT</div></div>
+    <div class="tbody"><span class="co"># Normal output — human readable text</span>
+<span class="pr">$</span> <span class="cm">nmap -oN scan.txt 192.168.1.10</span>
+
+<span class="co"># XML output — parseable by other tools (Metasploit imports this)</span>
+<span class="pr">$</span> <span class="cm">nmap -oX scan.xml 192.168.1.10</span>
+
+<span class="co"># Grepable output — easy to parse with grep/awk</span>
+<span class="pr">$</span> <span class="cm">nmap -oG scan.gnmap 192.168.1.10</span>
+
+<span class="co"># ALL formats simultaneously — best practice, always do this</span>
+<span class="pr">$</span> <span class="cm">nmap -oA scan_results 192.168.1.10</span>
+<span class="co"># Creates: scan_results.nmap, scan_results.xml, scan_results.gnmap</span>
+
+<span class="co"># Parse grepable output — find all open ports</span>
+<span class="pr">$</span> <span class="cm">grep "open" scan.gnmap | awk '{print $2, $5}'</span>
+
+<span class="co"># Import XML into Metasploit for automatic exploitation</span>
+<span class="pr">msf></span> <span class="cm">db_import scan.xml</span>
+<span class="pr">msf></span> <span class="cm">hosts</span>     <span class="co"># view imported hosts</span>
+<span class="pr">msf></span> <span class="cm">services</span>  <span class="co"># view imported services</span></div>
+  </div>
+
+  <div class="slbl">// §1 LAB EXERCISE</div>
+  <div class="lab-box">
+    <div class="lab-title">LAB 1 — YOUR FIRST NMAP RECON</div>
+    <ol class="lab-steps">
+      <li data-n="1.">Run <code>nmap scanme.nmap.org</code> — note which ports are open and what services they show.</li>
+      <li data-n="2.">Run the same scan with <code>-v</code> flag — observe the real-time port discovery output.</li>
+      <li data-n="3.">Run <code>nmap -A scanme.nmap.org -oA lab1_results</code> — save all output formats.</li>
+      <li data-n="4.">Open <code>lab1_results.nmap</code> in a text editor — read every line and understand what it means using the table above.</li>
+      <li data-n="5.">Run <code>grep "open" lab1_results.gnmap</code> — extract just the open ports.</li>
+      <li data-n="6.">Look up the SSH version Nmap found on scanme.nmap.org in <code>cve.mitre.org</code> — are there known vulnerabilities?</li>
+    </ol>
+  </div>
+
+  <div class="slbl">// §1 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You run <code>nmap 192.168.1.10</code> and see <code>filtered</code> next to port 443. You run it again with <code>-sT</code> (TCP connect scan) and still see <code>filtered</code>. What does this tell you and what should you try next?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Filtered means a firewall or packet filter is blocking the probe — Nmap cannot determine whether the port is open or closed. It does not mean the port is definitely closed.')"><span class="qk">A</span> Port 443 is closed — filtered and closed mean the same thing</div>
+      <div class="qo" onclick="qa(this,'wrong','Both SYN and TCP connect scans show filtered — this means the firewall is blocking both. Trying different ports won\'t help identify the state of port 443.')"><span class="qk">B</span> Try scanning a different port — 443 is always filtered on firewalls</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! Filtered means a firewall, packet filter, or network ACL is dropping or rejecting probes to port 443 — Nmap cannot determine whether the port is actually open. The service might be running but protected. Next steps: (1) Try --source-port 53 or 80 — some firewalls allow traffic from trusted source ports: nmap --source-port 53 -p 443 192.168.1.10. (2) Try -sA (TCP ACK scan) — maps firewall rules without triggering connection tracking: nmap -sA -p 443 192.168.1.10. (3) Use -sF -sN or -sX (FIN/NULL/XMAS) — some stateless firewalls don\'t filter these. (4) Try fragmentation: nmap -f -p 443 192.168.1.10. (5) Try --scan-delay to slow down and avoid threshold-based filtering. Filtered is not the end — it is the beginning of bypass work (covered in §6).')"><span class="qk">C</span> A firewall is dropping probes — try --source-port 53, -sA ACK scan, or fragmentation to bypass the filter</div>
+      <div class="qo" onclick="qa(this,'wrong','Nmap doesn\'t stop scanning — filtered is a reported state for that specific port. Other ports can still be scanned and return open or closed states.')"><span class="qk">D</span> Nmap crashed — filtered means the scan failed and you need to restart</div>
+    </div>
+    <div class="qfb" id="q0"></div>
+  </div>
+</div><!-- /p0 -->
+
+
+<!-- ══════════ §2 HOST DISCOVERY ══════════ -->
+<div class="pnl" id="p1">
+  <div class="sh">
+    <div class="sh-num c-orange">02</div>
+    <div class="sh-info">
+      <h2>Host Discovery</h2>
+      <p><span class="stag t-orange">OFFENSIVE</span> Subnet Mapping · ARP Scan · ICMP Sweep · TCP Ping · Silent Discovery</p>
+    </div>
+  </div>
+
+  <div class="note nw">
+    <div class="nico">🕵️</div>
+    <p><strong>Before scanning ports you need to know what's alive.</strong> Scanning every port on every IP in a /24 network (254 hosts × 65535 ports = 16.6 million port checks) is slow. Host discovery first narrows this to only live hosts — then you port scan just those. Done right, host discovery leaves almost no footprint.</p>
+  </div>
+
+  <div class="slbl">// §2.1 — INTERACTIVE NMAP COMMAND BUILDER</div>
+  <p style="font-size:0.83rem;color:var(--muted);margin-bottom:0.5rem;">Select options to build your command. Click RUN to see simulated output.</p>
+
+  <div class="builder">
+    <div class="builder-hdr">NMAP HOST DISCOVERY BUILDER</div>
+    <div class="builder-grid">
+      <div class="opt-group">
+        <div class="opt-group-title">DISCOVERY METHOD</div>
+        <button class="opt-btn" data-flag="-sn" data-group="mode" onclick="toggleOpt(this)">-sn (no port scan)</button>
+        <button class="opt-btn" data-flag="-Pn" data-group="ping" onclick="toggleOpt(this)">-Pn (skip ping)</button>
+        <button class="opt-btn" data-flag="-PE" data-group="probe" onclick="toggleOpt(this)">-PE (ICMP echo)</button>
+        <button class="opt-btn" data-flag="-PP" data-group="probe" onclick="toggleOpt(this)">-PP (ICMP timestamp)</button>
+      </div>
+      <div class="opt-group">
+        <div class="opt-group-title">TCP/UDP PROBES</div>
+        <button class="opt-btn" data-flag="-PS22,80,443" data-group="tcpprobe" onclick="toggleOpt(this)">-PS (TCP SYN ping)</button>
+        <button class="opt-btn" data-flag="-PA80,443" data-group="ackprobe" onclick="toggleOpt(this)">-PA (TCP ACK ping)</button>
+        <button class="opt-btn" data-flag="-PU53" data-group="udpprobe" onclick="toggleOpt(this)">-PU (UDP ping)</button>
+        <button class="opt-btn" data-flag="-PR" data-group="arpprobe" onclick="toggleOpt(this)">-PR (ARP scan)</button>
+      </div>
+      <div class="opt-group">
+        <div class="opt-group-title">OUTPUT & VERBOSITY</div>
+        <button class="opt-btn" data-flag="-v" onclick="toggleOpt(this)">-v (verbose)</button>
+        <button class="opt-btn" data-flag="-n" onclick="toggleOpt(this)">-n (no DNS resolve)</button>
+        <button class="opt-btn" data-flag="--open" onclick="toggleOpt(this)">--open (open only)</button>
+        <button class="opt-btn" data-flag="-oA discovery" onclick="toggleOpt(this)">-oA (save all formats)</button>
+      </div>
+      <div class="opt-group">
+        <div class="opt-group-title">TARGET</div>
+        <button class="opt-btn" data-flag="192.168.1.0/24" data-group="target" onclick="toggleOpt(this)">/24 subnet</button>
+        <button class="opt-btn" data-flag="192.168.1.1-50" data-group="target" onclick="toggleOpt(this)">IP range</button>
+        <button class="opt-btn" data-flag="192.168.1.10" data-group="target" onclick="toggleOpt(this)">Single host</button>
+        <button class="opt-btn" data-flag="-iL targets.txt" data-group="target" onclick="toggleOpt(this)">From file</button>
+      </div>
+    </div>
+    <div class="builder-output">
+      <div class="builder-cmd" id="builder-cmd">nmap <span style="color:var(--muted)">← select options above</span></div>
+      <div class="builder-actions">
+        <button class="b-btn b-run" onclick="runBuilder()">▶ Run (simulated)</button>
+        <button class="b-btn b-copy" onclick="copyBuilder()">Copy</button>
+        <button class="b-btn b-clear" onclick="clearBuilder()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="nmap-out" id="builder-output" style="display:none"></div>
+
+  <div class="slbl">// §2.2 — HOST DISCOVERY TECHNIQUES COMPARED</div>
+  <table class="tbl">
+    <tr><th>TECHNIQUE</th><th>FLAG</th><th>HOW IT WORKS</th><th>BEST FOR</th><th>BLOCKED BY</th></tr>
+    <tr><td><span class="hl">ARP Scan</span></td><td><code>-PR</code></td><td>Sends ARP requests — works at layer 2, no IP routing needed</td><td>Local LAN — most reliable, cannot be filtered by host firewall</td><td>Nothing on local segment (ARP always works locally)</td></tr>
+    <tr><td><span class="ham2">ICMP Echo</span></td><td><code>-PE</code></td><td>Sends ping (ICMP echo request) to each host</td><td>Networks that allow ping — fast and simple</td><td>Windows firewalls block ICMP by default</td></tr>
+    <tr><td><span class="hor2">TCP SYN Ping</span></td><td><code>-PS80,443</code></td><td>Sends SYN to port 80/443 — RST or SYN-ACK means host is up</td><td>Networks that block ICMP but have web servers</td><td>Strict firewalls blocking all inbound</td></tr>
+    <tr><td><span class="hor2">TCP ACK Ping</span></td><td><code>-PA80</code></td><td>Sends ACK — RST back means host is alive</td><td>Bypasses some stateful firewalls (ACK not tracked)</td><td>Stateful firewalls that drop unsolicited ACK</td></tr>
+    <tr><td><span class="hpp">UDP Ping</span></td><td><code>-PU53</code></td><td>Sends UDP to closed port — ICMP port unreachable = host alive</td><td>Networks blocking TCP but allowing UDP 53 (DNS)</td><td>Hosts with firewall blocking ICMP unreachable responses</td></tr>
+    <tr><td><span class="hbl">Skip Ping</span></td><td><code>-Pn</code></td><td>Assumes all hosts are up, skips discovery phase entirely</td><td>When you know host is up but blocking all probes</td><td>Wastes time on down hosts</td></tr>
+  </table>
+
+  <div class="slbl">// §2.3 — PRACTICAL: MAPPING A /24 NETWORK</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">SUBNET DISCOVERY — STEP BY STEP</div></div>
+    <div class="tbody"><span class="co"># ── STEP 1: Fast ARP sweep (local network only) ───────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sn -PR 192.168.1.0/24</span>
+<span class="hl2">Starting Nmap 7.94
+Host is up (0.00030s latency). 192.168.1.1   (Router)
+Host is up (0.00051s latency). 192.168.1.10  (Workstation)
+Host is up (0.00089s latency). 192.168.1.20  (Server)
+Host is up (0.00124s latency). 192.168.1.50  (Unknown)
+Nmap done: 254 IP addresses (4 hosts up) scanned in 2.31 seconds</span>
+
+<span class="co"># ── STEP 2: Handle ICMP-blocking hosts (TCP ping instead) ────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sn -PS22,80,443,8080 -PA80,443 192.168.1.0/24</span>
+
+<span class="co"># ── STEP 3: No DNS resolution (faster, less noise) ────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sn -n -PR 192.168.1.0/24</span>
+
+<span class="co"># ── STEP 4: Save live hosts to file for next step ─────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sn -PR 192.168.1.0/24 -oG - | grep "Up" | awk '{print $2}' > live_hosts.txt</span>
+<span class="pr">$</span> <span class="cm">cat live_hosts.txt</span>
+<span class="hl2">192.168.1.1
+192.168.1.10
+192.168.1.20
+192.168.1.50</span>
+
+<span class="co"># ── STEP 5: Port scan only live hosts ─────────────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -iL live_hosts.txt -p- -T4 -oA full_scan</span>
+
+<span class="co"># ── PASSIVE host discovery (zero packets sent) ─────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo netdiscover -p -i eth0</span>   <span class="co"># listen only mode — reads existing ARP</span>
+<span class="pr">$</span> <span class="cm">sudo arp-scan -l</span>               <span class="co"># ARP scan local network</span></div>
+  </div>
+
+  <div class="slbl">// §2 LAB EXERCISE</div>
+  <div class="lab-box">
+    <div class="lab-title">LAB 2 — NETWORK MAPPING</div>
+    <ol class="lab-steps">
+      <li data-n="1.">Find your network range: <code>ip addr show</code> — note your IP and subnet mask.</li>
+      <li data-n="2.">Run ARP discovery: <code>sudo nmap -sn -PR [your_subnet]/24</code> — list all live hosts.</li>
+      <li data-n="3.">Save live hosts to file using the grepable output command above.</li>
+      <li data-n="4.">Try each discovery method (-PE, -PS80, -PA80) — compare which finds more hosts.</li>
+      <li data-n="5.">On TryHackMe: join "Network Services" room — run host discovery against the provided target IP.</li>
+      <li data-n="6.">Try discovering a host that has ping blocked: <code>sudo nmap -Pn -sn 192.168.1.1</code> — does it still respond?</li>
+    </ol>
+  </div>
+
+  <div class="slbl">// §2 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You run <code>sudo nmap -sn 192.168.1.0/24</code> and only find 2 hosts. You know there are at least 10 devices on the network. What is the most likely cause and how do you fix it?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','Nmap is scanning the correct range — /24 covers 192.168.1.1 through 192.168.1.254 which is 254 hosts. The range is not the problem.')"><span class="qk">A</span> Wrong subnet — you need to scan a /16 instead of /24</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! By default -sn uses ICMP echo ping. Windows, macOS, and many hardened Linux hosts block ICMP by default. The hosts are alive but not responding to ping. Fix: combine multiple probe types so hosts blocking one type still respond to another. Run: sudo nmap -sn -PE -PS22,80,443,3389 -PA80,443 -PU53 192.168.1.0/24. This tries ICMP echo, TCP SYN to common ports, TCP ACK to web ports, and UDP to DNS port — a host blocking all of these is very unusual. You can also add -Pn to assume all hosts are up (slower but guarantees nothing is missed). On local networks, adding -PR (ARP) is most reliable as ARP cannot be blocked by host firewalls on the same segment.')"><span class="qk">B</span> Most hosts are blocking ICMP ping — use multiple probe types: -PE -PS22,80,443 -PA80 -PU53 to find hosts that block ping</div>
+      <div class="qo" onclick="qa(this,'wrong','Running as root provides raw socket access needed for SYN scans but host discovery with -sn works without root in basic form. The issue is the probe type, not permissions.')"><span class="qk">C</span> You need root privileges — run with sudo for host discovery to work</div>
+      <div class="qo" onclick="qa(this,'wrong','DNS resolution doesn\'t affect whether hosts are discovered — it only affects whether their hostnames are displayed. Adding -n skips DNS but doesn\'t change how many hosts are found.')"><span class="qk">D</span> DNS is blocking the scan — add -n to skip DNS resolution</div>
+    </div>
+    <div class="qfb" id="q1"></div>
+  </div>
+</div><!-- /p1 -->
+
+
+<!-- ══════════ §3 PORT SCANNING ══════════ -->
+<div class="pnl" id="p2">
+  <div class="sh">
+    <div class="sh-num c-orange">03</div>
+    <div class="sh-info">
+      <h2>Port Scanning Techniques</h2>
+      <p><span class="stag t-orange">OFFENSIVE</span> SYN · TCP Connect · UDP · FIN/NULL/XMAS · Timing · All 65535 Ports</p>
+    </div>
+  </div>
+
+  <div class="slbl">// §3.1 — SCAN TYPE COMPARISON</div>
+  <table class="tbl">
+    <tr><th>SCAN TYPE</th><th>FLAG</th><th>REQUIRES ROOT</th><th>HOW IT WORKS</th><th>LOGGED BY TARGET</th><th>WHEN TO USE</th></tr>
+    <tr><td><span class="hl">SYN Stealth</span></td><td><code>-sS</code></td><td>Yes</td><td>Sends SYN → gets SYN-ACK (open) or RST (closed) → never completes handshake</td><td>Often not logged — half-open connection</td><td>Default — fastest and stealthiest</td></tr>
+    <tr><td><span class="hbl">TCP Connect</span></td><td><code>-sT</code></td><td>No</td><td>Full 3-way handshake → OS handles it via connect() syscall</td><td>Always logged — full connection made</td><td>When you can't use root/raw sockets</td></tr>
+    <tr><td><span class="ham2">UDP Scan</span></td><td><code>-sU</code></td><td>Yes</td><td>Sends UDP packet → ICMP port unreachable = closed, no response = open|filtered</td><td>Rarely — UDP has no connection concept</td><td>Finding DNS, SNMP, TFTP, NTP services</td></tr>
+    <tr><td><span class="hpp">FIN Scan</span></td><td><code>-sF</code></td><td>Yes</td><td>Sends FIN → closed port sends RST, open port sends nothing (RFC 793)</td><td>Often bypasses basic IDS — no SYN sent</td><td>Firewall/IDS evasion (not Windows)</td></tr>
+    <tr><td><span class="hpp">NULL Scan</span></td><td><code>-sN</code></td><td>Yes</td><td>Sends packet with no TCP flags → same logic as FIN</td><td>Very low — flagless packet looks invalid</td><td>Stealth scanning UNIX systems</td></tr>
+    <tr><td><span class="hpp">XMAS Scan</span></td><td><code>-sX</code></td><td>Yes</td><td>Sets FIN, PSH, URG flags — "lit up like a Christmas tree"</td><td>Low on some systems</td><td>Firewall evasion on older systems</td></tr>
+    <tr><td><span class="hcr">ACK Scan</span></td><td><code>-sA</code></td><td>Yes</td><td>Sends ACK → RST from both open and closed ports — maps firewall rules not port states</td><td>Low</td><td>Map which ports a firewall filters</td></tr>
+  </table>
+
+  <div class="slbl">// §3.2 — PRACTICAL: FULL PORT SCANS</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">PORT SCANNING WORKFLOW — FAST TO THOROUGH</div></div>
+    <div class="tbody"><span class="co"># ── PHASE 1: Fast top-1000 ports (get quick wins) ────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sS -T4 192.168.1.10</span>
+<span class="co"># Scans 1000 most common ports in ~2 seconds on LAN</span>
+
+<span class="co"># ── PHASE 2: All 65535 ports (find hidden services) ──────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sS -p- -T4 192.168.1.10</span>
+<span class="co"># -p- means ALL ports (1-65535)
+# Can take 5-15 minutes depending on timing template
+# Often finds services on non-standard ports (e.g. SSH on 2222, HTTP on 8080)</span>
+
+<span class="co"># ── PHASE 3: UDP scan on key ports ───────────────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sU --top-ports 200 192.168.1.10</span>
+<span class="co"># UDP is slow — top 200 ports is a good balance
+# Look for: 53 (DNS), 161 (SNMP), 123 (NTP), 67 (DHCP), 69 (TFTP)</span>
+
+<span class="co"># ── COMBINED: Efficient full recon order ─────────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sS -p- --min-rate=5000 -T4 192.168.1.10 -oA ports</span>
+<span class="hl2">PORT      STATE  SERVICE
+22/tcp    open   ssh
+80/tcp    open   http
+443/tcp   open   https
+3306/tcp  open   mysql
+8080/tcp  open   http-proxy
+8443/tcp  open   https-alt
+27017/tcp open   mongod      ← MongoDB on non-standard port! Easy win.</span>
+
+<span class="co"># ── Extract just port numbers for next scan ───────────────────</span>
+<span class="pr">$</span> <span class="cm">grep "open" ports.nmap | awk -F'/' '{print $1}' | tr '\n' ','</span>
+<span class="hl2">22,80,443,3306,8080,8443,27017,</span>
+
+<span class="co"># ── Deep version scan on discovered ports only ────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sV -p 22,80,443,3306,8080,8443,27017 192.168.1.10</span></div>
+  </div>
+
+  <div class="slbl">// §3.3 — TIMING TEMPLATES</div>
+  <div class="card">
+    <div class="clbl">TIMING — T0 TO T5</div>
+    <table class="tbl" style="margin:0;">
+      <tr><th>TEMPLATE</th><th>NAME</th><th>SPEED</th><th>USE CASE</th><th>IDS DETECTION RISK</th></tr>
+      <tr><td><code>-T0</code></td><td>Paranoid</td><td>5min/port</td><td>Maximum stealth, IDS evasion</td><td><span class="hgn" style="color:var(--accent)">Very Low</span></td></tr>
+      <tr><td><code>-T1</code></td><td>Sneaky</td><td>15s/port</td><td>Slow scan to avoid detection</td><td><span class="hgn" style="color:var(--accent)">Low</span></td></tr>
+      <tr><td><code>-T2</code></td><td>Polite</td><td>0.4s/port</td><td>Reduce bandwidth use</td><td><span class="ham2">Low-Medium</span></td></tr>
+      <tr><td><code>-T3</code></td><td>Normal</td><td>Default</td><td>Balanced — default Nmap behaviour</td><td><span class="ham2">Medium</span></td></tr>
+      <tr><td><code>-T4</code></td><td>Aggressive</td><td>Fast</td><td>CTF, lab environments, trusted networks</td><td><span class="hor2">High</span></td></tr>
+      <tr><td><code>-T5</code></td><td>Insane</td><td>Very Fast</td><td>When speed matters more than accuracy</td><td><span class="hcr">Very High</span></td></tr>
+    </table>
+  </div>
+
+  <div class="slbl">// §3 LAB EXERCISE</div>
+  <div class="lab-box">
+    <div class="lab-title">LAB 3 — PORT SCANNING MASTERY</div>
+    <ol class="lab-steps">
+      <li data-n="1.">Run a SYN scan on your Metasploitable VM: <code>sudo nmap -sS -T4 [target_ip]</code> — list every open port.</li>
+      <li data-n="2.">Run a full port scan: <code>sudo nmap -sS -p- --min-rate=5000 [target_ip]</code> — did you find ports the top-1000 scan missed?</li>
+      <li data-n="3.">Run a UDP scan: <code>sudo nmap -sU --top-ports 100 [target_ip]</code> — which UDP services are open?</li>
+      <li data-n="4.">Compare SYN vs TCP connect: run <code>-sS</code> then <code>-sT</code> on the same target — do they find the same ports?</li>
+      <li data-n="5.">Try a FIN scan: <code>sudo nmap -sF [target_ip]</code> — compare results. Note which ports show different states.</li>
+      <li data-n="6.">Time comparison: run <code>-T3</code> vs <code>-T4</code> on a full port scan — record the time difference with <code>time nmap ...</code></li>
+    </ol>
+  </div>
+
+  <div class="slbl">// §3 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You run <code>sudo nmap -sS -p- 10.10.10.5</code> and it takes 45 minutes. Your teammate says "just use -T5". Why is that advice wrong for a real penetration test, and what is the better approach?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','T5 (Insane) sends packets so fast it often misses open ports on slower or loaded systems — you get false negatives. It also definitely triggers IDS/IPS alerts on any monitored network.')"><span class="qk">A</span> Use -T5 — it\'s always better to be fast and accept some missed results</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! -T5 causes missed ports on real networks (false negatives) and always triggers IDS. Better approach: (1) First do a fast top-1000 scan: sudo nmap -sS -T4 10.10.10.5 — gets results in seconds with common ports. (2) Then run the full scan with min-rate for speed control: sudo nmap -sS -p- --min-rate=1000 --max-retries=1 10.10.10.5 — faster than T3 but more reliable than T5. (3) Split the port range and run in parallel: nmap -p 1-32767 and nmap -p 32768-65535 in two terminals simultaneously — halves the time. (4) In real pentests, discuss scan speed with the client — aggressive scanning on production systems can cause service disruption. (5) --min-rate=5000 is a good balance for lab environments — sends at least 5000 packets/second without the reliability issues of T5.')"><span class="qk">B</span> T5 causes missed ports and always triggers IDS — use --min-rate=1000 with --max-retries=1, or split the range across parallel scans</div>
+      <div class="qo" onclick="qa(this,'wrong','Port scanning every port is appropriate for a thorough recon. Missing services on non-standard ports (like SSH on 2222 or HTTP on 8080) can mean missing the intended attack path in a CTF or real engagement.')"><span class="qk">C</span> Don\'t scan all 65535 ports — only scan the top 1000 to save time</div>
+      <div class="qo" onclick="qa(this,'wrong','Nmap is doing exactly what it should. The issue is the speed/accuracy tradeoff, not a tool problem.')"><span class="qk">D</span> The scan taking 45 minutes means Nmap is broken — reinstall it</div>
+    </div>
+    <div class="qfb" id="q2"></div>
+  </div>
+</div><!-- /p2 -->
+
+
+<!-- ══════════ §4 SERVICE & OS DETECTION ══════════ -->
+<div class="pnl" id="p3">
+  <div class="sh">
+    <div class="sh-num c-orange">04</div>
+    <div class="sh-info">
+      <h2>Service & OS Detection</h2>
+      <p><span class="stag t-orange">OFFENSIVE</span> Banner Grabbing · Version Detection · OS Fingerprinting · CVE Mapping</p>
+    </div>
+  </div>
+
+  <div class="slbl">// §4.1 — VERSION DETECTION IN PRACTICE</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">SERVICE VERSION DETECTION — REAL OUTPUT</div></div>
+    <div class="tbody"><span class="co"># Version detection (-sV) — probes open ports to determine software + version</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sV -p 22,80,21,3306 192.168.1.10</span>
+<span class="hl2">PORT     STATE SERVICE     VERSION
+21/tcp   open  ftp         vsftpd 2.3.4         ← BACKDOOR! CVE-2011-2523
+22/tcp   open  ssh         OpenSSH 4.7p1 Debian (protocol 2.0)
+80/tcp   open  http        Apache httpd 2.2.8
+3306/tcp open  mysql       MySQL 5.0.51a-3ubuntu5</span>
+
+<span class="hor2"># vsftpd 2.3.4 has a backdoor — smiling face ":)" in username triggers shell
+# This is a famous vulnerability that gives instant root!</span>
+
+<span class="co"># ── Version intensity control ─────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">nmap -sV --version-intensity 0 192.168.1.10</span>  <span class="co"># light probing</span>
+<span class="pr">$</span> <span class="cm">nmap -sV --version-intensity 9 192.168.1.10</span>  <span class="co"># all probes — most accurate</span>
+<span class="pr">$</span> <span class="cm">nmap -sV --version-all 192.168.1.10</span>          <span class="co"># equivalent to intensity 9</span>
+
+<span class="co"># ── OS Detection (-O) ─────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -O 192.168.1.10</span>
+<span class="ham">OS details: Linux 2.6.9 - 2.6.33
+Network Distance: 1 hop</span>
+
+<span class="co"># ── Aggressive scan (-A) — version + OS + scripts + traceroute</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -A 192.168.1.10</span>
+
+<span class="co"># ── Manual banner grabbing (verify Nmap's findings) ───────────</span>
+<span class="pr">$</span> <span class="cm">nc -nv 192.168.1.10 21</span>
+<span class="hl2">220 (vsFTPd 2.3.4)</span>    <span class="co">← exact version confirmed from banner</span>
+<span class="pr">$</span> <span class="cm">curl -I http://192.168.1.10</span>
+<span class="hl2">Server: Apache/2.2.8 (Ubuntu) DAV/2</span></div>
+  </div>
+
+  <div class="slbl">// §4.2 — MAPPING VERSIONS TO CVEs</div>
+  <div class="card">
+    <div class="clbl">FROM SCAN OUTPUT TO EXPLOITABLE VULNERABILITIES</div>
+    <p>Once you have service versions, you search for known vulnerabilities. This is the direct link between Nmap output and exploitation. Every version number Nmap gives you is a search query for CVEs.</p>
+    <table class="tbl" style="margin-top:0.8rem;">
+      <tr><th>SERVICE + VERSION (from Nmap)</th><th>CVE</th><th>IMPACT</th><th>HOW TO EXPLOIT</th></tr>
+      <tr><td><code>vsftpd 2.3.4</code></td><td>CVE-2011-2523</td><td><span class="hcr">Root RCE</span></td><td>Username with ":)" triggers backdoor on port 6200</td></tr>
+      <tr><td><code>OpenSSH 7.2p2</code></td><td>CVE-2016-6210</td><td><span class="ham2">User Enum</span></td><td>Timing attack reveals valid usernames</td></tr>
+      <tr><td><code>Apache 2.2.8</code></td><td>CVE-2017-7679</td><td><span class="hcr">RCE</span></td><td>mod_mime buffer overflow</td></tr>
+      <tr><td><code>MySQL 5.0.51</code></td><td>CVE-2016-6662</td><td><span class="hcr">Root RCE</span></td><td>Config file injection leads to root code execution</td></tr>
+      <tr><td><code>Samba 3.x</code></td><td>CVE-2017-7494 (EternalRed)</td><td><span class="hcr">Root RCE</span></td><td>Metasploit exploit/multi/samba/usermap_script</td></tr>
+    </table>
+  </div>
+
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">CVE LOOKUP WORKFLOW</div></div>
+    <div class="tbody"><span class="co"># After running nmap -sV, for each service version found:</span>
+
+<span class="co"># 1. Search in searchsploit (offline Exploit-DB)</span>
+<span class="pr">$</span> <span class="cm">searchsploit vsftpd 2.3.4</span>
+<span class="hl2">Exploits:
+  vsftpd 2.3.4 - Backdoor Command Execution | unix/remote/17491.rb</span>
+
+<span class="co"># 2. Search online resources:</span>
+<span class="co">#    nvd.nist.gov — official CVE database</span>
+<span class="co">#    exploit-db.com — public exploit code</span>
+<span class="co">#    cvedetails.com — CVE browser with filters</span>
+
+<span class="co"># 3. Search Metasploit for ready exploits</span>
+<span class="pr">msf></span> <span class="cm">search vsftpd</span>
+<span class="hl2">exploit/unix/ftp/vsftpd_234_backdoor  excellent  VSFTPD v2.3.4 Backdoor Command Execution</span>
+
+<span class="co"># 4. Automate with nmap --script vulners (requires vulners NSE script)</span>
+<span class="pr">$</span> <span class="cm">nmap -sV --script vulners 192.168.1.10</span>
+<span class="hl2">| vulners:
+|   vsftpd 2.3.4:
+|     CVE-2011-2523  10.0  https://vulners.com/cve/CVE-2011-2523
+|   OpenSSH 4.7p1:
+|     CVE-2008-3844   9.3  https://vulners.com/cve/CVE-2008-3844</span></div>
+  </div>
+
+  <div class="slbl">// §4 LAB EXERCISE</div>
+  <div class="lab-box">
+    <div class="lab-title">LAB 4 — SERVICE FINGERPRINTING & CVE MAPPING</div>
+    <ol class="lab-steps">
+      <li data-n="1.">Run <code>sudo nmap -sV -p- 192.168.1.[metasploitable]</code> — get every service version.</li>
+      <li data-n="2.">For each service found, run <code>searchsploit [service] [version]</code> — document all matches.</li>
+      <li data-n="3.">Search nvd.nist.gov for the CVE score of each vulnerability — rank them by CVSS score.</li>
+      <li data-n="4.">Pick the highest-scoring CVE and find it in Metasploit with <code>search [cve_number]</code>.</li>
+      <li data-n="5.">Run <code>sudo nmap -O 192.168.1.[target]</code> — confirm the OS. Does it match the Metasploitable documentation?</li>
+      <li data-n="6.">Run <code>nmap -sV --script vulners [target]</code> — compare the automated CVE findings to your manual research.</li>
+    </ol>
+  </div>
+
+  <div class="slbl">// §4 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">Nmap reports <code>21/tcp open ftp vsftpd 2.3.4</code>. What is the immediate next step and why is this finding critical?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','A brute force attack on FTP credentials takes time and may not succeed. The vsftpd 2.3.4 version is a much more direct path to access — a confirmed backdoor that gives root immediately.')"><span class="qk">A</span> Brute force the FTP login with Hydra using a password list</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! vsftpd 2.3.4 contains a deliberately planted backdoor (CVE-2011-2523). When a username containing ":)" is sent, the server opens a root shell on port 6200. This is one of the most famous backdoors in security history — it was planted by an attacker who compromised the vsftpd project\'s distribution server in 2011. Exploitation: (1) nmap confirms vsftpd 2.3.4 (2) In Metasploit: use exploit/unix/ftp/vsftpd_234_backdoor → set RHOSTS [target] → run → instant root shell. Or manually: send "USER a:)\nPASS x\n" to port 21, then nc -nv [target] 6200 for the shell. This is a Critical/10.0 CVSS score — immediate exploitation grants root without any credentials. Always check vsftpd version first when port 21 is open.')"><span class="qk">B</span> Immediately check for CVE-2011-2523 — vsftpd 2.3.4 has a planted backdoor that gives instant root shell via Metasploit or manual exploit on port 6200</div>
+      <div class="qo" onclick="qa(this,'wrong','FTP is inherently insecure (plaintext) but that\'s a secondary concern when there\'s a known RCE backdoor. The backdoor is a more critical and immediately actionable finding.')"><span class="qk">C</span> Note that FTP is insecure and recommend SFTP — move on to other ports</div>
+      <div class="qo" onclick="qa(this,'wrong','Version detection with -sV already confirms vsftpd 2.3.4. The version is in the banner. You have all the information needed to proceed with exploitation research.')"><span class="qk">D</span> Connect with a browser to verify the version manually before doing anything</div>
+    </div>
+    <div class="qfb" id="q3"></div>
+  </div>
+</div><!-- /p3 -->
+
+
+<!-- ══════════ §5 NSE SCRIPTS ══════════ -->
+<div class="pnl" id="p4">
+  <div class="sh">
+    <div class="sh-num c-orange">05</div>
+    <div class="sh-info">
+      <h2>NSE — Nmap Scripting Engine</h2>
+      <p><span class="stag t-orange">OFFENSIVE</span> Script Categories · Auth Bypass · Brute Force · Vuln Detection · Custom Scripts</p>
+    </div>
+  </div>
+
+  <div class="note nw">
+    <div class="nico">⚙️</div>
+    <p><strong>NSE turns Nmap from a scanner into an attack platform.</strong> 600+ built-in scripts cover everything from banner grabbing to exploiting vulnerabilities. The <code>vuln</code> category alone checks for dozens of critical CVEs automatically. Understanding NSE is what separates a basic scanner from a thorough enumeration engine.</p>
+  </div>
+
+  <div class="slbl">// §5.1 — SCRIPT CATEGORIES</div>
+  <table class="tbl">
+    <tr><th>CATEGORY</th><th>FLAG</th><th>WHAT IT DOES</th><th>EXAMPLE SCRIPTS</th></tr>
+    <tr><td><span class="hl">auth</span></td><td><code>--script auth</code></td><td>Tests authentication — default credentials, bypass methods</td><td>ftp-anon, http-auth, snmp-brute</td></tr>
+    <tr><td><span class="hcr">vuln</span></td><td><code>--script vuln</code></td><td>Checks for known vulnerabilities and CVEs</td><td>ms17-010, smb-vuln-ms08-067, http-shellshock</td></tr>
+    <tr><td><span class="hcr">exploit</span></td><td><code>--script exploit</code></td><td>Actively exploits vulnerabilities</td><td>Use carefully — actually exploits!</td></tr>
+    <tr><td><span class="ham2">default</span></td><td><code>-sC</code></td><td>Safe scripts that run by default — service info, banners</td><td>ssh-hostkey, http-title, ftp-banner</td></tr>
+    <tr><td><span class="hbl">discovery</span></td><td><code>--script discovery</code></td><td>Find more about the target — DNS, services, shares</td><td>smb-enum-shares, dns-zone-transfer</td></tr>
+    <tr><td><span class="hpp">brute</span></td><td><code>--script brute</code></td><td>Password brute forcing across protocols</td><td>ssh-brute, ftp-brute, http-brute</td></tr>
+    <tr><td><span class="htl" style="color:var(--blue)">safe</span></td><td><code>--script safe</code></td><td>Only safe scripts — no risk of crashing services</td><td>All scripts marked safe in their metadata</td></tr>
+  </table>
+
+  <div class="slbl">// §5.2 — NSE IN PRACTICE</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">NSE SCRIPTS — PRACTICAL COMMANDS</div></div>
+    <div class="tbody"><span class="co"># ── Run default scripts (-sC equivalent) ─────────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sC -sV 192.168.1.10</span>
+
+<span class="co"># ── Run vuln category — check for known CVEs ──────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap --script vuln 192.168.1.10</span>
+<span class="hc">| smb-vuln-ms17-010:
+|   VULNERABLE: EternalBlue
+|   State: VULNERABLE
+|   Risk factor: HIGH
+|   CVE: CVE-2017-0143
+|   Description: Remote Code Execution via SMBv1</span>
+
+<span class="co"># ── Check for anonymous FTP access ────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">nmap --script ftp-anon -p 21 192.168.1.10</span>
+<span class="hl2">| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+| -rw-r--r--  1 0  0  104857600 Jan 15 backup.tar.gz</span>
+
+<span class="co"># ── SMB enumeration (shares, users, OS) ───────────────────────</span>
+<span class="pr">$</span> <span class="cm">nmap --script smb-enum-shares,smb-enum-users,smb-os-discovery -p 445 192.168.1.10</span>
+<span class="hl2">| smb-enum-shares:
+|   \\192.168.1.10\ADMIN$  READ, WRITE (current user has write access!)
+|   \\192.168.1.10\C$      READ, WRITE
+|   \\192.168.1.10\secret  READ
+| smb-enum-users:
+|   john.smith, administrator, svc_backup</span>
+
+<span class="co"># ── HTTP enumeration ───────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">nmap --script http-title,http-methods,http-robots.txt,http-headers -p 80,443 192.168.1.10</span>
+<span class="hl2">| http-title: Admin Panel — Login
+| http-methods: GET POST PUT DELETE OPTIONS  ← PUT/DELETE enabled = dangerous!
+| http-robots.txt: /admin /backup /config</span>
+
+<span class="co"># ── SSH host key and algorithms ───────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">nmap --script ssh-hostkey,ssh2-enum-algos -p 22 192.168.1.10</span>
+
+<span class="co"># ── MySQL enumeration ─────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">nmap --script mysql-info,mysql-databases,mysql-empty-password -p 3306 192.168.1.10</span>
+<span class="hc">| mysql-empty-password: root account has no password!</span>
+
+<span class="co"># ── Heartbleed (OpenSSL vulnerability) ────────────────────────</span>
+<span class="pr">$</span> <span class="cm">nmap --script ssl-heartbleed -p 443 192.168.1.10</span>
+
+<span class="co"># ── EternalBlue check (MS17-010) ──────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">nmap --script smb-vuln-ms17-010 -p 445 192.168.1.10</span>
+
+<span class="co"># ── Shellshock check ──────────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">nmap --script http-shellshock --script-args uri=/cgi-bin/test.sh -p 80 192.168.1.10</span>
+
+<span class="co"># ── List all scripts in a category ────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">ls /usr/share/nmap/scripts/ | grep smb</span>
+<span class="pr">$</span> <span class="cm">nmap --script-help vuln</span>   <span class="co"># detailed info on vuln category</span></div>
+  </div>
+
+  <div class="slbl">// §5.3 — WRITING A BASIC NSE SCRIPT</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">CUSTOM NSE SCRIPT — BANNER GRABBER</div></div>
+    <div class="tbody"><span class="co">-- File: /usr/share/nmap/scripts/custom-banner.nse
+-- Run: nmap --script custom-banner -p 80 target</span>
+
+<span class="ha">description = [[
+  Grabs the HTTP server banner and checks for version disclosure.
+]]
+
+categories = {"default", "safe", "discovery"}
+
+local http = require "http"
+local shortport = require "shortport"
+
+-- Only run on HTTP ports
+portrule = shortport.port_or_service({80, 8080, 443}, "http")
+
+action = function(host, port)
+  local response = http.get(host, port, "/")
+  if response and response.header then
+    local server = response.header["server"]
+    if server then
+      return "Server: " .. server
+    end
+  end
+  return "No Server header found"
+end</span>
+
+<span class="co"># Save the file, then run it:</span>
+<span class="pr">$</span> <span class="cm">sudo nmap --script custom-banner -p 80 192.168.1.10</span>
+<span class="hl2">| custom-banner:
+|_  Server: Apache/2.2.8 (Ubuntu)</span></div>
+  </div>
+
+  <div class="slbl">// §5 LAB EXERCISE</div>
+  <div class="lab-box">
+    <div class="lab-title">LAB 5 — NSE SCRIPTING ATTACK CHAIN</div>
+    <ol class="lab-steps">
+      <li data-n="1.">Run <code>sudo nmap --script vuln 192.168.1.[metasploitable]</code> — document every vulnerability found.</li>
+      <li data-n="2.">Run <code>nmap --script ftp-anon -p 21 [target]</code> — can you log in anonymously? If yes, what files are there?</li>
+      <li data-n="3.">Run <code>nmap --script smb-enum-shares,smb-enum-users -p 445 [target]</code> — what shares and users are visible?</li>
+      <li data-n="4.">Run <code>nmap --script mysql-empty-password -p 3306 [target]</code> — does root have no password?</li>
+      <li data-n="5.">Run <code>nmap -sC -sV -p- [target] -oA nse_full</code> — save the complete enumeration.</li>
+      <li data-n="6.">Write a summary of the attack surface: list every finding and rank by exploitability.</li>
+    </ol>
+  </div>
+
+  <div class="slbl">// §5 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You run <code>nmap --script smb-vuln-ms17-010 -p 445 10.10.10.40</code> and get: <code>VULNERABLE: EternalBlue — Risk factor: HIGH — CVE-2017-0143</code>. What does this mean and what is your exploitation path?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','MS17-010 (EternalBlue) exploits SMBv1 — not web application vulnerabilities. It is a network-level exploit, not an injection attack.')"><span class="qk">A</span> The target has SQL injection — exploit it with sqlmap</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! EternalBlue (MS17-010) is the SMBv1 vulnerability used in the WannaCry ransomware attack of 2017. It allows unauthenticated Remote Code Execution as SYSTEM on Windows machines running SMBv1. Exploitation path: (1) In Metasploit: use exploit/windows/smb/ms17_010_eternalblue → set RHOSTS 10.10.10.40 → set LHOST [your_ip] → run → get SYSTEM shell. (2) Verify with: whoami → nt authority\system. (3) Post-exploitation: hashdump to extract all password hashes, then crack or pass-the-hash to other machines. This is one of the most famous and impactful vulnerabilities ever discovered — leaked from NSA by the Shadow Brokers in 2017. The NSE script confirms vulnerability without exploiting — Metasploit does the actual exploitation. Many HackTheBox machines (Blue, Legacy) are based on this vulnerability.')"><span class="qk">B</span> The machine is vulnerable to EternalBlue — use Metasploit exploit/windows/smb/ms17_010_eternalblue for an unauthenticated SYSTEM shell</div>
+      <div class="qo" onclick="qa(this,'wrong','NSE vuln scripts check for the specific vulnerability pattern without exploiting — a positive result is a genuine vulnerability confirmation, not a false alarm.')"><span class="qk">C</span> The NSE script result is unreliable — always verify manually before trusting vuln scripts</div>
+      <div class="qo" onclick="qa(this,'wrong','MS17-010 is an SMB vulnerability that gives SYSTEM access — the highest privilege level on Windows. It doesn\'t just expose data; it gives full remote code execution.')"><span class="qk">D</span> The vulnerability only leaks data — it cannot be used for remote code execution</div>
+    </div>
+    <div class="qfb" id="q4"></div>
+  </div>
+</div><!-- /p4 -->
+
+
+<!-- ══════════ §6 FIREWALL BYPASS ══════════ -->
+<div class="pnl" id="p5">
+  <div class="sh">
+    <div class="sh-num c-purple">06</div>
+    <div class="sh-info">
+      <h2>Firewall & IDS Evasion</h2>
+      <p><span class="stag t-purple">BYPASS</span> Fragmentation · Decoys · Source Port Spoofing · Idle Scan · Slow Scan</p>
+    </div>
+  </div>
+
+  <div class="note np">
+    <div class="nico">👻</div>
+    <p><strong>A firewall showing "filtered" is not the end — it is the beginning.</strong> Every firewall has rules, and rules have gaps. Fragmentation exploits packet reassembly. Decoys hide your real IP among fake ones. Source port spoofing exploits firewall rules that trust certain ports. Idle scanning hides behind a zombie host completely.</p>
+  </div>
+
+  <div class="slbl">// §6.1 — EVASION TECHNIQUES</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">FIREWALL BYPASS — ALL TECHNIQUES</div></div>
+    <div class="tbody"><span class="co"># ── 1. PACKET FRAGMENTATION ──────────────────────────────────</span>
+<span class="co"># Splits TCP header across multiple small packets
+# Some IDS/firewalls don't reassemble — miss the full pattern</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -f 192.168.1.10</span>           <span class="co"># 8-byte fragments</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -f -f 192.168.1.10</span>        <span class="co"># 16-byte fragments</span>
+<span class="pr">$</span> <span class="cm">sudo nmap --mtu 24 192.168.1.10</span>     <span class="co"># custom fragment size (must be multiple of 8)</span>
+
+<span class="co"># ── 2. DECOY SCANNING ─────────────────────────────────────────</span>
+<span class="co"># Makes your scan appear to come from multiple IPs simultaneously
+# Target sees scans from decoys + your real IP — hard to identify you</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -D 10.0.0.1,10.0.0.2,10.0.0.3,ME 192.168.1.10</span>
+<span class="co"># ME = insert your real IP at this position in the decoy list</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -D RND:10 192.168.1.10</span>   <span class="co"># 10 random decoy IPs</span>
+<span class="co"># Warning: decoy IPs should be UP or target gets flooded with RSTs from down IPs</span>
+
+<span class="co"># ── 3. SOURCE PORT SPOOFING ───────────────────────────────────</span>
+<span class="co"># Some firewalls allow traffic from port 53 (DNS) or 80 (HTTP) implicitly
+# Using those as source ports can bypass naive firewall rules</span>
+<span class="pr">$</span> <span class="cm">sudo nmap --source-port 53 192.168.1.10</span>   <span class="co"># use DNS port as source</span>
+<span class="pr">$</span> <span class="cm">sudo nmap --source-port 80 192.168.1.10</span>   <span class="co"># use HTTP port as source</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -g 53 192.168.1.10</span>              <span class="co"># -g is shorthand for --source-port</span>
+
+<span class="co"># ── 4. IDLE / ZOMBIE SCAN ─────────────────────────────────────</span>
+<span class="co"># Uses a third "zombie" host to scan the target
+# Your IP never appears in target logs — completely invisible
+# Zombie must be: idle (no traffic), have predictable IP ID sequence</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sI [zombie_ip] [target_ip]</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sI 192.168.1.100 192.168.1.10 -p 80,443,22</span>
+<span class="co"># First: find a suitable zombie (old Windows/printer with incremental IP ID)
+# Check: nmap -O --script ipidseq [potential_zombie] — look for "Incremental"</span>
+
+<span class="co"># ── 5. SLOW SCAN (timing evasion) ────────────────────────────</span>
+<span class="co"># IDS uses rate thresholds — scan slowly enough to stay below them</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -T0 --scan-delay 5s 192.168.1.10</span>  <span class="co"># 5 second delay between probes</span>
+<span class="pr">$</span> <span class="cm">sudo nmap --max-rate 1 192.168.1.10</span>          <span class="co"># max 1 packet per second</span>
+
+<span class="co"># ── 6. RANDOMISE TARGET ORDER ──────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap --randomize-hosts 192.168.1.0/24</span>
+<span class="co"># Doesn't scan sequentially — harder for IDS to correlate into a "scan pattern"</span>
+
+<span class="co"># ── 7. APPEND RANDOM DATA ──────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap --data-length 25 192.168.1.10</span>
+<span class="co"># Adds random 25 bytes to packets — changes packet size signatures</span>
+
+<span class="co"># ── 8. IPv6 (bypass IPv4 firewalls) ──────────────────────────</span>
+<span class="pr">$</span> <span class="cm">nmap -6 2001:db8::1</span>
+<span class="co"># Many orgs have IPv4 firewalls but open IPv6 — check both!</span>
+
+<span class="co"># ── COMBINED STEALTH SCAN ─────────────────────────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sS -f -D RND:5 --source-port 53 --randomize-hosts \
+  --data-length 15 -T1 192.168.1.10</span>
+<span class="co"># Fragmented + decoys + source port 53 + random data + slow timing
+# Maximum evasion — use when stealth is critical</span></div>
+  </div>
+
+  <div class="slbl">// §6.2 — ACK SCAN FOR FIREWALL MAPPING</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">MAP FIREWALL RULES WITH ACK SCAN</div></div>
+    <div class="tbody"><span class="co"># ACK scan (-sA) maps which ports a FIREWALL is filtering
+# Unlike other scans it doesn't find open/closed — just FILTERED vs UNFILTERED
+# Both open and closed ports return RST to ACK → both show as "unfiltered"
+# If firewall drops the ACK → "filtered"</span>
+
+<span class="pr">$</span> <span class="cm">sudo nmap -sA -p 1-1000 192.168.1.10</span>
+<span class="hl2">PORT    STATE      SERVICE
+22/tcp  unfiltered ssh      ← firewall allows ACK to port 22
+80/tcp  unfiltered http     ← firewall allows ACK to port 80
+443/tcp filtered   https    ← firewall DROPS ACK to port 443 (stateful rule)
+3306/tcp filtered  mysql    ← firewall DROPS ACK to MySQL</span>
+
+<span class="co"># Interpretation:
+# unfiltered = firewall passes this traffic (can try actual exploitation)
+# filtered = stateful firewall tracking connections (port may still be open)
+# This tells you the FIREWALL TOPOLOGY, not service state</span>
+
+<span class="co"># Follow up: on unfiltered ports, use source-port matching the allowed port</span>
+<span class="pr">$</span> <span class="cm">sudo nmap --source-port 80 -p 3306 192.168.1.10</span>
+<span class="co"># If firewall allows src:80→any, MySQL might now show as open!</span></div>
+  </div>
+
+  <div class="slbl">// §6 LAB EXERCISE</div>
+  <div class="lab-box">
+    <div class="lab-title">LAB 6 — FIREWALL BYPASS PRACTICE</div>
+    <ol class="lab-steps">
+      <li data-n="1.">On your firewall (iptables): block port 80 inbound: <code>sudo iptables -A INPUT -p tcp --dport 80 -j DROP</code></li>
+      <li data-n="2.">Verify it's filtered: run <code>nmap -p 80 localhost</code> — confirm it shows filtered.</li>
+      <li data-n="3.">Try bypassing with source port: <code>sudo nmap --source-port 53 -p 80 localhost</code> — does it bypass?</li>
+      <li data-n="4.">Try fragmentation: <code>sudo nmap -f -p 80 localhost</code> — any difference?</li>
+      <li data-n="5.">Run an ACK scan: <code>sudo nmap -sA -p 1-100 localhost</code> — which ports show as filtered vs unfiltered?</li>
+      <li data-n="6.">Add a more specific iptables rule that blocks source port 53 too. Then test what still works.</li>
+      <li data-n="7.">Clean up: <code>sudo iptables -F</code> to flush all rules when done.</li>
+    </ol>
+  </div>
+
+  <div class="slbl">// §6 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">You use <code>sudo nmap -sI zombie_host target_host -p 80</code> (idle scan). The zombie host's IP ID goes from 1000 to 1002 (increments by 2) after your scan. What does this tell you about port 80 on the target?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','In idle scan, IP ID incrementing by 1 means the port is closed or filtered (target sends RST back to zombie, zombie ignores it — IP ID only increments for the probe we sent). Incrementing by 2 means the target responded with SYN-ACK which caused the zombie to send a RST — meaning the port is open.')"><span class="qk">A</span> Port 80 is closed — the IP ID increment of 2 shows a rejection</div>
+      <div class="qo" onclick="qa(this,'correct','Correct! In idle scanning: (1) You send a spoofed SYN to target port 80, making it look like it came from the zombie. (2) If port 80 is OPEN: target sends SYN-ACK back to zombie. Zombie (not expecting this) sends RST — consuming one IP ID increment. Plus the initial probe to zombie = total increment of 2. (3) If port 80 is CLOSED: target sends RST to zombie. Zombie ignores RST — no IP ID increment. Total = 1 (only your probe). (4) If port 80 is FILTERED: firewall drops the packet — zombie gets nothing. Total = 1. So: IP ID increments by 2 = port is OPEN. Your IP address never appears in the target logs — all they see is traffic from the zombie. This is the most stealthy Nmap technique but requires finding a valid zombie with predictable IP IDs (rare on modern systems).')"><span class="qk">B</span> Port 80 is OPEN — increment of 2 means the target sent SYN-ACK to the zombie (open port response) causing zombie to RST, consuming an extra IP ID</div>
+      <div class="qo" onclick="qa(this,'wrong','An increment of 2 is the expected result for an open port — it is not an error. The zombie\'s IP ID incrementing predictably is what makes idle scanning work.')"><span class="qk">C</span> The zombie is not suitable — IP ID incrementing by 2 means it has random IP IDs</div>
+      <div class="qo" onclick="qa(this,'wrong','Filtered ports cause no response to the zombie — IP ID only increments by 1 (just the initial probe). An increment of 2 specifically indicates the target responded with SYN-ACK.')"><span class="qk">D</span> Port 80 is filtered — the firewall intercepted the packet</div>
+    </div>
+    <div class="qfb" id="q5"></div>
+  </div>
+</div><!-- /p5 -->
+
+
+<!-- ══════════ §7 DETECTION ══════════ -->
+<div class="pnl" id="p6">
+  <div class="sh">
+    <div class="sh-num c-blue">07</div>
+    <div class="sh-info">
+      <h2>Detecting Nmap Scans</h2>
+      <p><span class="stag t-blue">DEFENSIVE</span> Wireshark Signatures · Snort Rules · System Logs · Hardening Against Scanning</p>
+    </div>
+  </div>
+
+  <div class="note ni">
+    <div class="nico">🛡️</div>
+    <p><strong>Every Nmap scan leaves a signature.</strong> SYN scans generate thousands of half-open connections. Version detection sends distinctive service probes. NSE scripts have recognisable payloads. Knowing what each scan looks like from the defender's side makes you better at both attacking (avoid detection) and defending (build detection rules).</p>
+  </div>
+
+  <div class="slbl">// §7.1 — WHAT NMAP LOOKS LIKE IN WIRESHARK</div>
+  <table class="tbl">
+    <tr><th>SCAN TYPE</th><th>WIRESHARK FILTER</th><th>SIGNATURE PATTERN</th></tr>
+    <tr><td><span class="hl">SYN Scan (-sS)</span></td><td><code>tcp.flags.syn==1 && tcp.flags.ack==0</code></td><td>Many SYN packets from one IP to sequential ports in rapid succession. No completing ACK after SYN-ACK.</td></tr>
+    <tr><td><span class="hbl">TCP Connect (-sT)</span></td><td><code>tcp.flags==0x002</code></td><td>Full 3-way handshakes followed immediately by RST. Many connections, each lasting milliseconds.</td></tr>
+    <tr><td><span class="ham2">UDP Scan (-sU)</span></td><td><code>udp && icmp.type==3</code></td><td>ICMP port unreachable messages flooding back from target — one per closed UDP port.</td></tr>
+    <tr><td><span class="hpp">FIN/NULL/XMAS</span></td><td><code>tcp.flags==0x001 || tcp.flags==0x000 || tcp.flags==0x029</code></td><td>Packets with unusual flag combinations — FIN without prior SYN, NULL (no flags), or FIN+PSH+URG together.</td></tr>
+    <tr><td><span class="hor2">Version Scan (-sV)</span></td><td><code>tcp && frame.len > 100 && ip.src==[scanner]</code></td><td>Service-specific probe strings sent to open ports. Distinctive payload content per protocol.</td></tr>
+    <tr><td><span class="hcr">NSE Scripts</span></td><td><code>http.user_agent contains "Nmap"</code></td><td>HTTP requests with Nmap user-agent, SMB probe sequences, protocol-specific NSE payloads.</td></tr>
+    <tr><td><span class="hbl">OS Detection (-O)</span></td><td><code>tcp.window_size==1 || tcp.window_size==2</code></td><td>Unusual TCP window sizes (1, 2, 4, 63) — Nmap OS probes use specific window values for fingerprinting.</td></tr>
+  </table>
+
+  <div class="slbl">// §7.2 — SNORT RULES FOR NMAP DETECTION</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">SNORT RULES — DETECT NMAP SCANNING</div></div>
+    <div class="tbody"><span class="co"># ── Detect SYN port scan ─────────────────────────────────────</span>
+<span class="ha">alert tcp any any -> $HOME_NET any (
+  msg:"NMAP SYN Port Scan Detected";
+  flags:S;
+  threshold: type both, track by_src, count 30, seconds 5;
+  classtype:network-scan;
+  sid:1000201; rev:1;
+)</span>
+<span class="co"># Fires when any source sends 30+ SYN packets in 5 seconds</span>
+
+<span class="co"># ── Detect FIN scan ───────────────────────────────────────────</span>
+<span class="ha">alert tcp any any -> $HOME_NET any (
+  msg:"NMAP FIN Scan Detected";
+  flags:F,!SAPRU;
+  classtype:network-scan;
+  sid:1000202; rev:1;
+)</span>
+<span class="co"># FIN packet without prior SYN = stealth scan attempt</span>
+
+<span class="co"># ── Detect NULL scan ──────────────────────────────────────────</span>
+<span class="ha">alert tcp any any -> $HOME_NET any (
+  msg:"NMAP NULL Scan Detected";
+  flags:0;
+  classtype:network-scan;
+  sid:1000203; rev:1;
+)</span>
+
+<span class="co"># ── Detect XMAS scan ──────────────────────────────────────────</span>
+<span class="ha">alert tcp any any -> $HOME_NET any (
+  msg:"NMAP XMAS Scan Detected";
+  flags:FPU;
+  classtype:network-scan;
+  sid:1000204; rev:1;
+)</span>
+
+<span class="co"># ── Detect Nmap version scan (HTTP probe) ─────────────────────</span>
+<span class="ha">alert tcp any any -> $HOME_NET 80 (
+  msg:"NMAP HTTP Version Scan";
+  content:"User-Agent|3a| Nmap";
+  nocase; http_header;
+  classtype:network-scan;
+  sid:1000205; rev:1;
+)</span>
+
+<span class="co"># ── Detect OS detection probes (window size 1) ────────────────</span>
+<span class="ha">alert tcp any any -> $HOME_NET any (
+  msg:"NMAP OS Detection Probe - Window Size 1";
+  flags:S;
+  window:1;
+  classtype:network-scan;
+  sid:1000206; rev:1;
+)</span>
+
+<span class="co"># ── Detect NSE SMB enumeration ────────────────────────────────</span>
+<span class="ha">alert tcp any any -> $HOME_NET 445 (
+  msg:"NMAP SMB Enumeration Script";
+  content:"|ff|SMB";
+  depth:4;
+  offset:4;
+  threshold: type both, track by_src, count 5, seconds 10;
+  classtype:network-scan;
+  sid:1000207; rev:1;
+)</span></div>
+  </div>
+
+  <div class="slbl">// §7.3 — SYSTEM LOG ANALYSIS FOR SCANS</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">DETECTING SCANS IN SYSTEM LOGS</div></div>
+    <div class="tbody"><span class="co"># ── Linux syslog / auth.log ───────────────────────────────────</span>
+<span class="co"># SSH brute force from nmap ssh-brute script:</span>
+<span class="pr">$</span> <span class="cm">grep "Failed password" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -rn</span>
+<span class="hc">  847 192.168.1.50   ← NSE ssh-brute script running against us</span>
+
+<span class="co"># ── iptables logging — log all dropped packets ────────────────</span>
+<span class="pr">$</span> <span class="cm">sudo iptables -A INPUT -j LOG --log-prefix "DROPPED: " --log-level 4</span>
+<span class="pr">$</span> <span class="cm">sudo tail -f /var/log/kern.log | grep "DROPPED"</span>
+<span class="hc">DROPPED: IN=eth0 SRC=192.168.1.50 DST=192.168.1.10 PROTO=TCP DPT=22 FLAGS=S
+DROPPED: IN=eth0 SRC=192.168.1.50 DST=192.168.1.10 PROTO=TCP DPT=23 FLAGS=S
+DROPPED: IN=eth0 SRC=192.168.1.50 DST=192.168.1.10 PROTO=TCP DPT=25 FLAGS=S</span>
+<span class="co"># Sequential port scan visible in kernel log</span>
+
+<span class="co"># ── Automated detection with fail2ban ─────────────────────────</span>
+<span class="co"># /etc/fail2ban/filter.d/portscan.conf:</span>
+<span class="ha">failregex = DROPPED.*SRC=<HOST></span>
+<span class="co"># /etc/fail2ban/jail.conf:</span>
+<span class="ha">[portscan]
+enabled = true
+filter  = portscan
+logpath = /var/log/kern.log
+maxretry = 50
+findtime = 10
+bantime  = 3600</span>
+<span class="co"># Automatically bans any IP that triggers 50+ drops in 10 seconds</span>
+
+<span class="co"># ── Splunk SPL for Nmap detection ─────────────────────────────</span>
+<span class="ha">index=network_logs tcp_flags="S"
+| stats dc(dest_port) as unique_ports count by src_ip
+| where unique_ports > 50
+| sort -unique_ports</span>
+<span class="co"># Any IP hitting 50+ unique destination ports = likely port scan</span></div>
+  </div>
+
+  <div class="slbl">// §7.4 — HARDENING AGAINST SCANNING</div>
+  <div class="two">
+    <div class="card">
+      <div class="clbl">REDUCE SCAN FOOTPRINT</div>
+      <ul class="ck">
+        <li>Remove or change default service banners — <code>ServerTokens Prod</code> in Apache (hides version)</li>
+        <li>Disable unnecessary services — every closed port is one less attack surface</li>
+        <li>Change default ports — SSH on 2222 instead of 22 reduces automated scan hits (security through obscurity only)</li>
+        <li>Use <code>--version-intensity 0</code> equivalent on services — disable verbose error messages</li>
+        <li>Block ICMP echo with iptables — forces Nmap to use TCP ping (slower, noisier for attacker)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="clbl">DETECT & RESPOND</div>
+      <ul class="ck">
+        <li>Deploy <code>psad</code> (Port Scan Attack Detector) — reads iptables logs and auto-blocks scanners</li>
+        <li>Enable Suricata in IPS mode — automatically drops connections matching scan signatures</li>
+        <li>Use honeypot ports — open a fake port (e.g. 8888) with no service. Any connection = scanner/attacker</li>
+        <li>Monitor <code>/var/log/auth.log</code> with fail2ban for SSH scanning</li>
+        <li>Set up Zeek on your network tap — produces automatic scan detection notices in notice.log</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slbl">// §7 — QUIZ</div>
+  <div class="qb">
+    <div class="qt">Your Snort alert fires on "SYN Scan Detected" from 192.168.1.50 at 02:14 AM. You check the logs and see 3,847 SYN packets in 12 seconds across ports 1-65535. The IP belongs to your internal network. What is your immediate response and what follow-up investigation do you do?</div>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','This could be a legitimate scheduled task but 3,847 SYN packets to 65,535 ports at 2 AM is extremely abnormal. Even legitimate vulnerability scanners are typically scheduled, documented, and don\'t scan all ports. This requires investigation, not dismissal.')"><span class="qk">A</span> Ignore it — internal IPs scanning the network is normal for IT teams doing vulnerability assessments</div>
+      <div class="qo" onclick="qa(this,'correct','Correct response: IMMEDIATE — (1) Check if 192.168.1.50 is a known/authorised scanner. If not documented in the change management system, treat as hostile. (2) Check if the device is still scanning — Wireshark or iptables log. (3) If not authorised: isolate the host from the network (VLAN reassignment or firewall rule). INVESTIGATION — (4) Check what service runs on 192.168.1.50 — workstation or server? (5) Check auth.log on the host — who is logged in? Any unusual accounts? (6) Check process list (if accessible) — is nmap or masscan running? By whom? (7) Check Wireshark — did the scan identify any interesting targets? Did subsequent exploitation attempts follow the scan? (8) Check 192.168.1.50 memory/processes for malware — automated scanners are a common malware behaviour for lateral movement preparation. (9) Check what the scan was targeting — did subsequent connection attempts follow to any discovered open ports? A full-subnet scan at 2 AM from an internal host is a high-confidence indicator of compromise or unauthorized insider activity.')"><span class="qk">B</span> Verify if 192.168.1.50 is an authorised scanner — if not, isolate immediately and investigate for compromise (malware often scans internally before lateral movement)</div>
+      <div class="qo" onclick="qa(this,'wrong','Blocking the IP at the firewall is a containment step but not sufficient — the host itself may be compromised. You need to investigate the source, not just block it at the network level.')"><span class="qk">C</span> Block 192.168.1.50 at the firewall and close the ticket</div>
+      <div class="qo" onclick="qa(this,'wrong','Even if it\'s a legitimate security tool, the scan should be documented in change management. An undocumented scan at 2 AM requires investigation regardless of whether it\'s a known tool.')"><span class="qk">D</span> It must be a security tool — only escalate if it\'s from an external IP</div>
+    </div>
+    <div class="qfb" id="q6"></div>
+  </div>
+</div><!-- /p6 -->
+
+
+<!-- ══════════ §8 FULL RECON LAB ══════════ -->
+<div class="pnl" id="p7">
+  <div class="sh">
+    <div class="sh-num c-green">08</div>
+    <div class="sh-info">
+      <h2>Full Recon Lab</h2>
+      <p><span class="stag t-green">LAB</span> Complete Workflow · Output Parsing · CVE Mapping · Professional Report</p>
+    </div>
+  </div>
+
+  <div class="note ng">
+    <div class="nico">🎓</div>
+    <p><strong>This is the capstone — put everything together.</strong> Real pentesters run a methodical recon workflow, not random commands. Every tool, flag, and technique from §1–§7 feeds into a structured process that ends with a prioritised list of vulnerabilities ready for exploitation.</p>
+  </div>
+
+  <div class="slbl">// §8.1 — COMPLETE RECON WORKFLOW</div>
+  <div class="trm">
+    <div class="tbar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><div class="ttl">PROFESSIONAL NMAP RECON — FULL WORKFLOW</div></div>
+    <div class="tbody"><span class="co">##############################################################
+# PHASE 0: SETUP
+##############################################################</span>
+<span class="pr">$</span> <span class="cm">mkdir -p recon/{nmap,screenshots,notes}</span>
+<span class="pr">$</span> <span class="cm">TARGET="192.168.1.10"</span>
+<span class="pr">$</span> <span class="cm">echo "Target: $TARGET" >> recon/notes/recon.txt</span>
+
+<span class="co">##############################################################
+# PHASE 1: HOST DISCOVERY (confirm target is alive)
+##############################################################</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sn -PR -PE -PS22,80,443 $TARGET -oN recon/nmap/host_discovery.txt</span>
+<span class="hl2">Host is up (0.0021s latency). ✓</span>
+
+<span class="co">##############################################################
+# PHASE 2: FAST PORT SCAN (top 1000 ports — quick overview)
+##############################################################</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sS -T4 $TARGET -oA recon/nmap/fast_scan</span>
+<span class="co"># Read output immediately — note all open ports</span>
+
+<span class="co">##############################################################
+# PHASE 3: FULL PORT SCAN (all 65535 — find hidden services)
+##############################################################</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sS -p- --min-rate=5000 $TARGET -oA recon/nmap/full_ports</span>
+<span class="co"># Extract open ports:</span>
+<span class="pr">$</span> <span class="cm">PORTS=$(grep "open" recon/nmap/full_ports.nmap | awk -F'/' '{print $1}' | tr '\n' ',' | sed 's/,$//')</span>
+<span class="pr">$</span> <span class="cm">echo "Open ports: $PORTS"</span>
+
+<span class="co">##############################################################
+# PHASE 4: VERSION + OS DETECTION (on discovered ports)
+##############################################################</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sV -sC -O -p $PORTS $TARGET -oA recon/nmap/versions</span>
+
+<span class="co">##############################################################
+# PHASE 5: UDP SCAN (often missed services)
+##############################################################</span>
+<span class="pr">$</span> <span class="cm">sudo nmap -sU --top-ports 200 $TARGET -oA recon/nmap/udp_scan</span>
+
+<span class="co">##############################################################
+# PHASE 6: NSE VULNERABILITY SCRIPTS
+##############################################################</span>
+<span class="pr">$</span> <span class="cm">sudo nmap --script vuln -p $PORTS $TARGET -oA recon/nmap/vuln_scan</span>
+<span class="pr">$</span> <span class="cm">sudo nmap --script auth -p $PORTS $TARGET -oA recon/nmap/auth_scan</span>
+<span class="pr">$</span> <span class="cm">sudo nmap --script discovery -p $PORTS $TARGET -oA recon/nmap/discovery</span>
+
+<span class="co">##############################################################
+# PHASE 7: PARSE AND SUMMARISE
+##############################################################</span>
+<span class="pr">$</span> <span class="cm">echo "=== OPEN PORTS ===" && grep "open" recon/nmap/full_ports.nmap</span>
+<span class="pr">$</span> <span class="cm">echo "=== VULNERABILITIES ===" && grep "VULNERABLE\|CVE\|CRITICAL" recon/nmap/vuln_scan.nmap</span>
+<span class="pr">$</span> <span class="cm">echo "=== AUTH ISSUES ===" && grep "allowed\|anonymous\|empty" recon/nmap/auth_scan.nmap</span>
+
+<span class="co">##############################################################
+# PHASE 8: IMPORT TO METASPLOIT
+##############################################################</span>
+<span class="pr">msf></span> <span class="cm">workspace -a target_recon</span>
+<span class="pr">msf></span> <span class="cm">db_import recon/nmap/versions.xml</span>
+<span class="pr">msf></span> <span class="cm">vulns</span>   <span class="co"># view imported vulnerabilities</span>
+<span class="pr">msf></span> <span class="cm">hosts</span>   <span class="co"># view discovered hosts</span></div>
+  </div>
+
+  <div class="slbl">// §8.2 — SAMPLE FULL RECON OUTPUT (METASPLOITABLE)</div>
+  <div class="nmap-out">
+<span class="no-header">Starting Nmap 7.94 — Full Recon of 192.168.1.10 (Metasploitable 2)</span>
+<span class="no-comment">═══════════════════════════════════════════════════════════════</span>
+
+<span class="no-host">PORT      STATE  SERVICE      VERSION</span>
+<span class="no-open">21/tcp    open   ftp          vsftpd 2.3.4</span>
+<span class="no-warn">  | ftp-anon: Anonymous FTP login allowed
+  | ftp-vsftpd-backdoor: VULNERABLE (CVE-2011-2523) ← INSTANT ROOT</span>
+<span class="no-open">22/tcp    open   ssh          OpenSSH 4.7p1</span>
+<span class="no-open">23/tcp    open   telnet       Linux telnetd</span>
+<span class="no-warn">  | TELNET: Plaintext protocol — credentials in clear text</span>
+<span class="no-open">25/tcp    open   smtp         Postfix smtpd</span>
+<span class="no-open">80/tcp    open   http         Apache httpd 2.2.8</span>
+<span class="no-warn">  | http-vuln-cve2017-5638: VULNERABLE (Apache Struts RCE)</span>
+<span class="no-open">139/tcp   open   netbios-ssn  Samba smbd 3.x</span>
+<span class="no-open">445/tcp   open   netbios-ssn  Samba smbd 3.0.20</span>
+<span class="no-warn">  | smb-vuln-cve2009-3103: VULNERABLE ← Samba Command Injection
+  | smb-enum-shares: ADMIN$ C$ tmp (READ/WRITE access!)</span>
+<span class="no-open">3306/tcp  open   mysql        MySQL 5.0.51a</span>
+<span class="no-warn">  | mysql-empty-password: root account has EMPTY PASSWORD</span>
+<span class="no-open">5432/tcp  open   postgresql   PostgreSQL 8.3.0</span>
+<span class="no-open">6667/tcp  open   irc          UnrealIRCd</span>
+<span class="no-warn">  | irc-unrealircd-backdoor: VULNERABLE (CVE-2010-2075) ← Another backdoor!</span>
+<span class="no-open">8180/tcp  open   http         Apache Tomcat 5.5</span>
+<span class="no-warn">  | http-default-accounts: Tomcat manager default creds work! (tomcat:tomcat)</span>
+
+<span class="no-os">OS: Linux 2.6.9 - 2.6.33</span>
+<span class="no-comment">═══════════════════════════════════════════════════════════════</span>
+<span class="no-warn">CRITICAL FINDINGS (exploit immediately):
+  [10.0] vsftpd 2.3.4 backdoor → instant root via MSF
+  [10.0] UnrealIRCd backdoor → instant root via MSF
+  [9.8]  MySQL root empty password → full DB access
+  [9.0]  SMB command injection → remote code execution
+  [8.5]  Tomcat default creds → war file upload → shell</span>
+  </div>
+
+  <div class="slbl">// §8.3 — PROFESSIONAL RECON REPORT STRUCTURE</div>
+  <div class="card">
+    <div class="clbl">WHAT TO DOCUMENT AFTER EVERY NMAP RUN</div>
+    <table class="tbl" style="margin:0;">
+      <tr><th>SECTION</th><th>CONTENT</th><th>EXAMPLE</th></tr>
+      <tr><td><span class="hl">Target Summary</span></td><td>IP, hostname, OS, scan date/time</td><td>192.168.1.10 (Metasploitable) — Linux 2.6.x — Scanned 2024-01-15 14:30</td></tr>
+      <tr><td><span class="hl">Open Ports</span></td><td>All open ports with service and version</td><td>21/tcp vsftpd 2.3.4, 22/tcp OpenSSH 4.7p1 ...</td></tr>
+      <tr><td><span class="hcr">Critical Findings</span></td><td>CVSS 9.0+ vulnerabilities with CVE</td><td>CVE-2011-2523: vsftpd backdoor — CVSS 10.0 — Unauthenticated RCE</td></tr>
+      <tr><td><span class="ham2">High Findings</span></td><td>CVSS 7.0-8.9 vulnerabilities</td><td>CVE-2017-5638: Apache Struts — CVSS 8.5 — RCE via Content-Type</td></tr>
+      <tr><td><span class="hpp">Attack Surface</span></td><td>Ranked exploitation paths</td><td>1. vsftpd backdoor (instant root) 2. IRC backdoor 3. MySQL no password ...</td></tr>
+      <tr><td><span class="hbl">Recommendations</span></td><td>Patch/mitigate each finding</td><td>Update vsftpd to 2.3.5+, disable telnet, set MySQL root password ...</td></tr>
+    </table>
+  </div>
+
+  <div class="slbl">// §8 FINAL LAB EXERCISE</div>
+  <div class="lab-box">
+    <div class="lab-title">FINAL LAB — COMPLETE PENTEST RECON ON METASPLOITABLE</div>
+    <ol class="lab-steps">
+      <li data-n="1.">Run the complete Phase 0–8 workflow above against your Metasploitable VM. Save all output.</li>
+      <li data-n="2.">List every open port and service version found. Check each one in searchsploit.</li>
+      <li data-n="3.">Rank all vulnerabilities by CVSS score. Identify the top 3 easiest exploitation paths.</li>
+      <li data-n="4.">Exploit the vsftpd backdoor using Metasploit. Confirm you get a root shell. <code>use exploit/unix/ftp/vsftpd_234_backdoor</code></li>
+      <li data-n="5.">Write a one-page recon report using the structure above. Include: target summary, all open ports, critical findings with CVE numbers, and recommended exploitation path.</li>
+      <li data-n="6.">Bonus: Enable iptables logging on Metasploitable, run your scan, then check the logs — what does your scan look like from the defender's perspective?</li>
+      <li data-n="7.">TryHackMe: Complete "Blue" room using only Nmap for recon — no hints. EternalBlue is the path.</li>
+    </ol>
+  </div>
+
+  <div class="slbl">// §8 FINAL QUIZ</div>
+  <div class="qb">
+    <div class="qt">You run a full Nmap recon on a target and find: port 22 (OpenSSH 7.4), port 80 (nginx 1.10.3), port 8080 (Apache Tomcat 7.0.88), port 3306 (MySQL 5.7.22) only accessible from localhost, and port 27017 (MongoDB 3.4.0) with no authentication. Rank these by exploitation priority and explain your reasoning.</dt>
+    <div class="qopts">
+      <div class="qo" onclick="qa(this,'wrong','SSH with a known version is lower priority than an unauthenticated database. Without valid credentials or a specific known CVE for that exact version, SSH is not easily exploitable compared to MongoDB with no auth.')"><span class="qk">A</span> SSH first — it gives the most direct access to the system</div>
+      <div class="qo" onclick="qa(this,'wrong','nginx 1.10.3 on port 80 is worth investigating for web vulnerabilities but a completely unauthenticated database is a direct, immediate path to data.')"><span class="qk">B</span> Port 80 first — web servers always have the most vulnerabilities</div>
+      <div class="qo" onclick="qa(this,'correct','Correct priority: (1) IMMEDIATE — MongoDB 27017 with no authentication. Run: mongo 192.168.x.x:27017 — you have full read/write access to ALL databases with zero credentials. This is a critical misconfiguration, not even a CVE — just zero auth. Dump all data immediately. (2) HIGH — Tomcat 7.0.88 on 8080. Check for default credentials (tomcat:tomcat, admin:admin). If manager app accessible: upload a WAR reverse shell for RCE. Tomcat 7.0.88 also has CVE-2017-12617 (JSP upload bypass). (3) MEDIUM — nginx 1.10.3 on port 80. Check nginx CVEs, look for web application vulnerabilities behind it (SQLi, LFI, RCE). (4) LOW (for now) — MySQL on localhost only. Cannot reach it directly from your scanner. First get RCE via one of the above, then access MySQL from inside. (5) BACKGROUND — SSH 7.4 — look for CVEs, try default creds, but this is lowest priority when unauthenticated MongoDB is sitting open. The MongoDB finding alone could be a critical breach on a production system.')"><span class="qk">C</span> Priority: (1) MongoDB no-auth = instant full database access, (2) Tomcat default creds → WAR shell, (3) nginx web vulns, (4) MySQL only after getting RCE, (5) SSH last</div>
+      <div class="qo" onclick="qa(this,'wrong','MySQL being localhost-only means you cannot reach it directly from your scanner. You would need code execution first to pivot to MySQL from inside. It is not the first target.')"><span class="qk">D</span> MySQL first — databases always contain the most valuable data</div>
+    </div>
+    <div class="qfb" id="q7"></div>
+  </div>
+
+  <!-- COMPLETION -->
+  <div style="border:1px solid rgba(0,230,118,0.3);border-radius:4px;padding:2.5rem;margin:2rem 0;background:linear-gradient(135deg,rgba(0,230,118,0.05),rgba(255,109,0,0.03));text-align:center;">
+    <div style="font-family:var(--sans);font-size:2rem;font-weight:800;color:var(--accent);margin-bottom:0.6rem;">NMAP DEEP DIVE — COMPLETE</div>
+    <p style="color:var(--muted);font-size:0.9rem;max-width:520px;margin:0 auto 1.8rem;">You can now map networks, enumerate services, detect OS and versions, run vulnerability scripts, evade firewalls, and build detection rules against your own scans.</p>
+    <div style="display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;">
+      <div><div style="font-family:var(--mono);font-size:1.6rem;font-weight:700;color:var(--accent);">8</div><div style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;">SECTIONS</div></div>
+      <div><div style="font-family:var(--mono);font-size:1.6rem;font-weight:700;color:var(--orange);">8</div><div style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;">QUIZZES</div></div>
+      <div><div style="font-family:var(--mono);font-size:1.6rem;font-weight:700;color:var(--blue);">30+</div><div style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;">LAB TASKS</div></div>
+      <div><div style="font-family:var(--mono);font-size:1.6rem;font-weight:700;color:var(--purple);">7</div><div style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;">SNORT RULES</div></div>
+      <div><div style="font-family:var(--mono);font-size:1.6rem;font-weight:700;color:var(--amber);">70%</div><div style="font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;">PRACTICAL</div></div>
+    </div>
+  </div>
+</div><!-- /p7 -->
+
+</div><!-- .wrap -->
+
+<footer>CYBERBOOTCAMP // NMAP DEEP DIVE // 8 SECTIONS // 70% PRACTICAL · OFFENSIVE · BYPASS · DEFENSIVE</footer>
+
+<a href="#" id="btt" title="Back to top">↑</a>
+
+<script>
+'use strict';
+
+// ── Selected flags for command builder ────────────────────────
+var selectedFlags = {};
+
+function toggleOpt(btn) {
+  var flag  = btn.dataset.flag;
+  var group = btn.dataset.group;
+
+  if (group) {
+    // Deselect others in same group
+    document.querySelectorAll('[data-group="' + group + '"]').forEach(function(b) {
+      if (b !== btn) {
+        b.classList.remove('active', 'off-opt');
+        delete selectedFlags[b.dataset.flag];
+      }
+    });
+  }
+
+  if (btn.classList.contains('active')) {
+    btn.classList.remove('active', 'off-opt');
+    delete selectedFlags[flag];
+  } else {
+    btn.classList.add('active');
+    selectedFlags[flag] = true;
+  }
+  updateBuilder();
+}
+
+function updateBuilder() {
+  var flags = Object.keys(selectedFlags);
+  var cmd   = document.getElementById('builder-cmd');
+  if (!cmd) return;
+  if (flags.length === 0) {
+    cmd.innerHTML = 'nmap <span style="color:var(--muted)">← select options above</span>';
+  } else {
+    cmd.textContent = 'sudo nmap ' + flags.join(' ');
+  }
+}
+
+function clearBuilder() {
+  selectedFlags = {};
+  document.querySelectorAll('.opt-btn').forEach(function(b) {
+    b.classList.remove('active', 'off-opt');
+  });
+  updateBuilder();
+  var out = document.getElementById('builder-output');
+  if (out) out.style.display = 'none';
+}
+
+function copyBuilder() {
+  var cmd = document.getElementById('builder-cmd');
+  if (!cmd) return;
+  navigator.clipboard.writeText(cmd.textContent).then(function() {
+    var btn = document.querySelector('.b-copy');
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(function() { btn.textContent = 'Copy'; }, 2000); }
+  });
+}
+
+// ── Simulated nmap output ─────────────────────────────────────
+var simOutputs = {
+  '-sn': '<span class="no-header">Starting Nmap 7.94 — Host Discovery</span>\n<span class="no-host">Host is up (0.0003s latency). — 192.168.1.1 (router)</span>\n<span class="no-host">Host is up (0.0021s latency). — 192.168.1.10 (workstation)</span>\n<span class="no-host">Host is up (0.0045s latency). — 192.168.1.20 (server)</span>\n<span class="no-host">Host is up (0.0089s latency). — 192.168.1.50 (unknown)</span>\n<span class="no-timing">Nmap done: 254 IP addresses (4 hosts up) scanned in 2.31 seconds</span>',
+  '-PR': '<span class="no-header">ARP Scan — Layer 2 — Cannot be blocked by host firewall</span>\n<span class="no-host">192.168.1.1   aa:bb:cc:11:22:33 — Gateway Router</span>\n<span class="no-host">192.168.1.10  dd:ee:ff:44:55:66 — Intel NIC (Workstation)</span>\n<span class="no-host">192.168.1.20  11:22:33:77:88:99 — Dell EMC (Server)</span>\n<span class="no-host">192.168.1.50  dc:a6:32:ab:cd:ef — Raspberry Pi Foundation</span>',
+  'default': '<span class="no-header">Starting Nmap 7.94 scan of 192.168.1.0/24</span>\n<span class="no-open">22/tcp   open  ssh</span>\n<span class="no-open">80/tcp   open  http</span>\n<span class="no-open">443/tcp  open  https</span>\n<span class="no-filtered">3306/tcp filtered mysql</span>\n<span class="no-timing">Nmap done: 254 IP addresses scanned in 8.43 seconds</span>'
+};
+
+function runBuilder() {
+  var out   = document.getElementById('builder-output');
+  var flags = Object.keys(selectedFlags);
+  if (!out) return;
+
+  var key = flags.find(function(f) { return simOutputs[f]; }) || 'default';
+  out.innerHTML = simOutputs[key];
+  out.style.display = 'block';
+}
+
+// ── Tab switching ──────────────────────────────────────────────
+function show(i) {
+  document.querySelectorAll('.pnl').forEach(function(p) { p.classList.remove('on'); });
+  document.querySelectorAll('.stab').forEach(function(t) { t.classList.remove('on'); });
+  var panel = document.getElementById('p' + i);
+  var tab   = document.querySelectorAll('.stab')[i];
+  if (panel) panel.classList.add('on');
+  if (tab) {
+    tab.classList.add('on');
+    tab.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Quiz ───────────────────────────────────────────────────────
+function qa(el, type, exp) {
+  var q = el.closest('.qb');
+  if (!q || q.dataset.done) return;
+  q.dataset.done = '1';
+  q.querySelectorAll('.qo').forEach(function(o) { o.style.pointerEvents = 'none'; o.style.opacity = '0.4'; });
+  el.style.opacity = '1'; el.classList.add(type);
+  var fb = q.querySelector('.qfb');
+  if (fb) { fb.classList.add('show', type); fb.textContent = exp; }
+}
+
+// ── Back to top ────────────────────────────────────────────────
+(function() {
+  var btn = document.getElementById('btt');
+  if (!btn) return;
+  window.addEventListener('scroll', function() {
+    btn.classList.toggle('show', window.scrollY > 350);
+  }, { passive: true });
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+
+// ── Keyboard nav ───────────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+  var tabs   = document.querySelectorAll('.stab');
+  var active = document.querySelector('.stab.on');
+  if (!active) return;
+  var idx = Array.from(tabs).indexOf(active);
+  if (e.key === 'ArrowRight' && idx < tabs.length - 1) { e.preventDefault(); show(idx + 1); }
+  if (e.key === 'ArrowLeft'  && idx > 0)               { e.preventDefault(); show(idx - 1); }
+});
+
+// ── Copy buttons ───────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.tbody').forEach(function(block) {
+    var wrapper = block.parentElement;
+    if (!wrapper) return;
+    wrapper.style.position = 'relative';
+    var btn = document.createElement('button');
+    btn.textContent = 'Copy';
+    btn.style.cssText = 'position:absolute;top:8px;right:8px;font-family:monospace;font-size:0.62rem;padding:3px 9px;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.6);color:#aaa;border-radius:2px;cursor:pointer;z-index:10;';
+    wrapper.appendChild(btn);
+    btn.addEventListener('click', function() {
+      navigator.clipboard.writeText(block.innerText).then(function() {
+        btn.textContent = 'Copied!'; btn.style.color = '#00e676';
+        setTimeout(function() { btn.textContent = 'Copy'; btn.style.color = '#aaa'; }, 2000);
+      });
+    });
+  });
+});
+</script>
+</body>
+</html>
